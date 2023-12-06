@@ -1,7 +1,13 @@
 <script setup>
-const handleSubmit = async () => {
+const handleSubmit = async data => {
     try {
-        const res = await fetch('http://localhost:3000/')
+        const res = await fetch('http://localhost:3000/email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
         const jsonRes = await res.json()
         if (!res.ok) throw Error('Resource Not Found')
         console.log('jsonRes :=>', jsonRes)
@@ -24,12 +30,12 @@ const handleSubmit = async () => {
                 size="30"
                 minlength="5"
                 placeholder="jondoe@example.com"
-                @keyup.enter="handleSubmit()"
+                @keyup.enter="handleSubmit({ msg: 'posted data' })"
                 required
             />
             <br />
             <button
-                @click="handleSubmit()"
+                @click="handleSubmit({ msg: 'posted data' })"
                 type="submit"
                 value="Submit"
                 className="submit-btn"

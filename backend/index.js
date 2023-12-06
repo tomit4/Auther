@@ -13,6 +13,15 @@ const init = async () => {
         },
     })
 
+    server.route({
+        method: 'POST',
+        path: '/email',
+        handler: (req, h) => {
+            console.log('req.payload :=>', req.payload)
+            return { msg: 'Hello World!' }
+        },
+    })
+
     await server.start()
     console.log('Server running on %s', server.info.uri)
 }
