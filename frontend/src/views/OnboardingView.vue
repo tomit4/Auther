@@ -1,8 +1,14 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 const input = null
 const errMessage = ref(null)
 const resSuccessful = ref(false)
+
+const delay = ms => {
+    return new Promise(resolve => setTimeout(resolve, ms))
+}
 
 const handleSubmit = async data => {
     try {
@@ -22,9 +28,10 @@ const handleSubmit = async data => {
             errMessage.value = errMsg.error
             throw Error(`An error occurred: ${JSON.stringify(errMsg)}`)
         } else {
-            resSuccessful.value = true
+            resSuccessful.value = jsonRes.email
+            await delay(1000)
+            router.push('/auth')
         }
-        console.log('jsonRes :=>', jsonRes)
     } catch (err) {
         console.error(err)
     }
@@ -62,7 +69,7 @@ const handleSubmit = async data => {
             <p>{{ errMessage }}</p>
         </span>
         <span v-else-if="resSuccessful">
-            <p>Your Email Was Successfully Sent!</p>
+            <p>Your Email Was Successfully Sent to {{ resSuccessful }}!</p>
         </span>
         <span v-else></span>
     </div>

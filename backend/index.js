@@ -33,7 +33,7 @@ const init = async () => {
             }
             // TODO: respond with hashed json web token
             // to be assigned to front end cookie string
-            return { msg: `received input: ${input}` }
+            return { ok: true, msg: `Email sent to ${input}`, email: input }
         },
     })
 
