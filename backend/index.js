@@ -22,7 +22,6 @@ const sendEmail = async email => {
     ]
     sendSmtpEmail.templateId = Number(process.env.BREVO_TEMPLATE_ID)
     sendSmtpEmail.params = {
-        // link: `${process.env.BREVO_LINK}/verify/${hashedSessionToken}`,
         link: `${process.env.BREVO_LINK}/verify`,
     }
     return await apiInstance.sendTransacEmail(sendSmtpEmail).then(
@@ -42,14 +41,6 @@ const init = async () => {
     })
 
     server.route({
-        method: 'GET',
-        path: '/',
-        handler: (req, h) => {
-            return { msg: 'Hello World!' }
-        },
-    })
-
-    server.route({
         method: 'POST',
         path: '/email',
         handler: async (req, h) => {
@@ -63,12 +54,12 @@ const init = async () => {
                     : true
                 if (!inputIsValid) throw new Error(validate.error)
                 const emailSent = await sendEmail(input)
-                console.log('emailSent :=>', emailSent)
+                if (!emailSent.wasSuccessfull) {
+                    console.error('ERROR :=>', emailSent.error)
+                }
             } catch (err) {
                 return { error: `${input} is not a valid email` }
             }
-            // TODO: respond with hashed json web token
-            // to be assigned to front end cookie string
             return { ok: true, msg: `Email sent to ${input}`, email: input }
         },
     })
