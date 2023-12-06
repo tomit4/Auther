@@ -139,3 +139,8 @@ of interacting with the Brevo Transactional Email API, I felt it was worthwhile
 to document this simple project as it might prove useful to myself (and possibly
 others) in the future when starting out on a basic project that utilizes
 these tools.
+
+**TODOS**
+
+- [ ] Dockerize the backend and adjust the backend server accordingly
+- [ ] Expand example to include jsonwebtoken/login demonstration
