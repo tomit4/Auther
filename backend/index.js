@@ -54,9 +54,8 @@ const init = async () => {
                     : true
                 if (!inputIsValid) throw new Error(validate.error)
                 const emailSent = await sendEmail(input)
-                if (!emailSent.wasSuccessfull) {
+                if (!emailSent.wasSuccessfull)
                     console.error('ERROR :=>', emailSent.error)
-                }
             } catch (err) {
                 return { error: `${input} is not a valid email` }
             }
