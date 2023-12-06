@@ -2,9 +2,9 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
-const input = null
+const input = ref(null)
 const errMessage = ref(null)
-const resSuccessful = ref(false)
+const resSuccessful = ref('')
 
 const delay = ms => {
     return new Promise(resolve => setTimeout(resolve, ms))
@@ -13,7 +13,7 @@ const delay = ms => {
 const handleSubmit = async data => {
     try {
         errMessage.value = null
-        resSuccessful.value = false
+        resSuccessful.value = ''
         const res = await fetch('http://localhost:3000/email', {
             method: 'POST',
             ContentType: 'application/x-www-form-urlencoded',
@@ -68,10 +68,10 @@ const handleSubmit = async data => {
         <span v-if="errMessage">
             <p>{{ errMessage }}</p>
         </span>
-        <span v-else-if="resSuccessful">
+        <span v-else-if="resSuccessful.length">
             <p>Your Email Was Successfully Sent to {{ resSuccessful }}!</p>
         </span>
-        <span v-else></span>
+        <span v-else />
     </div>
 </template>
 
