@@ -24,14 +24,14 @@ const handleSubmit = async data => {
         if (!res.ok || jsonRes.error) {
             const errMsg = {
                 ok: res.ok,
-                error: jsonRes.error,
+                error: jsonRes.error ? jsonRes.error : 'Unknown error occurred',
             }
             errMessage.value = errMsg.error
             throw Error(`An error occurred: ${JSON.stringify(errMsg)}`)
         } else {
             resSuccessful.value = jsonRes.email
             await delay(1000)
-            router.push('/auth')
+            return router.push('/auth')
         }
     } catch (err) {
         console.error(err)
