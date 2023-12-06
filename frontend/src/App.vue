@@ -1,27 +1,6 @@
 <script setup>
-// Components
 import Nav from './components/Nav.vue'
 import Footer from './components/Footer.vue'
-/*
-// Vue Dependencies
-import { onMounted, onUnmounted, watchEffect } from 'vue'
-import { useRouter } from 'vue-router'
-// Vue-Router Declarations
-const router = useRouter()
-// Vue Life-Cycle Hooks
-onMounted(() => {
-    console.log('Mounted...')
-    watchEffect(() => {
-        // TODO: change this to conditionally push to onboarding
-        // only if user has not received transactional email
-        // otherwise redirect to dashboard
-        router.push('/onboarding')
-    })
-})
-onUnmounted(() => {
-    console.log('Unmounted...')
-})
-*/
 </script>
 
 <template>
