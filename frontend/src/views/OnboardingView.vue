@@ -1,15 +1,29 @@
 <script setup>
+import { ref, watch } from 'vue'
+const input = null
+const errMessage = ref(null)
+const resSuccessful = ref(false)
+
 const handleSubmit = async data => {
     try {
+        errMessage.value = null
+        resSuccessful.value = false
         const res = await fetch('http://localhost:3000/email', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
+            ContentType: 'application/x-www-form-urlencoded',
+            body: data,
         })
         const jsonRes = await res.json()
-        if (!res.ok) throw Error('Resource Not Found')
+        if (!res.ok || jsonRes.error) {
+            const errMsg = {
+                ok: res.ok,
+                error: jsonRes.error,
+            }
+            errMessage.value = errMsg.error
+            throw Error(`An error occurred: ${JSON.stringify(errMsg)}`)
+        } else {
+            resSuccessful.value = true
+        }
         console.log('jsonRes :=>', jsonRes)
     } catch (err) {
         console.error(err)
@@ -30,12 +44,13 @@ const handleSubmit = async data => {
                 size="30"
                 minlength="5"
                 placeholder="jondoe@example.com"
-                @keyup.enter="handleSubmit({ msg: 'posted data' })"
+                v-model="input"
+                @keyup.enter="handleSubmit(input)"
                 required
             />
             <br />
             <button
-                @click="handleSubmit({ msg: 'posted data' })"
+                @click="handleSubmit(input)"
                 type="submit"
                 value="Submit"
                 className="submit-btn"
@@ -43,6 +58,13 @@ const handleSubmit = async data => {
                 Submit
             </button>
         </span>
+        <span v-if="errMessage">
+            <p>{{ errMessage }}</p>
+        </span>
+        <span v-else-if="resSuccessful">
+            <p>Your Email Was Successfully Sent!</p>
+        </span>
+        <span v-else></span>
     </div>
 </template>
 
