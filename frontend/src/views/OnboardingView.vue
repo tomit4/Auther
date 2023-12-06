@@ -1,7 +1,13 @@
 <script setup>
-// TODO: Write fetch() to backend logic here
-const handleSubmit = () => {
-    console.log('hello')
+const handleSubmit = async () => {
+    try {
+        const res = await fetch('http://localhost:3000/')
+        const jsonRes = await res.json()
+        if (!res.ok) throw Error('Resource Not Found')
+        console.log('jsonRes :=>', jsonRes)
+    } catch (err) {
+        console.error(err)
+    }
 }
 </script>
 
