@@ -102,7 +102,7 @@ This is taken directly from the Vue-Router website. To get this working on
 NGINX, you of course, must have NGINX installed on your development machine. I
 personally work on an Arch Linux based distribution, so while the pathnames may be a
 bit different, the concepts around NGINX remain similar between Linux
-distribution, consult your specific distros documentation on NGINX to find where
+distributions. Consult your specific distros documentation on NGINX to find where
 your default nginx.conf files exist.
 
 On Arch Linux, those files can be found in /etc/nginx. There you will find a
