@@ -10,19 +10,16 @@ const routes = [
         path: '/',
         component: HomeView,
         name: 'HomeView',
-        // meta: { requiresAuth: true},
     },
     {
         path: '/onboarding',
         component: OnboardingView,
         name: 'OnboardingView',
-        // meta: { requiresAuth: true},
     },
     {
         path: '/auth',
         component: WaitingForActionView,
         name: 'WaitingForActionView',
-        // meta: { requiresAuth: true},
     },
     {
         path: '/verify',
@@ -34,7 +31,6 @@ const routes = [
         path: '/:catchAll(.*)*',
         component: NotFoundView,
         name: 'NotFoundView',
-        // meta: { requiresAuth: true},
     },
 ]
 
