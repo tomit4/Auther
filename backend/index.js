@@ -57,7 +57,7 @@ const init = async () => {
                 if (!emailSent.wasSuccessfull)
                     console.error('ERROR :=>', emailSent.error)
             } catch (err) {
-                return { error: `${input} is not a valid email` }
+                return { ok: false, error: `${input} is not a valid email` }
             }
             return { ok: true, msg: `Email sent to ${input}`, email: input }
         },
