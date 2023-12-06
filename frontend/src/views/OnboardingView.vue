@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+const emailRoute = import.meta.env.VITE_EMAIL_ROUTE
 const router = useRouter()
 const input = ref(null)
 const errMessage = ref(null)
@@ -14,7 +15,7 @@ const handleSubmit = async data => {
     try {
         errMessage.value = null
         resSuccessful.value = ''
-        const res = await fetch('http://localhost:3000/email', {
+        const res = await fetch(emailRoute, {
             method: 'POST',
             ContentType: 'application/x-www-form-urlencoded',
             body: data,
