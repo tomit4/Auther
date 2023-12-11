@@ -18,9 +18,12 @@ exports.default = async (fastify, options, done) => {
                 email: joi_1.default.string().email(),
             });
             try {
-                const inputIsValid = schema.validate({ email: input }).error ? false : true;
+                const inputIsValid = schema.validate({ email: input }).error
+                    ? false
+                    : true;
                 if (!inputIsValid) {
-                    const validationErr = (_b = (_a = schema.validate({ email: input }).error) === null || _a === void 0 ? void 0 : _a.details[0]) === null || _b === void 0 ? void 0 : _b.message;
+                    const validationErr = (_b = (_a = schema.validate({ email: input })
+                        .error) === null || _a === void 0 ? void 0 : _a.details[0]) === null || _b === void 0 ? void 0 : _b.message;
                     throw new Error(validationErr);
                 }
                 const emailSent = await (0, send_email_1.default)(String(input));
