@@ -13,6 +13,7 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "@fastify/cors": "^8.4.2",
         "@getbrevo/brevo": "^2.0.0-beta.4",
         "dotenv": "^16.3.1",
         "fastify": "^4.24.3",

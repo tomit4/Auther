@@ -1,5 +1,5 @@
 {
-    "exclude": ["src/**/*/*.interface.ts"],
+    /* "exclude": ["src/common/types/*"], */
     "compilerOptions": {
         /* Visit https://aka.ms/tsconfig to read more about this file */
 

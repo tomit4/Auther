@@ -29,37 +29,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fastify_1 = __importDefault(require("fastify"));
 const joi_1 = __importDefault(require("joi"));
 require("dotenv/config");
-const Brevo = __importStar(require("@getbrevo/brevo"));
+const send_email_1 = __importDefault(require("./utils/send-email"));
 const fastify = (0, fastify_1.default)({ logger: true });
-// Configuration for Brevo
-const apiInstance = new Brevo.TransactionalEmailsApi();
-/* TS-IGNORE: Property 'authentications' is protected and only accessible
- * within class 'TransactionalEmailsApi' and its subclasses. */
-// @ts-ignore
-const apiKey = apiInstance.authentications.apiKey;
-apiKey.apiKey = String(process.env.BREVO_KEY);
-const sendSmtpEmail = new Brevo.SendSmtpEmail();
-const sendEmail = async (email) => {
-    sendSmtpEmail.sender = {
-        name: 'My Test Company',
-        email: 'mytestemail@email.com',
-    };
-    sendSmtpEmail.subject = 'My Test Company';
-    sendSmtpEmail.to = [
-        {
-            email: email,
-        },
-    ];
-    sendSmtpEmail.templateId = Number(process.env.BREVO_TEMPLATE_ID);
-    sendSmtpEmail.params = {
-        link: `${process.env.BREVO_LINK}/verify`,
-    };
-    return await apiInstance.sendTransacEmail(sendSmtpEmail).then(data => {
-        console.log('data :=>', data);
-        return { wasSuccessfull: true, data: data };
-    }, error => {
-        return { wasSuccessfull: false, error: error };
-    });
+// Plugins
+const registerPlugins = async () => {
+    await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/cors'))), {});
 };
 fastify.post('/email', async (request, reply) => {
     var _a, _b;
@@ -75,7 +49,7 @@ fastify.post('/email', async (request, reply) => {
             const validationErr = (_b = (_a = schema.validate({ email: input }).error) === null || _a === void 0 ? void 0 : _a.details[0]) === null || _b === void 0 ? void 0 : _b.message;
             throw new Error(validationErr);
         }
-        const emailSent = await sendEmail(String(input));
+        const emailSent = await (0, send_email_1.default)(String(input));
         if (!emailSent.wasSuccessfull)
             console.error('ERROR :=>', emailSent.error);
     }
@@ -93,6 +67,7 @@ fastify.post('/email', async (request, reply) => {
 });
 const start = async () => {
     try {
+        await registerPlugins();
         await fastify.listen({
             port: Number(process.env.PORT),
             host: String(process.env.HOST),
