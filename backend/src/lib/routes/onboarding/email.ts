@@ -1,3 +1,10 @@
+import {
+    FastifyInstance,
+    FastifyRequest,
+    FastifyReply,
+    FastifyPluginOptions,
+    DoneFuncWithErrOrRes,
+} from 'fastify'
 import Joi from 'joi'
 import sendEmail from '../../utils/send-email'
 
@@ -8,13 +15,20 @@ type PostEmail = {
     error?: string
 }
 
-export default async (fastify, options, done) => {
+export default async (
+    fastify: FastifyInstance,
+    options: FastifyPluginOptions,
+    done: DoneFuncWithErrOrRes,
+) => {
     await fastify.route({
         method: 'POST',
         url: '/email',
         // add validation schema, see:
         // https://fastify.dev/docs/latest/Reference/TypeScript/#json-schema
-        handler: async (request, reply): Promise<PostEmail> => {
+        handler: async (
+            request: FastifyRequest,
+            reply: FastifyReply,
+        ): Promise<PostEmail> => {
             const input = request.body
             const schema = Joi.object({
                 email: Joi.string().email(),
