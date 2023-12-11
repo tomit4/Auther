@@ -7,8 +7,8 @@ import registerPlugins from './lib/plugins'
 const fastify: FastifyInstance = Fastify({ logger: true })
 const start = async (): Promise<string> => {
     try {
-        await registerRoutes(fastify)
         await registerPlugins(fastify)
+        await registerRoutes(fastify)
         return await fastify.listen({
             port: Number(process.env.PORT),
             host: String(process.env.HOST),

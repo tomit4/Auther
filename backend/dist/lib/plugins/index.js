@@ -27,8 +27,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const env_1 = __importDefault(require("@fastify/env"));
+const fastify_type_provider_zod_1 = require("fastify-type-provider-zod");
 exports.default = async (fastify) => {
     await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/cors'))));
+    await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/swagger'))), {
+        openapi: {
+            info: {
+                title: 'Vite via Nginx',
+                version: '0.0.1',
+            },
+        },
+        transform: fastify_type_provider_zod_1.jsonSchemaTransform,
+    });
+    await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/swagger-ui'))), {
+        routePrefix: '/documentation',
+    });
     await fastify.register(env_1.default, {
         schema: {
             type: 'object',
@@ -43,4 +56,6 @@ exports.default = async (fastify) => {
             },
         },
     });
+    fastify.setValidatorCompiler(fastify_type_provider_zod_1.validatorCompiler);
+    fastify.setSerializerCompiler(fastify_type_provider_zod_1.serializerCompiler);
 };

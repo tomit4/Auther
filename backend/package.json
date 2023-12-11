@@ -14,8 +14,11 @@
     "dependencies": {
         "@fastify/cors": "^8.4.2",
         "@fastify/env": "^4.3.0",
+        "@fastify/swagger": "^8.12.1",
+        "@fastify/swagger-ui": "^2.0.1",
         "@getbrevo/brevo": "^2.0.0-beta.4",
         "fastify": "^4.24.3",
+        "fastify-type-provider-zod": "^1.1.9",
         "zod": "^3.22.4"
     },
     "devDependencies": {

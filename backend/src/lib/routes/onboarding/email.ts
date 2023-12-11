@@ -5,6 +5,7 @@ import {
     FastifyRequest,
     HookHandlerDoneFunction,
 } from 'fastify'
+import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import sendEmail from '../../utils/send-email'
 
@@ -20,32 +21,33 @@ export default (
     options: FastifyPluginOptions,
     done: HookHandlerDoneFunction,
 ) => {
-    fastify.route({
+    fastify.withTypeProvider<ZodTypeProvider>().route({
         method: 'POST',
         url: '/email',
-        // add validation schema, see:
-        // https://fastify.dev/docs/latest/Reference/TypeScript/#json-schema
+        schema: {
+            body: z.string().email(),
+            response: {
+                200: z.object({
+                    ok: z.boolean(),
+                    msg: z.string().optional(),
+                    email: z.string().optional(),
+                    error: z.string().optional(),
+                }),
+            },
+        },
         handler: async (
             request: FastifyRequest,
             reply: FastifyReply,
         ): Promise<PostEmail> => {
             const input = request.body
-            const schema = z.object({
-                email: z.string().email(),
-            })
             try {
-                // TODO: Consider wrapping this with sendEmail in a fastify
-                // service/class
-                const inputIsValid = schema.safeParse({ email: input })
-                if (!inputIsValid.success)
-                    throw new Error(`ERROR :=> ${inputIsValid.error}`)
                 const emailSent = await sendEmail(String(input))
                 if (!emailSent.wasSuccessfull)
                     throw new Error(`ERROR :=> ${emailSent.error}`)
             } catch (err) {
                 return reply.code(400).send({
                     ok: false,
-                    error: `${input} is not a valid email`,
+                    error: `Something went wrong: ${err}`,
                 })
             }
             return reply.code(200).send({
