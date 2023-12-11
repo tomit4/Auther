@@ -7,7 +7,7 @@
         "build": "tsc -p tsconfig.json",
         "watch": "tsc -w -p tsconfig.json",
         "start": "node index.js",
-        "dev": "nodemon index.js"
+        "dev": "nodemon dist/index.js"
     },
     "keywords": [],
     "author": "",

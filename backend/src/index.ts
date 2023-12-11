@@ -3,11 +3,12 @@ import Joi from 'joi'
 import 'dotenv/config'
 import * as Brevo from '@getbrevo/brevo'
 const fastify = Fastify({ logger: true })
-// TODO: Get familiar with fastify typescript practices
-// https://fastify.dev/docs/latest/Reference/TypeScript/
 
 // Configuration for Brevo
 const apiInstance = new Brevo.TransactionalEmailsApi()
+/* TS-IGNORE: Property 'authentications' is protected and only accessible
+ * within class 'TransactionalEmailsApi' and its subclasses. */
+// @ts-ignore
 const apiKey = apiInstance.authentications.apiKey
 apiKey.apiKey = String(process.env.BREVO_KEY)
 const sendSmtpEmail = new Brevo.SendSmtpEmail()
