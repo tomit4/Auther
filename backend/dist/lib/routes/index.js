@@ -1,11 +1,9 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-// import { FastifyInstance, FastifyPluginCallback } from 'fastify'
-// import emailRoute from './onboarding/email'
+const email_1 = __importDefault(require("./onboarding/email"));
 exports.default = async (fastify) => {
-    // await fastify.register(emailRoute, { prefix: '/onboarding' })
-    // NOTE: using require as import throws overload ts error
-    await fastify.register(require('./onboarding/email'), {
-        prefix: '/onboarding',
-    });
+    await fastify.register(email_1.default, { prefix: '/onboarding' });
 };

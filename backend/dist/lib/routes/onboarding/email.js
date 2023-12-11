@@ -18,7 +18,8 @@ exports.default = (fastify, options, done) => {
                 email: joi_1.default.string().email(),
             });
             try {
-                // TODO: Consider wrapping this with sendEmail in a fastify service/class
+                // TODO: Consider wrapping this with sendEmail in a fastify
+                // service/class
                 const inputIsValid = schema.validate({ email: input }).error
                     ? false
                     : true;

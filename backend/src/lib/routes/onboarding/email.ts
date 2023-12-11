@@ -1,9 +1,9 @@
 import {
     FastifyInstance,
-    FastifyRequest,
-    FastifyReply,
     FastifyPluginOptions,
-    DoneFuncWithErrOrRes,
+    FastifyReply,
+    FastifyRequest,
+    HookHandlerDoneFunction,
 } from 'fastify'
 import Joi from 'joi'
 import sendEmail from '../../utils/send-email'
@@ -18,7 +18,7 @@ type PostEmail = {
 export default (
     fastify: FastifyInstance,
     options: FastifyPluginOptions,
-    done: DoneFuncWithErrOrRes,
+    done: HookHandlerDoneFunction,
 ) => {
     fastify.route({
         method: 'POST',
@@ -34,7 +34,8 @@ export default (
                 email: Joi.string().email(),
             })
             try {
-                // TODO: Consider wrapping this with sendEmail in a fastify service/class
+                // TODO: Consider wrapping this with sendEmail in a fastify
+                // service/class
                 const inputIsValid = schema.validate({ email: input }).error
                     ? false
                     : true
