@@ -5,8 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const joi_1 = __importDefault(require("joi"));
 const send_email_1 = __importDefault(require("../../utils/send-email"));
-exports.default = async (fastify, options, done) => {
-    await fastify.route({
+exports.default = (fastify, options, done) => {
+    fastify.route({
         method: 'POST',
         url: '/email',
         // add validation schema, see:

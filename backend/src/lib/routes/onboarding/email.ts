@@ -15,12 +15,12 @@ type PostEmail = {
     error?: string
 }
 
-export default async (
+export default (
     fastify: FastifyInstance,
     options: FastifyPluginOptions,
     done: DoneFuncWithErrOrRes,
 ) => {
-    await fastify.route({
+    fastify.route({
         method: 'POST',
         url: '/email',
         // add validation schema, see:
