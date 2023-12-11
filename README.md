@@ -3,7 +3,10 @@
 ### Introduction
 
 This simple project is simply an experimentation in how Vue-Router's Page
-Routing Logic, Brevo's Transacitonal Email API, and also NGINX interact.
+Routing Logic, Brevo's Transacitonal Email API, and also NGINX interact. The
+plan is to eventually expand this out as a scaffolding for a project
+incorporating login via logic involving jwt, trasac email, redis caching, and
+db storage via mariadb.
 
 #### The Why
 
@@ -142,5 +145,11 @@ these tools.
 
 **TODOS**
 
-- [ ] Dockerize the backend and adjust the backend server accordingly
+- [ ] Convert project over to typescript as practice
+- [ ] Incorporate mariadb with knex query builder for very basic db integration,
+      allow for secure storage of hashed email addresses and associated usernames,
+      dates of sign up, etc.
 - [ ] Expand example to include jsonwebtoken/login demonstration
+- [ ] Investigate caching of hashed jsonwebtoken in memory for period of time (i.e.redis)
+- [ ] Dockerize the backend and adjust the backend server accordingly
+- [ ] Dockerize mariadb/mysql db as separate server
