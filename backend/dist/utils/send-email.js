@@ -49,7 +49,6 @@ const sendEmail = async (email) => {
         link: `${process.env.BREVO_LINK}/verify`,
     };
     return await apiInstance.sendTransacEmail(sendSmtpEmail).then(data => {
-        console.log('data :=>', data);
         return { wasSuccessfull: true, data: data };
     }, error => {
         return { wasSuccessfull: false, error: error };

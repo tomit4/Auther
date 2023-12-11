@@ -34,7 +34,6 @@ const sendEmail = async (email: string): Promise<SendEmail> => {
     }
     return await apiInstance.sendTransacEmail(sendSmtpEmail).then(
         data => {
-            console.log('data :=>', data)
             return { wasSuccessfull: true, data: data }
         },
         error => {
