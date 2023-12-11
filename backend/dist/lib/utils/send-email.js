@@ -23,7 +23,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-require("dotenv/config");
 const Brevo = __importStar(require("@getbrevo/brevo"));
 // TODO: Consider wrapping this as a fastify service plugin/class
 // Configuration for Brevo
