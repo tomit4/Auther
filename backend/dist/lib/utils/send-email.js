@@ -28,13 +28,14 @@ const Brevo = __importStar(require("@getbrevo/brevo"));
 // TODO: Consider wrapping this as a fastify service plugin/class
 // Configuration for Brevo
 const apiInstance = new Brevo.TransactionalEmailsApi();
+// TODO: Address this once you know more TS
 /* TS-IGNORE: Property 'authentications' is protected and only accessible
  * within class 'TransactionalEmailsApi' and its subclasses. */
 // @ts-ignore
 const apiKey = apiInstance.authentications.apiKey;
 apiKey.apiKey = String(process.env.BREVO_KEY);
 const sendSmtpEmail = new Brevo.SendSmtpEmail();
-const sendEmail = async (email) => {
+exports.default = async (email) => {
     sendSmtpEmail.sender = {
         name: 'My Test Company',
         email: 'mytestemail@email.com',
@@ -55,4 +56,3 @@ const sendEmail = async (email) => {
         return { wasSuccessfull: false, error: error };
     });
 };
-exports.default = sendEmail;

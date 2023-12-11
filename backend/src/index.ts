@@ -1,9 +1,9 @@
 import Fastify from 'fastify'
 import 'dotenv/config'
-const fastify = Fastify({ logger: true })
 import registerRoutes from './lib/routes'
 import registerPlugins from './lib/plugins'
 
+const fastify = Fastify({ logger: true })
 const start = async (): Promise<string> => {
     try {
         await registerRoutes(fastify)

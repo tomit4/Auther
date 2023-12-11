@@ -5,6 +5,7 @@ import * as Brevo from '@getbrevo/brevo'
 
 // Configuration for Brevo
 const apiInstance = new Brevo.TransactionalEmailsApi()
+// TODO: Address this once you know more TS
 /* TS-IGNORE: Property 'authentications' is protected and only accessible
  * within class 'TransactionalEmailsApi' and its subclasses. */
 // @ts-ignore
@@ -19,7 +20,7 @@ type SendEmail = {
     error?: object
 }
 
-const sendEmail = async (email: string): Promise<SendEmail> => {
+export default async (email: string): Promise<SendEmail> => {
     sendSmtpEmail.sender = {
         name: 'My Test Company',
         email: 'mytestemail@email.com',
@@ -43,5 +44,3 @@ const sendEmail = async (email: string): Promise<SendEmail> => {
         },
     )
 }
-
-export default sendEmail
