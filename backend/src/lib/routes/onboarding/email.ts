@@ -5,7 +5,7 @@ import {
     FastifyRequest,
     HookHandlerDoneFunction,
 } from 'fastify'
-import Joi from 'joi'
+import { z } from 'zod'
 import sendEmail from '../../utils/send-email'
 
 type PostEmail = {
@@ -30,30 +30,25 @@ export default (
             reply: FastifyReply,
         ): Promise<PostEmail> => {
             const input = request.body
-            const schema = Joi.object({
-                email: Joi.string().email(),
+            const schema = z.object({
+                email: z.string().email(),
             })
             try {
                 // TODO: Consider wrapping this with sendEmail in a fastify
                 // service/class
-                const inputIsValid = schema.validate({ email: input }).error
-                    ? false
-                    : true
-                if (!inputIsValid) {
-                    const validationErr = schema.validate({ email: input })
-                        .error?.details[0]?.message
-                    throw new Error(validationErr)
-                }
+                const inputIsValid = schema.safeParse({ email: input })
+                if (!inputIsValid.success)
+                    throw new Error(`ERROR :=> ${inputIsValid.error}`)
                 const emailSent = await sendEmail(String(input))
                 if (!emailSent.wasSuccessfull)
-                    console.error('ERROR :=>', emailSent.error)
+                    throw new Error(`ERROR :=> ${emailSent.error}`)
             } catch (err) {
-                return reply.send({
+                return reply.code(400).send({
                     ok: false,
                     error: `${input} is not a valid email`,
                 })
             }
-            return reply.send({
+            return reply.code(200).send({
                 ok: true,
                 msg: `Email sent to ${input}`,
                 email: String(input),
