@@ -1,20 +1,20 @@
 import Fastify from 'fastify'
 import Joi from 'joi'
 import 'dotenv/config'
-import Brevo from '@getbrevo/brevo'
+import * as Brevo from '@getbrevo/brevo'
+
+// TODO: Get familiar with fastify typescript practices
+// https://fastify.dev/docs/latest/Reference/TypeScript/
 
 // Configuration for Brevo
-const Brevo = require('@getbrevo/brevo')
 const apiInstance = new Brevo.TransactionalEmailsApi()
 const apiKey = apiInstance.authentications.apiKey
-apiKey.apiKey = process.env.BREVO_KEY
+apiKey.apiKey = String(process.env.BREVO_KEY)
 const sendSmtpEmail = new Brevo.SendSmtpEmail()
 
-// type returnedEmail = {
-// wasSuccessfull: boolean
-// }
-
-const sendEmail = async (email: string): Promise<void> => {
+const sendEmail = async (
+    email: string,
+): Promise<{ wasSuccessfull: boolean; data?: object; error?: object }> => {
     sendSmtpEmail.sender = {
         name: 'My Test Company',
         email: 'mytestemail@email.com',
@@ -40,14 +40,19 @@ const sendEmail = async (email: string): Promise<void> => {
     )
 }
 
-// TODO: Get familiar with fastify typescript practices
-// https://fastify.dev/docs/latest/Reference/TypeScript/
 const fastify = Fastify({ logger: true })
 
-// TODO: review interfaces/type declarations to address TS error/warning messages
 fastify.post(
     '/email',
-    async (request, reply): Promise<{ ok: boolean; error: string }> => {
+    async (
+        request,
+        reply,
+    ): Promise<{
+        ok: boolean
+        msg?: string
+        email?: string
+        error?: string
+    }> => {
         const input = request.body
         const schema = Joi.object({
             email: Joi.string().email(),
@@ -56,27 +61,38 @@ fastify.post(
             const inputIsValid = schema.validate({ email: input }).error
                 ? false
                 : true
-            if (!inputIsValid) throw new Error(validate.error)
-            const emailSent = await sendEmail(input)
+            if (!inputIsValid) {
+                const validationErr = schema.validate({ email: input }).error
+                    ?.details[0]?.message
+                throw new Error(validationErr)
+            }
+            const emailSent = await sendEmail(String(input))
             if (!emailSent.wasSuccessfull)
                 console.error('ERROR :=>', emailSent.error)
         } catch (err) {
-            return { ok: false, error: `${input} is not a valid email` }
+            return reply.send({
+                ok: false,
+                error: `${input} is not a valid email`,
+            })
         }
-        return { ok: true, msg: `Email sent to ${input}`, email: input }
+        return reply.send({
+            ok: true,
+            msg: `Email sent to ${input}`,
+            email: String(input),
+        })
     },
 )
 
-const start = async () => {
-    await fastify.listen(
+const start = async (): Promise<void> => {
+    return await fastify.listen(
         { port: process.env.PORT, host: process.env.HOST },
-        (err, address) => {
+        (err: Error) => {
             if (err) {
-                console.error(`fastify failed to start, ERROR :=> ${err}`)
+                console.error('fastify failed to start, ERROR :=>', err)
                 process.exit(1)
             }
             console.log(
-                `Server running on port: ${process.env.PORT} on host: ${process.env.HOST}`,
+                `Server running on port: ${process.env.PORT}, host: ${process.env.HOST}`,
             )
         },
     )
