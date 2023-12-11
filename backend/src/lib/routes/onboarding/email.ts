@@ -1,5 +1,4 @@
 import Joi from 'joi'
-
 import sendEmail from '../../utils/send-email'
 
 type PostEmail = {
@@ -21,6 +20,7 @@ export default async (fastify, options, done) => {
                 email: Joi.string().email(),
             })
             try {
+                // TODO: Consider wrapping this with sendEmail in a fastify service/class
                 const inputIsValid = schema.validate({ email: input }).error
                     ? false
                     : true
