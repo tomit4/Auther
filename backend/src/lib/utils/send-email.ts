@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import * as Brevo from '@getbrevo/brevo'
 
-// TODO: Consider wrapping this as a fastify service plugin
+// TODO: Consider wrapping this as a fastify service plugin/class
 
 // Configuration for Brevo
 const apiInstance = new Brevo.TransactionalEmailsApi()

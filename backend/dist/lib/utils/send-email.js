@@ -25,7 +25,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 require("dotenv/config");
 const Brevo = __importStar(require("@getbrevo/brevo"));
-// TODO: Consider wrapping this as a fastify service plugin
+// TODO: Consider wrapping this as a fastify service plugin/class
 // Configuration for Brevo
 const apiInstance = new Brevo.TransactionalEmailsApi();
 /* TS-IGNORE: Property 'authentications' is protected and only accessible
