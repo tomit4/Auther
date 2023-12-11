@@ -2,7 +2,7 @@ import Fastify from 'fastify'
 import Joi from 'joi'
 import 'dotenv/config'
 import * as Brevo from '@getbrevo/brevo'
-
+const fastify = Fastify({ logger: true })
 // TODO: Get familiar with fastify typescript practices
 // https://fastify.dev/docs/latest/Reference/TypeScript/
 
@@ -39,8 +39,6 @@ const sendEmail = async (
         },
     )
 }
-
-const fastify = Fastify({ logger: true })
 
 fastify.post(
     '/email',
@@ -84,18 +82,15 @@ fastify.post(
 )
 
 const start = async (): Promise<void> => {
-    return await fastify.listen(
-        { port: process.env.PORT, host: process.env.HOST },
-        (err: Error) => {
-            if (err) {
-                console.error('fastify failed to start, ERROR :=>', err)
-                process.exit(1)
-            }
-            console.log(
-                `Server running on port: ${process.env.PORT}, host: ${process.env.HOST}`,
-            )
-        },
-    )
+    try {
+        await fastify.listen({
+            port: Number(process.env.PORT),
+            host: String(process.env.HOST),
+        })
+    } catch (err) {
+        fastify.log.error(err)
+        process.exit(1)
+    }
 }
 
 start()
