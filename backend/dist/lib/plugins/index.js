@@ -22,7 +22,25 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const env_1 = __importDefault(require("@fastify/env"));
 exports.default = async (fastify) => {
     await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/cors'))));
+    await fastify.register(env_1.default, {
+        schema: {
+            type: 'object',
+            required: ['PORT', 'HOST'],
+            properties: {
+                PORT: {
+                    type: 'number',
+                },
+                HOST: {
+                    type: 'string',
+                },
+            },
+        },
+    });
 };
