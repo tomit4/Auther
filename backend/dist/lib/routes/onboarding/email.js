@@ -21,7 +21,6 @@ exports.default = (fastify, options, done) => {
             },
         },
         handler: async (request, reply) => {
-            // ): Promise<PostEmail> => {
             const { email, password } = JSON.parse(String(request.body));
             console.log('password :=>', password);
             const emailSchema = zod_1.z.string().email();

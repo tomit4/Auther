@@ -9,7 +9,7 @@ import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import sendEmail from '../../utils/send-email'
 
-type PostEmail = {
+type SignUpRes = {
     ok: boolean
     msg?: string
     email?: string
@@ -35,8 +35,10 @@ export default (
                 }),
             },
         },
-        handler: async (request: FastifyRequest, reply: FastifyReply) => {
-            // ): Promise<PostEmail> => {
+        handler: async (
+            request: FastifyRequest,
+            reply: FastifyReply,
+        ): Promise<SignUpRes> => {
             const { email, password } = JSON.parse(String(request.body))
             console.log('password :=>', password)
             const emailSchema = z.string().email()
