@@ -9,6 +9,9 @@ import {
 export default async (fastify: FastifyInstance): Promise<void> => {
     await fastify.register(import('@fastify/cors'))
     await fastify.register(import('@fastify/helmet'))
+    await fastify.register(import('@fastify/jwt'), {
+        secret: 'replaceme',
+    })
     await fastify.register(import('@fastify/swagger'), {
         openapi: {
             info: {
