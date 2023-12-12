@@ -30,8 +30,11 @@ exports.default = (fastify, options, done) => {
         */
         handler: async (request, reply) => {
             try {
+                /* TODO: set up knex and mariadb
+                 * auth table with hashed email and
+                 * hashed key with object that has jwt in it (reddis cache?)
+                 */
                 // TODO: establish jwt here
-                // TODO: set up knex and sqlite
                 // TODO: hash email
                 // TODO: hash token
                 // TODO: store token in cache/redis
