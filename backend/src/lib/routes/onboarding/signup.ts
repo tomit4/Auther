@@ -5,30 +5,28 @@ import {
     FastifyRequest,
     HookHandlerDoneFunction,
 } from 'fastify'
-// import { ZodTypeProvider } from 'fastify-type-provider-zod'
-// import { z } from 'zod'
+import { ZodTypeProvider } from 'fastify-type-provider-zod'
+import { z } from 'zod'
+import sendEmail from '../../utils/send-email'
 
-/*
-type PostEmail = {
+type SignUpRes = {
     ok: boolean
     msg?: string
     email?: string
     error?: string
 }
-*/
 
 export default (
     fastify: FastifyInstance,
     options: FastifyPluginOptions,
     done: HookHandlerDoneFunction,
 ) => {
-    // fastify.withTypeProvider<ZodTypeProvider>().route({
-    fastify.route({
+    fastify.withTypeProvider<ZodTypeProvider>().route({
         method: 'POST',
+        // TODO: This is actually the /signup route to replace the old signup.ts
         url: '/signup',
-        /*
         schema: {
-            body: z.string().email(),
+            body: z.string(),
             response: {
                 200: z.object({
                     ok: z.boolean(),
@@ -38,26 +36,49 @@ export default (
                 }),
             },
         },
-        */
-        handler: async (request: FastifyRequest, reply: FastifyReply) => {
+        handler: async (
+            request: FastifyRequest,
+            reply: FastifyReply,
+        ): Promise<SignUpRes> => {
+            const { email, password } = JSON.parse(String(request.body))
+            // TODO: replicate zod checks on front end
+            const emailSchema = z.string().email()
+            const passwordSchema = z
+                .string()
+                .regex(
+                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])[A-Za-z\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{10,}$/,
+                    {
+                        message:
+                            'Password must be at least 10 characters in length and contain at least one lowercase letter, one uppercase letter, one digit, and one special character',
+                    },
+                )
             try {
-                /* TODO: set up knex and mariadb
-                 * auth table with hashed email and
-                 * hashed key with object that has jwt in it (reddis cache?)
-                 */
-
-                // TODO: establish jwt here
-                // TODO: hash email
-                // TODO: hash token
-                // TODO: store token in cache/redis
-                console.log('request.body :=>', request.body)
-                const token = fastify.jwt.sign({ payload: request.body })
-                console.log('token :=>', token)
-                reply.code(200).send({ token })
+                const zParsedEmail = emailSchema.safeParse(email)
+                const zParsedPassword = passwordSchema.safeParse(password)
+                if (!zParsedEmail.success) {
+                    const { error } = zParsedEmail
+                    throw new Error(String(error.issues[0].message))
+                }
+                if (!zParsedPassword.success) {
+                    const { error } = zParsedPassword
+                    throw new Error(String(error.issues[0].message))
+                }
+                const emailSent = await sendEmail(String(email))
+                if (!emailSent.wasSuccessfull)
+                    throw new Error(String(emailSent.error))
             } catch (err) {
-                console.error('ERROR :=>', err)
-                reply.code(400).send({ err_msg: err })
+                if (err instanceof Error) {
+                    return reply.code(400).send({
+                        ok: false,
+                        error: err.message,
+                    })
+                }
             }
+            return reply.code(200).send({
+                ok: true,
+                msg: `Email sent to ${email}`,
+                email: String(email),
+            })
         },
     })
     done()

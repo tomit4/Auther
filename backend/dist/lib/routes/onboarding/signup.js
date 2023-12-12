@@ -1,52 +1,63 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-// import { ZodTypeProvider } from 'fastify-type-provider-zod'
-// import { z } from 'zod'
-/*
-type PostEmail = {
-    ok: boolean
-    msg?: string
-    email?: string
-    error?: string
-}
-*/
+const zod_1 = require("zod");
+const send_email_1 = __importDefault(require("../../utils/send-email"));
 exports.default = (fastify, options, done) => {
-    // fastify.withTypeProvider<ZodTypeProvider>().route({
-    fastify.route({
+    fastify.withTypeProvider().route({
         method: 'POST',
+        // TODO: This is actually the /signup route to replace the old signup.ts
         url: '/signup',
-        /*
         schema: {
-            body: z.string().email(),
+            body: zod_1.z.string(),
             response: {
-                200: z.object({
-                    ok: z.boolean(),
-                    msg: z.string().optional(),
-                    email: z.string().optional(),
-                    error: z.string().optional(),
+                200: zod_1.z.object({
+                    ok: zod_1.z.boolean(),
+                    msg: zod_1.z.string().optional(),
+                    email: zod_1.z.string().optional(),
+                    error: zod_1.z.string().optional(),
                 }),
             },
         },
-        */
         handler: async (request, reply) => {
+            const { email, password } = JSON.parse(String(request.body));
+            // TODO: replicate zod checks on front end
+            const emailSchema = zod_1.z.string().email();
+            const passwordSchema = zod_1.z
+                .string()
+                .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])[A-Za-z\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{10,}$/, {
+                message: 'Password must be at least 10 characters in length and contain at least one lowercase letter, one uppercase letter, one digit, and one special character',
+            });
             try {
-                /* TODO: set up knex and mariadb
-                 * auth table with hashed email and
-                 * hashed key with object that has jwt in it (reddis cache?)
-                 */
-                // TODO: establish jwt here
-                // TODO: hash email
-                // TODO: hash token
-                // TODO: store token in cache/redis
-                console.log('request.body :=>', request.body);
-                const token = fastify.jwt.sign({ payload: request.body });
-                console.log('token :=>', token);
-                reply.code(200).send({ token });
+                const zParsedEmail = emailSchema.safeParse(email);
+                const zParsedPassword = passwordSchema.safeParse(password);
+                if (!zParsedEmail.success) {
+                    const { error } = zParsedEmail;
+                    throw new Error(String(error.issues[0].message));
+                }
+                if (!zParsedPassword.success) {
+                    const { error } = zParsedPassword;
+                    throw new Error(String(error.issues[0].message));
+                }
+                const emailSent = await (0, send_email_1.default)(String(email));
+                if (!emailSent.wasSuccessfull)
+                    throw new Error(String(emailSent.error));
             }
             catch (err) {
-                console.error('ERROR :=>', err);
-                reply.code(400).send({ err_msg: err });
+                if (err instanceof Error) {
+                    return reply.code(400).send({
+                        ok: false,
+                        error: err.message,
+                    });
+                }
             }
+            return reply.code(200).send({
+                ok: true,
+                msg: `Email sent to ${email}`,
+                email: String(email),
+            });
         },
     });
     done();

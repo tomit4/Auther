@@ -86,7 +86,6 @@ const handleSubmit = async (
                 "
                 required
             />
-            <!-- TODO: Submit must send both email and password -->
             <!-- TODO: Integrate zod here to validate if is email and if password passes 
                 specific params (i.e. length, special characters, numbers, 
                 capitalized letters, etc.) -->

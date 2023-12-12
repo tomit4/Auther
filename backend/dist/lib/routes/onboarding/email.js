@@ -8,7 +8,8 @@ const send_email_1 = __importDefault(require("../../utils/send-email"));
 exports.default = (fastify, options, done) => {
     fastify.withTypeProvider().route({
         method: 'POST',
-        url: '/email',
+        // TODO: This is actually the /signup route to replace the old signup.ts
+        url: '/signup',
         schema: {
             body: zod_1.z.string(),
             response: {
