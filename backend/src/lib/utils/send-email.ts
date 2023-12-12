@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import * as Brevo from '@getbrevo/brevo'
 
 type SendEmail = {
