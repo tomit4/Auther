@@ -1,5 +1,4 @@
-import Fastify from 'fastify'
-import { FastifyInstance } from 'fastify'
+import Fastify, { FastifyInstance } from 'fastify'
 import 'dotenv/config'
 import registerRoutes from './lib/routes'
 import registerPlugins from './lib/plugins'
