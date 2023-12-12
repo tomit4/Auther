@@ -146,6 +146,8 @@ these tools.
 **TODOS**
 
 - [ ] Convert project over to typescript as practice
+- [ ] Consider instead of knex using [kysely](https://kysely.dev/) (like knex,
+      but with better TS suppport)
 - [ ] Incorporate mariadb with knex query builder for very basic db integration,
       allow for secure storage of hashed email addresses and associated usernames,
       dates of sign up, etc.
