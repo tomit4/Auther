@@ -44,6 +44,10 @@ exports.default = (fastify, options, done) => {
                 const emailSent = await (0, send_email_1.default)(String(email));
                 if (!emailSent.wasSuccessfull)
                     throw new Error(String(emailSent.error));
+                // TODO: hash/salt the email and store it in mariadb db via knex
+                /* TODO: hash/salt the password and use it as a key in an
+                 * in-memory HashMap to reference a jwt token (learn redis)
+                 */
             }
             catch (err) {
                 if (err instanceof Error) {

@@ -79,7 +79,7 @@ const handleSubmit = async (
                 className="password-input"
                 size="30"
                 minlength="10"
-                placeholder="mypassword"
+                placeholder="Password1234!"
                 v-model="passwordInput"
                 @keyup.enter="
                     handleSubmit(String(emailInput), String(passwordInput))
@@ -88,9 +88,9 @@ const handleSubmit = async (
             />
             <!-- TODO: Integrate zod here to validate if is email and if password passes 
                 specific params (i.e. length, special characters, numbers, 
-                capitalized letters, etc.) -->
-            <!-- TODO: Setup a vue watcher to tell if password is valid 
-                and notify user if it is/isn't -->
+                capitalized letters, etc.) (see backend for reference) -->
+            <!-- TODO: Setup a vue watcher to tell if email/password are valid 
+                and notify user if they are/aren't -->
             <button
                 @click="handleSubmit(String(emailInput), String(passwordInput))"
                 type="submit"
