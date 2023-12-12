@@ -7,7 +7,13 @@ const fastify_1 = __importDefault(require("fastify"));
 require("dotenv/config");
 const routes_1 = __importDefault(require("./lib/routes"));
 const plugins_1 = __importDefault(require("./lib/plugins"));
-const fastify = (0, fastify_1.default)({ logger: true });
+const fastify = (0, fastify_1.default)({
+    logger: {
+        transport: {
+            target: 'pino-pretty',
+        },
+    },
+});
 const start = async () => {
     try {
         await (0, plugins_1.default)(fastify);

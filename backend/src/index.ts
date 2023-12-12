@@ -3,7 +3,13 @@ import 'dotenv/config'
 import registerRoutes from './lib/routes'
 import registerPlugins from './lib/plugins'
 
-const fastify: FastifyInstance = Fastify({ logger: true })
+const fastify: FastifyInstance = Fastify({
+    logger: {
+        transport: {
+            target: 'pino-pretty',
+        },
+    },
+})
 const start = async (): Promise<string> => {
     try {
         await registerPlugins(fastify)
