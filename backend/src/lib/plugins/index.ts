@@ -9,6 +9,10 @@ import {
 export default async (fastify: FastifyInstance): Promise<void> => {
     await fastify.register(import('@fastify/cors'))
     await fastify.register(import('@fastify/helmet'))
+    await fastify.register(import('@fastify/rate-limit'), {
+        max: 100,
+        timeWindow: '1 minute',
+    })
     await fastify.register(import('@fastify/jwt'), {
         secret: 'replaceme',
     })

@@ -64,8 +64,13 @@ export default (
                     throw new Error(String(error.issues[0].message))
                 }
                 const emailSent = await sendEmail(String(email))
-                if (!emailSent.wasSuccessfull)
+                if (!emailSent.wasSuccessfull) {
+                    fastify.log.error(
+                        'Error occurred while sending email, are your Brevo credentials up to date? :=>',
+                        emailSent.error,
+                    )
                     throw new Error(String(emailSent.error))
+                }
 
                 // TODO: hash/salt the email and store it in mariadb db via knex
 
