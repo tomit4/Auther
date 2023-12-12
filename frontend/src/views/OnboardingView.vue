@@ -17,7 +17,7 @@ const handleSubmit = async (data: string): Promise<void> => {
         resSuccessful.value = ''
         const res = await fetch(emailRoute, {
             method: 'POST',
-            headers: { 'content-type': 'application/x-www-form-urlencoded' },
+            headers: { 'Content-Type': 'text/plain' },
             body: data,
         })
         const jsonRes = await res.json()
