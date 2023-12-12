@@ -41,6 +41,11 @@ export default (
         */
         handler: async (request: FastifyRequest, reply: FastifyReply) => {
             try {
+                // TODO: establish jwt here
+                // TODO: set up knex and sqlite
+                // TODO: hash email
+                // TODO: hash token
+                // TODO: store token in cache/redis
                 console.log('request.body :=>', request.body)
                 const token = fastify.jwt.sign({ payload: request.body })
                 console.log('token :=>', token)
