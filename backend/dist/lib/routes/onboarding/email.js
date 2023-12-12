@@ -22,13 +22,22 @@ exports.default = (fastify, options, done) => {
         },
         handler: async (request, reply) => {
             const { email, password } = JSON.parse(String(request.body));
-            console.log('password :=>', password);
+            // TODO: replicate zod checks on front end
             const emailSchema = zod_1.z.string().email();
+            const passwordSchema = zod_1.z
+                .string()
+                .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])[A-Za-z\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{10,}$/, {
+                message: 'Password must be at least 10 characters in length and contain at least one lowercase letter, one uppercase letter, one digit, and one special character',
+            });
             try {
                 const zParsedEmail = emailSchema.safeParse(email);
-                const { success } = zParsedEmail;
-                if (!success) {
+                const zParsedPassword = passwordSchema.safeParse(password);
+                if (!zParsedEmail.success) {
                     const { error } = zParsedEmail;
+                    throw new Error(String(error.issues[0].message));
+                }
+                if (!zParsedPassword.success) {
+                    const { error } = zParsedPassword;
                     throw new Error(String(error.issues[0].message));
                 }
                 const emailSent = await (0, send_email_1.default)(String(email));
