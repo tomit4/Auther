@@ -1,23 +1,23 @@
-<script setup>
-import { ref } from 'vue'
+<script setup lang="ts">
+import { ref, Ref } from 'vue'
 import { useRouter } from 'vue-router'
 const emailRoute = import.meta.env.VITE_EMAIL_ROUTE
 const router = useRouter()
-const input = ref(null)
-const errMessage = ref(null)
-const resSuccessful = ref('')
+const input: Ref<null> = ref(null)
+const errMessage: Ref<null> = ref(null)
+const resSuccessful: Ref<string> = ref('')
 
-const delay = ms => {
+const delay = (ms: number): Promise<void> => {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-const handleSubmit = async data => {
+const handleSubmit = async (data: string): Promise<void> => {
     try {
         errMessage.value = null
         resSuccessful.value = ''
         const res = await fetch(emailRoute, {
             method: 'POST',
-            ContentType: 'application/x-www-form-urlencoded',
+            headers: { 'content-type': 'application/x-www-form-urlencoded' },
             body: data,
         })
         const jsonRes = await res.json()
@@ -31,7 +31,7 @@ const handleSubmit = async data => {
         } else {
             resSuccessful.value = jsonRes.email
             await delay(1000)
-            return router.push('/auth')
+            router.push('/auth')
         }
     } catch (err) {
         console.error(err)
@@ -53,12 +53,12 @@ const handleSubmit = async data => {
                 minlength="5"
                 placeholder="jondoe@example.com"
                 v-model="input"
-                @keyup.enter="handleSubmit(input)"
+                @keyup.enter="handleSubmit(String(input))"
                 required
             />
             <br />
             <button
-                @click="handleSubmit(input)"
+                @click="handleSubmit(String(input))"
                 type="submit"
                 value="Submit"
                 className="submit-btn"
