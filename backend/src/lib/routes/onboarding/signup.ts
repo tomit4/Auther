@@ -9,6 +9,11 @@ import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import sendEmail from '../../utils/send-email'
 
+type BodyReq = {
+    email: string
+    password: string
+}
+
 type SignUpRes = {
     ok: boolean
     msg?: string
@@ -26,7 +31,10 @@ export default (
         // TODO: This is actually the /signup route to replace the old signup.ts
         url: '/signup',
         schema: {
-            body: z.string(),
+            body: z.object({
+                email: z.string(),
+                password: z.string(),
+            }),
             response: {
                 200: z.object({
                     ok: z.boolean(),
@@ -37,10 +45,10 @@ export default (
             },
         },
         handler: async (
-            request: FastifyRequest,
+            request: FastifyRequest<{ Body: BodyReq }>,
             reply: FastifyReply,
         ): Promise<SignUpRes> => {
-            const { email, password } = JSON.parse(String(request.body))
+            const { email, password } = request.body
             // TODO: replicate zod checks on front end
             const emailSchema = z.string().email()
             const passwordSchema = z

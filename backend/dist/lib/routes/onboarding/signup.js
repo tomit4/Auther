@@ -11,7 +11,10 @@ exports.default = (fastify, options, done) => {
         // TODO: This is actually the /signup route to replace the old signup.ts
         url: '/signup',
         schema: {
-            body: zod_1.z.string(),
+            body: zod_1.z.object({
+                email: zod_1.z.string(),
+                password: zod_1.z.string(),
+            }),
             response: {
                 200: zod_1.z.object({
                     ok: zod_1.z.boolean(),
@@ -22,7 +25,7 @@ exports.default = (fastify, options, done) => {
             },
         },
         handler: async (request, reply) => {
-            const { email, password } = JSON.parse(String(request.body));
+            const { email, password } = request.body;
             // TODO: replicate zod checks on front end
             const emailSchema = zod_1.z.string().email();
             const passwordSchema = zod_1.z
