@@ -14,14 +14,21 @@ const delay = (ms: number): Promise<void> => {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-const handleSubmit = async (data: string): Promise<void> => {
+const handleSubmit = async (
+    emailInput: string,
+    passwordInput: string,
+): Promise<void> => {
     try {
         errMessage.value = null
         resSuccessful.value = ''
+        const data = {
+            email: emailInput,
+            password: passwordInput,
+        }
         const res = await fetch(emailRoute, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain' },
-            body: data,
+            body: JSON.stringify(data),
         })
         const jsonRes = await res.json()
         if (!res.ok || jsonRes.error) {
@@ -56,7 +63,9 @@ const handleSubmit = async (data: string): Promise<void> => {
                 minlength="5"
                 placeholder="jondoe@example.com"
                 v-model="emailInput"
-                @keyup.enter="handleSubmit(String(emailInput))"
+                @keyup.enter="
+                    handleSubmit(String(emailInput), String(passwordInput))
+                "
                 v-focus
                 required
             />
@@ -72,17 +81,19 @@ const handleSubmit = async (data: string): Promise<void> => {
                 minlength="10"
                 placeholder="mypassword"
                 v-model="passwordInput"
-                @keyup.enter="handleSubmit(String(passwordInput))"
+                @keyup.enter="
+                    handleSubmit(String(emailInput), String(passwordInput))
+                "
                 required
             />
             <!-- TODO: Submit must send both email and password -->
-            <!-- TODO: Integrate zod here to validate if password passes 
+            <!-- TODO: Integrate zod here to validate if is email and if password passes 
                 specific params (i.e. length, special characters, numbers, 
                 capitalized letters, etc.) -->
             <!-- TODO: Setup a vue watcher to tell if password is valid 
                 and notify user if it is/isn't -->
             <button
-                @click="handleSubmit(String(emailInput))"
+                @click="handleSubmit(String(emailInput), String(passwordInput))"
                 type="submit"
                 value="Submit"
                 className="submit-btn"

@@ -20,6 +20,7 @@ const handleSignUp = async (): Promise<void> => {
                 Sign Up
             </button>
             <br />
+            <!--
             <button
                 @click="handleLogin(String(input))"
                 type="submit"
@@ -28,6 +29,7 @@ const handleSignUp = async (): Promise<void> => {
             >
                 Login
             </button>
+            -->
         </div>
     </div>
 </template>

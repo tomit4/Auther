@@ -25,7 +25,7 @@ export default (
         method: 'POST',
         url: '/email',
         schema: {
-            body: z.string().email(),
+            body: z.string(),
             response: {
                 200: z.object({
                     ok: z.boolean(),
@@ -35,25 +35,33 @@ export default (
                 }),
             },
         },
-        handler: async (
-            request: FastifyRequest,
-            reply: FastifyReply,
-        ): Promise<PostEmail> => {
-            const input = request.body
+        handler: async (request: FastifyRequest, reply: FastifyReply) => {
+            // ): Promise<PostEmail> => {
+            const { email, password } = JSON.parse(String(request.body))
+            console.log('password :=>', password)
+            const emailSchema = z.string().email()
             try {
-                const emailSent = await sendEmail(String(input))
+                const zParsedEmail = emailSchema.safeParse(email)
+                const { success } = zParsedEmail
+                if (!success) {
+                    const { error } = zParsedEmail
+                    throw new Error(String(error.issues[0].message))
+                }
+                const emailSent = await sendEmail(String(email))
                 if (!emailSent.wasSuccessfull)
-                    throw new Error(`ERROR :=> ${emailSent.error}`)
+                    throw new Error(String(emailSent.error))
             } catch (err) {
-                return reply.code(400).send({
-                    ok: false,
-                    error: `Something went wrong: ${err}`,
-                })
+                if (err instanceof Error) {
+                    return reply.code(400).send({
+                        ok: false,
+                        error: err.message,
+                    })
+                }
             }
             return reply.code(200).send({
                 ok: true,
-                msg: `Email sent to ${input}`,
-                email: String(input),
+                msg: `Email sent to ${email}`,
+                email: String(email),
             })
         },
     })

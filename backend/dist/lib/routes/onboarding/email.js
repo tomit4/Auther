@@ -10,7 +10,7 @@ exports.default = (fastify, options, done) => {
         method: 'POST',
         url: '/email',
         schema: {
-            body: zod_1.z.string().email(),
+            body: zod_1.z.string(),
             response: {
                 200: zod_1.z.object({
                     ok: zod_1.z.boolean(),
@@ -21,22 +21,33 @@ exports.default = (fastify, options, done) => {
             },
         },
         handler: async (request, reply) => {
-            const input = request.body;
+            // ): Promise<PostEmail> => {
+            const { email, password } = JSON.parse(String(request.body));
+            console.log('password :=>', password);
+            const emailSchema = zod_1.z.string().email();
             try {
-                const emailSent = await (0, send_email_1.default)(String(input));
+                const zParsedEmail = emailSchema.safeParse(email);
+                const { success } = zParsedEmail;
+                if (!success) {
+                    const { error } = zParsedEmail;
+                    throw new Error(String(error.issues[0].message));
+                }
+                const emailSent = await (0, send_email_1.default)(String(email));
                 if (!emailSent.wasSuccessfull)
-                    throw new Error(`ERROR :=> ${emailSent.error}`);
+                    throw new Error(String(emailSent.error));
             }
             catch (err) {
-                return reply.code(400).send({
-                    ok: false,
-                    error: `Something went wrong: ${err}`,
-                });
+                if (err instanceof Error) {
+                    return reply.code(400).send({
+                        ok: false,
+                        error: err.message,
+                    });
+                }
             }
             return reply.code(200).send({
                 ok: true,
-                msg: `Email sent to ${input}`,
-                email: String(input),
+                msg: `Email sent to ${email}`,
+                email: String(email),
             });
         },
     });
