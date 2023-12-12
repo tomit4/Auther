@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import OnboardingView from '../views/OnboardingView.vue'
+import SplashView from '../views/SplashView.vue'
+import SignUpView from '../views/SignUpView.vue'
 import WaitingForActionView from '../views/WaitingForActionView.vue'
 import VerifiedView from '../views/VerifiedView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
@@ -8,13 +8,13 @@ import NotFoundView from '../views/NotFoundView.vue'
 const routes = [
     {
         path: '/',
-        component: HomeView,
-        name: 'HomeView',
+        component: SplashView,
+        name: 'SplashView',
     },
     {
-        path: '/onboarding',
-        component: OnboardingView,
-        name: 'OnboardingView',
+        path: '/signup',
+        component: SignUpView,
+        name: 'SignUpView',
     },
     {
         path: '/auth',

@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { ref, Ref } from 'vue'
 import { useRouter } from 'vue-router'
-const emailRoute = import.meta.env.VITE_EMAIL_ROUTE
+
 const router = useRouter()
-const input: Ref<null> = ref(null)
+const emailInput: Ref<string> = ref('')
+const passwordInput: Ref<null> = ref(null)
 const errMessage: Ref<null> = ref(null)
 const resSuccessful: Ref<string> = ref('')
+
+const emailRoute = import.meta.env.VITE_EMAIL_ROUTE
 
 const delay = (ms: number): Promise<void> => {
     return new Promise(resolve => setTimeout(resolve, ms))
@@ -41,10 +44,10 @@ const handleSubmit = async (data: string): Promise<void> => {
 
 <template>
     <div>
-        <h1>Onboarding</h1>
+        <h1>Sign Up</h1>
         <br />
         <span className="email-form">
-            <label for="email">Email Me At:</label>
+            <label className="email-label" for="email">Email Me At:</label>
             <input
                 type="email"
                 id="email"
@@ -52,13 +55,34 @@ const handleSubmit = async (data: string): Promise<void> => {
                 size="30"
                 minlength="5"
                 placeholder="jondoe@example.com"
-                v-model="input"
-                @keyup.enter="handleSubmit(String(input))"
+                v-model="emailInput"
+                @keyup.enter="handleSubmit(String(emailInput))"
+                v-focus
                 required
             />
             <br />
+            <label className="password-label" for="password"
+                >Create A Password:</label
+            >
+            <input
+                type="password"
+                id="password"
+                className="password-input"
+                size="30"
+                minlength="10"
+                placeholder="mypassword"
+                v-model="passwordInput"
+                @keyup.enter="handleSubmit(String(passwordInput))"
+                required
+            />
+            <!-- TODO: Submit must send both email and password -->
+            <!-- TODO: Integrate zod here to validate if password passes 
+                specific params (i.e. length, special characters, numbers, 
+                capitalized letters, etc.) -->
+            <!-- TODO: Setup a vue watcher to tell if password is valid 
+                and notify user if it is/isn't -->
             <button
-                @click="handleSubmit(String(input))"
+                @click="handleSubmit(String(emailInput))"
                 type="submit"
                 value="Submit"
                 className="submit-btn"
@@ -77,19 +101,30 @@ const handleSubmit = async (data: string): Promise<void> => {
 </template>
 
 <style scoped>
-.email-fieldset {
-    display: block;
-    justify-content: center;
-    border: none;
+.email-label,
+.password-label {
+    font-size: 100%;
+    font-weight: 500;
 }
-.email-input {
+.email-input,
+.password-input {
     display: flex;
     text-align: center;
-    margin: 1em auto;
+    font-weight: 700;
+    font-size: 80%;
+    margin: 1em auto -1em auto;
+    border: 2px solid black;
+    padding: 0.5em;
+    border-radius: 5px;
 }
 .submit-btn {
     display: flex;
-    margin: 0 auto;
-    margin-top: -2em;
+    margin: 3em auto 1em auto;
+    cursor: pointer;
+    padding: 0.5em;
+    font-weight: 700;
+    font-size: 80%;
+    border: 2px solid black;
+    border-radius: 5px;
 }
 </style>
