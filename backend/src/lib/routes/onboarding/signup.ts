@@ -28,7 +28,6 @@ export default (
 ) => {
     fastify.withTypeProvider<ZodTypeProvider>().route({
         method: 'POST',
-        // TODO: This is actually the /signup route to replace the old signup.ts
         url: '/signup',
         schema: {
             body: z.object({
