@@ -155,3 +155,23 @@ these tools.
 - [ ] Investigate caching of hashed jsonwebtoken in memory for period of time (i.e.redis)
 - [ ] Dockerize the backend and adjust the backend server accordingly
 - [ ] Dockerize mariadb/mysql db as separate server
+
+**SIGNUP LOGIC**
+
+- Once the user has entered their email and password,
+  A unique hash token representing their temporary credentials is established in
+  redis, this stores a hash of their email as well as their password encrypted
+  using bcrypt. This has an expiration time of a few hours (up to 24 hours or so).
+
+- The transactional email using Brevo holds a variable known as params.link, which
+  should send them back to our application url with the same hash email in the
+  url.
+
+- Upon arrival back at the application at this specified url, the hash is sent to
+  the backend where it is checked against the redis store.
+
+- If the hash exists, a jwt is established, that jwt is hashed and then sent back
+  as a cookie to the client in the headers to be used as a login (this is
+  indicative of how login will be covered as well). Additionally,
+  the user's hashed email and encrypted password is then stored in the SQL
+  database (either mariadb or postgresql) for future logins.
