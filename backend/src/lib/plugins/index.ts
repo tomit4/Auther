@@ -9,6 +9,10 @@ import {
 export default async (fastify: FastifyInstance): Promise<void> => {
     await fastify.register(import('@fastify/cors'))
     await fastify.register(import('@fastify/helmet'))
+    await fastify.register(import('@fastify/redis'), {
+        host: String(process.env.REDIS_HOST),
+        port: Number(process.env.REDIS_PORT),
+    })
     await fastify.register(import('@fastify/rate-limit'), {
         max: 100,
         timeWindow: '1 minute',

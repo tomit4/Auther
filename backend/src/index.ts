@@ -10,6 +10,7 @@ const fastify: FastifyInstance = Fastify({
         },
     },
 })
+
 const start = async (): Promise<string> => {
     try {
         await registerPlugins(fastify)
