@@ -29,6 +29,13 @@ exports.default = (fastify, options, done) => {
             // test works
             // TODO:  hash/salt email and encrypt password
             // set in redis hash_email_string: encrypted_password
+            // NOTE: If the user answers the transac email within time limit,
+            // the encrypted password is pulled from the redis cache and stored
+            // in the postgresql database, it is then removed from the redis cache.
+            // Otherwise, after the time limit has expired, it is removed from the
+            // redis cache, and an error message is sent to the user upon redirection
+            // to verify/${hashedEmail} that they took too long to answer the email and
+            // to sign up again.
             redis.set('test', 'test_string', err => {
                 console.error('ERROR :=>', err);
             });
@@ -50,6 +57,7 @@ exports.default = (fastify, options, done) => {
                     const { error } = zParsedPassword;
                     throw new Error(String(error.issues[0].message));
                 }
+                // const emailSent = await sendEmail(String(email, String(hashedEmail)))
                 const emailSent = await (0, send_email_1.default)(String(email));
                 if (!emailSent.wasSuccessfull) {
                     fastify.log.error('Error occurred while sending email, are your Brevo credentials up to date? :=>', emailSent.error);
