@@ -13,6 +13,7 @@ export default async (fastify: FastifyInstance): Promise<void> => {
     await fastify.register(import('@fastify/redis'), {
         host: String(process.env.REDIS_HOST),
         port: Number(process.env.REDIS_PORT),
+        password: String(process.env.REDIS_PASSWORD),
     })
     await fastify.register(import('@fastify/rate-limit'), {
         max: 100,

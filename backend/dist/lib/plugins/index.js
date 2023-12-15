@@ -26,6 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+require("dotenv/config");
 const env_1 = __importDefault(require("@fastify/env"));
 const fastify_type_provider_zod_1 = require("fastify-type-provider-zod");
 exports.default = async (fastify) => {
@@ -34,6 +35,7 @@ exports.default = async (fastify) => {
     await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/redis'))), {
         host: String(process.env.REDIS_HOST),
         port: Number(process.env.REDIS_PORT),
+        password: String(process.env.REDIS_PASSWORD),
     });
     await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/rate-limit'))), {
         max: 100,
