@@ -48,6 +48,13 @@ export default (
             reply: FastifyReply,
         ): Promise<SignUpRes> => {
             const { email, password } = request.body
+            const { redis } = fastify
+            // test works
+            // TODO:  hash/salt email and encrypt password
+            // set in redis hash_email_string: encrypted_password
+            redis.set('test', 'test_string', err => {
+                console.error('ERROR :=>', err)
+            })
             // TODO: replicate zod checks on front end
             const emailSchema = z.string().email()
             const passwordSchema = z

@@ -25,6 +25,13 @@ exports.default = (fastify, options, done) => {
         },
         handler: async (request, reply) => {
             const { email, password } = request.body;
+            const { redis } = fastify;
+            // test works
+            // TODO:  hash/salt email and encrypt password
+            // set in redis hash_email_string: encrypted_password
+            redis.set('test', 'test_string', err => {
+                console.error('ERROR :=>', err);
+            });
             // TODO: replicate zod checks on front end
             const emailSchema = zod_1.z.string().email();
             const passwordSchema = zod_1.z
