@@ -145,16 +145,15 @@ these tools.
 
 **TODOS**
 
-- [ ] Convert project over to typescript as practice
-- [ ] Consider instead of knex using [kysely](https://kysely.dev/) (like knex,
-      but with better TS suppport)
-- [ ] Incorporate mariadb with knex query builder for very basic db integration,
+- [x] Convert project over to typescript as practice
+- [x] Investigate caching (i.e.redis)
+- [ ] Set up knex/postgresql following [this tutorial](https://www.basedash.com/blog/how-to-configure-knex-js-with-typescript)
+- [ ] Incorporate postgresql with knex query builder for very basic db integration,
       allow for secure storage of hashed email addresses and associated usernames,
       dates of sign up, etc.
 - [ ] Expand example to include jsonwebtoken/login demonstration
-- [ ] Investigate caching of hashed jsonwebtoken in memory for period of time (i.e.redis)
-- [ ] Dockerize the backend and adjust the backend server accordingly
-- [ ] Dockerize mariadb/mysql db as separate server
+- [ ] Dockerize the backend fastify/redis/knex/postgresql as one docker
+      container (not going to be easy)
 
 **SIGNUP LOGIC**
 
