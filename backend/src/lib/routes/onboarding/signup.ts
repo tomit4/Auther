@@ -53,8 +53,6 @@ export default (
             const hashedEmail = hasher(email)
             // TODO: change with encryption
             const hashedPassword = password
-            const hashedData = new Map()
-            hashedData.set(hashedEmail, hashedPassword)
             // TODO:  hash/salt email and encrypt password
             // set in redis hash_email_string: encrypted_password
             // NOTE: If the user answers the transac email within time limit,
@@ -64,9 +62,11 @@ export default (
             // redis cache, and an error message is sent to the user upon redirection
             // to verify/${hashedEmail} that they took too long to answer the email and
             // to sign up again.
-            await redis.hset('user-hash', hashedData)
+            await redis.set(hashedEmail, hashedPassword, 'EX', 3600)
             // TODO: on another route, that is hit by frontend /verify/${hashedEmail}, check if hashedEmail matches a cookie with the same hash, THEN send it to the backend and check again in the redis cache:
-            // await redis.hexists('user-hash', hashedEmail)
+            // console.log('returned stuff :=>', await redis.get(hashedEmail))
+            // console.log('time to live :=>', await redis.ttl(hashedEmail))
+
             // TODO: replicate zod checks on front end
             const emailSchema = z.string().email()
             const passwordSchema = z
