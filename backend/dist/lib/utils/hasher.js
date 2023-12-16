@@ -5,6 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const crypto_1 = __importDefault(require("crypto"));
 exports.default = (string) => {
-    const salt = crypto_1.default.randomBytes(16);
-    return crypto_1.default.createHash('sha256', salt).update(string).digest('hex');
+    const salt = crypto_1.default.randomBytes(16).toString('hex');
+    return crypto_1.default.createHash('sha256').update(`${string}${salt}`).digest('hex');
 };

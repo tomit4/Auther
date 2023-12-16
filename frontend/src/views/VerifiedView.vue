@@ -13,7 +13,6 @@ const grabStoredCookie = (cookieKey: string): string => {
 }
 
 const cookie = grabStoredCookie('appname-hash')
-console.log('hash in route:=>', route.params.hash)
 if (cookie === route.params.hash) {
     console.log('verified!')
 } else {
