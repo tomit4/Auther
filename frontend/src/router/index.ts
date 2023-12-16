@@ -3,6 +3,7 @@ import SplashView from '../views/SplashView.vue'
 import SignUpView from '../views/SignUpView.vue'
 import WaitingForActionView from '../views/WaitingForActionView.vue'
 import VerifiedView from '../views/VerifiedView.vue'
+import AppView from '../views/AppView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 
 const routes = [
@@ -25,6 +26,12 @@ const routes = [
         path: '/verify/:hash',
         component: VerifiedView,
         name: 'VerifiedView',
+    },
+    // TODO: protect this route with auth/login
+    {
+        path: '/app',
+        component: AppView,
+        name: 'AppView',
         // meta: { requiresAuth: true},
     },
     {

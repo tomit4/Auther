@@ -9,7 +9,7 @@ const errMessage: Ref<null> = ref(null)
 const resSuccessful: Ref<string> = ref('')
 
 const emailRoute = import.meta.env.VITE_EMAIL_ROUTE
-
+// TODO: place in a utility class/file
 const delay = (ms: number): Promise<void> => {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
