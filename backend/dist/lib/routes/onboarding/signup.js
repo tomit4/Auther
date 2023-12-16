@@ -35,7 +35,6 @@ exports.default = (fastify, options, done) => {
             // NOTE: If the user answers the transac email within time limit,
             // the encrypted password is pulled from the redis cache and stored
             // in the postgresql database, it is then removed from the redis cache.
-            await redis.set(hashedEmail, hashedPassword, 'EX', 60);
             // TODO: replicate zod checks on front end
             const emailSchema = zod_1.z.string().email();
             const passwordSchema = zod_1.z
@@ -54,6 +53,8 @@ exports.default = (fastify, options, done) => {
                     const { error } = zParsedPassword;
                     throw new Error(String(error.issues[0].message));
                 }
+                if (await redis.get(hashedEmail))
+                    throw new Error('You have already submitted your email, please check your inbox.');
                 const emailSent = await (0, send_email_1.default)(String(email), String(hashedEmail));
                 if (!emailSent.wasSuccessfull) {
                     fastify.log.error('Error occurred while sending email, are your Brevo credentials up to date? :=>', emailSent.error);
@@ -68,6 +69,7 @@ exports.default = (fastify, options, done) => {
                     });
                 }
             }
+            await redis.set(hashedEmail, hashedPassword, 'EX', 60);
             return reply
                 .setCookie('appname-hash', hashedEmail, {
                 path: '/verify',

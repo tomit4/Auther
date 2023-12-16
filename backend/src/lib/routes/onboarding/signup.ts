@@ -58,7 +58,6 @@ export default (
             // NOTE: If the user answers the transac email within time limit,
             // the encrypted password is pulled from the redis cache and stored
             // in the postgresql database, it is then removed from the redis cache.
-            await redis.set(hashedEmail, hashedPassword, 'EX', 60)
             // TODO: replicate zod checks on front end
             const emailSchema = z.string().email()
             const passwordSchema = z
@@ -81,6 +80,10 @@ export default (
                     const { error } = zParsedPassword
                     throw new Error(String(error.issues[0].message))
                 }
+                if (await redis.get(hashedEmail))
+                    throw new Error(
+                        'You have already submitted your email, please check your inbox.',
+                    )
                 const emailSent = await sendEmail(
                     String(email),
                     String(hashedEmail),
@@ -100,6 +103,7 @@ export default (
                     })
                 }
             }
+            await redis.set(hashedEmail, hashedPassword, 'EX', 60)
             return reply
                 .setCookie('appname-hash', hashedEmail, {
                     path: '/verify',
