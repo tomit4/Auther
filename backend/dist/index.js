@@ -7,6 +7,13 @@ const fastify_1 = __importDefault(require("fastify"));
 require("dotenv/config");
 const routes_1 = __importDefault(require("./lib/routes"));
 const plugins_1 = __importDefault(require("./lib/plugins"));
+/* TODO: Remove from here and export from custom type file
+import knex from 'knex'
+type FastifyInstanceWithCustomPlugins = FastifyInstance & {
+    knex?: typeof knex
+}
+const fastify: FastifyInstanceWithCustomPlugins = Fastify()
+*/
 const fastify = (0, fastify_1.default)({
     logger: {
         transport: {

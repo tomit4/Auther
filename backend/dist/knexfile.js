@@ -94,4 +94,4 @@ const config = {
         },
     },
 };
-module.exports = config;
+exports.default = config;

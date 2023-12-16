@@ -43,6 +43,7 @@ exports.default = async (fastify) => {
         // TODO: Reinstate once working within docker
         // password: String(process.env.REDIS_PASSWORD),
     });
+    await fastify.register(Promise.resolve().then(() => __importStar(require('./knex'))));
     await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/rate-limit'))), {
         max: 100,
         timeWindow: '1 minute',
