@@ -43,12 +43,14 @@ onMounted(async () => {
                 error: jsonRes.error ? jsonRes.error : 'Unknown error occurred',
             }
             errMessage.value = errMsg.error
+            // TODO: set up watcher to display count down before redirect
             await delay(1000)
             router.push('/signup')
         } else {
             resSuccessful.value = jsonRes.msg
             // TODO: grab a JWT from backend for
             // further authentication in /app route
+            // TODO: set up watcher to display count down before redirect
             await delay(1000)
             router.push('/app')
         }

@@ -41,6 +41,7 @@ const handleSubmit = async (
             throw Error(`An error occurred: ${JSON.stringify(errMsg)}`)
         } else {
             resSuccessful.value = jsonRes.email
+            // TODO: set up watcher to display count down before redirect
             await delay(1000)
             router.push('/auth')
         }
