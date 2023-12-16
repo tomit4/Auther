@@ -58,15 +58,7 @@ export default (
             // NOTE: If the user answers the transac email within time limit,
             // the encrypted password is pulled from the redis cache and stored
             // in the postgresql database, it is then removed from the redis cache.
-            // Otherwise, after the time limit has expired, it is removed from the
-            // redis cache, and an error message is sent to the user upon redirection
-            // to verify/${hashedEmail} that they took too long to answer the email and
-            // to sign up again.
             await redis.set(hashedEmail, hashedPassword, 'EX', 60)
-            // TODO: on another route, that is hit by frontend /verify/${hashedEmail}, check if hashedEmail matches a cookie with the same hash, THEN send it to the backend and check again in the redis cache:
-            // console.log('returned stuff :=>', await redis.get(hashedEmail))
-            // console.log('time to live :=>', await redis.ttl(hashedEmail))
-
             // TODO: replicate zod checks on front end
             const emailSchema = z.string().email()
             const passwordSchema = z
@@ -100,12 +92,6 @@ export default (
                     )
                     throw new Error(String(emailSent.error))
                 }
-
-                // TODO: hash/salt the email and store it in mariadb db via knex
-
-                /* TODO: hash/salt the password and use it as a key in an
-                 * in-memory HashMap to reference a jwt token (learn redis)
-                 */
             } catch (err) {
                 if (err instanceof Error) {
                     return reply.code(400).send({

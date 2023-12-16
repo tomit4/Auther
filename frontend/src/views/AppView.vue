@@ -1,4 +1,11 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+// TODO: onMounted immediately queries the backend to check if JWT is valid
+
+/* TODO: implement logic that deals with session/access tokens 
+    (i.e. one expires short term, and simply checks against longer 
+    term session token, if session token is valid, reissue access, 
+    otherwise log out) */
+</script>
 
 <template>
     <!-- TODO: protect this route with auth/login (i.e. JWT/DB logic)-->

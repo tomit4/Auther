@@ -33,6 +33,7 @@ onMounted(async () => {
         const res = await fetch(verifyRoute, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify(data),
         })
         const jsonRes = await res.json()
@@ -46,6 +47,8 @@ onMounted(async () => {
             router.push('/signup')
         } else {
             resSuccessful.value = jsonRes.msg
+            // TODO: grab a JWT from backend for
+            // further authentication in /app route
             await delay(1000)
             router.push('/app')
         }

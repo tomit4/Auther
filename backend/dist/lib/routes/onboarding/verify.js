@@ -40,6 +40,7 @@ exports.default = (fastify, options, done) => {
                 }
             }
             // TODO: persist email in db
+            // TODO: generate and send back hashed JWT in cookie headers
             return reply.code(200).send({
                 ok: true,
                 msg: 'Your email has been  verified, redirecting you to the app...',
