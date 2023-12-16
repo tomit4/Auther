@@ -28,6 +28,7 @@ const handleSubmit = async (
         const res = await fetch(emailRoute, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify(data),
         })
         const jsonRes = await res.json()

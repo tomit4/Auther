@@ -17,8 +17,10 @@ const apiKey: Brevo.ApiKeyAuth = apiInstance.authentications.apiKey
 apiKey.apiKey = String(process.env.BREVO_KEY)
 const sendSmtpEmail = new Brevo.SendSmtpEmail()
 
-// export default async (email: string, hashedEmail: string): Promise<SendEmail> => {
-export default async (email: string): Promise<SendEmail> => {
+export default async (
+    email: string,
+    hashedEmail: string,
+): Promise<SendEmail> => {
     sendSmtpEmail.sender = {
         name: 'My Test Company',
         email: 'mytestemail@email.com',
@@ -31,8 +33,7 @@ export default async (email: string): Promise<SendEmail> => {
     ]
     sendSmtpEmail.templateId = Number(process.env.BREVO_TEMPLATE_ID)
     sendSmtpEmail.params = {
-        // link: `${process.env.BREVO_LINK}/verify/${hashedEmail}`,
-        link: `${process.env.BREVO_LINK}/verify`,
+        link: `${process.env.BREVO_LINK}/verify/${hashedEmail}`,
     }
     return await apiInstance.sendTransacEmail(sendSmtpEmail).then(
         data => {

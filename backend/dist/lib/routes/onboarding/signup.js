@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const zod_1 = require("zod");
 const send_email_1 = __importDefault(require("../../utils/send-email"));
+const hasher_1 = __importDefault(require("../../utils/hasher"));
 exports.default = (fastify, options, done) => {
     fastify.withTypeProvider().route({
         method: 'POST',
@@ -26,7 +27,11 @@ exports.default = (fastify, options, done) => {
         handler: async (request, reply) => {
             const { email, password } = request.body;
             const { redis } = fastify;
-            // test works
+            const hashedEmail = (0, hasher_1.default)(email);
+            // TODO: change with encryption
+            const hashedPassword = password;
+            const hashedData = new Map();
+            hashedData.set(hashedEmail, hashedPassword);
             // TODO:  hash/salt email and encrypt password
             // set in redis hash_email_string: encrypted_password
             // NOTE: If the user answers the transac email within time limit,
@@ -36,9 +41,9 @@ exports.default = (fastify, options, done) => {
             // redis cache, and an error message is sent to the user upon redirection
             // to verify/${hashedEmail} that they took too long to answer the email and
             // to sign up again.
-            redis.set('test', 'test_string', err => {
-                console.error('ERROR :=>', err);
-            });
+            await redis.hset('user-hash', hashedData);
+            // TODO: on another route, that is hit by frontend /verify/${hashedEmail}, check if hashedEmail matches a cookie with the same hash, THEN send it to the backend and check again in the redis cache:
+            // await redis.hexists('user-hash', hashedEmail)
             // TODO: replicate zod checks on front end
             const emailSchema = zod_1.z.string().email();
             const passwordSchema = zod_1.z
@@ -57,8 +62,7 @@ exports.default = (fastify, options, done) => {
                     const { error } = zParsedPassword;
                     throw new Error(String(error.issues[0].message));
                 }
-                // const emailSent = await sendEmail(String(email, String(hashedEmail)))
-                const emailSent = await (0, send_email_1.default)(String(email));
+                const emailSent = await (0, send_email_1.default)(String(email), String(hashedEmail));
                 if (!emailSent.wasSuccessfull) {
                     fastify.log.error('Error occurred while sending email, are your Brevo credentials up to date? :=>', emailSent.error);
                     throw new Error(String(emailSent.error));
@@ -76,7 +80,12 @@ exports.default = (fastify, options, done) => {
                     });
                 }
             }
-            return reply.code(200).send({
+            return reply
+                .setCookie('appname-hash', hashedEmail, {
+                path: '/verify',
+                maxAge: 60 * 60,
+            })
+                .send({
                 ok: true,
                 msg: `Email sent to ${email}`,
                 email: String(email),

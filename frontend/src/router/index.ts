@@ -22,7 +22,7 @@ const routes = [
         name: 'WaitingForActionView',
     },
     {
-        path: '/verify',
+        path: '/verify/:hash',
         component: VerifiedView,
         name: 'VerifiedView',
         // meta: { requiresAuth: true},
