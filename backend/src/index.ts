@@ -3,14 +3,6 @@ import 'dotenv/config'
 import registerRoutes from './lib/routes'
 import registerPlugins from './lib/plugins'
 
-/* TODO: Remove from here and export from custom type file
-import knex from 'knex'
-type FastifyInstanceWithCustomPlugins = FastifyInstance & {
-    knex?: typeof knex
-}
-const fastify: FastifyInstanceWithCustomPlugins = Fastify()
-*/
-
 const fastify: FastifyInstance = Fastify({
     logger: {
         transport: {

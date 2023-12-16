@@ -27,12 +27,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const fp = __importStar(require("fastify-plugin"));
-const knexfile_1 = __importDefault(require("../../knexfile"));
 const knex_1 = __importDefault(require("knex"));
-const knexFile = knexfile_1.default.development;
-const knexInstance = (0, knex_1.default)(knexFile);
 const knexPlugin = (fastify, options, done) => {
-    fastify.decorate('knex', knexInstance);
+    if (!fastify.knex) {
+        fastify.decorate('knex', (0, knex_1.default)(options));
+    }
     done();
 };
 const plugin = fp.default(knexPlugin, {

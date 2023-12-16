@@ -6,6 +6,8 @@ import {
     serializerCompiler,
     validatorCompiler,
 } from 'fastify-type-provider-zod'
+import knexConfig from '../../knexfile'
+const knexFile = knexConfig.development
 
 export default async (fastify: FastifyInstance): Promise<void> => {
     await fastify.register(import('@fastify/cors'))
@@ -21,7 +23,7 @@ export default async (fastify: FastifyInstance): Promise<void> => {
         // TODO: Reinstate once working within docker
         // password: String(process.env.REDIS_PASSWORD),
     })
-    await fastify.register(import('./knex'))
+    await fastify.register(import('./knex'), knexFile)
     await fastify.register(import('@fastify/rate-limit'), {
         max: 100,
         timeWindow: '1 minute',

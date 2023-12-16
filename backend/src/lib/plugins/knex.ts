@@ -5,17 +5,21 @@ import {
 } from 'fastify'
 import { FastifyPluginCallback } from 'fastify'
 import * as fp from 'fastify-plugin'
-import config from '../../knexfile'
 import knex from 'knex'
-const knexFile = config.development
-const knexInstance = knex(knexFile)
+
+// NOTE: Copy or put this in its own file to be exported out to routes
+type FastifyInstanceWithCustomPlugins = FastifyInstance & {
+    knex?: typeof knex
+}
 
 const knexPlugin: FastifyPluginCallback = (
-    fastify: FastifyInstance,
+    fastify: FastifyInstanceWithCustomPlugins,
     options: FastifyPluginOptions,
     done: HookHandlerDoneFunction,
 ) => {
-    fastify.decorate('knex', knexInstance)
+    if (!fastify.knex) {
+        fastify.decorate('knex', knex(options))
+    }
     done()
 }
 

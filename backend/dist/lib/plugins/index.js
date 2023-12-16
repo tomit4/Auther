@@ -29,6 +29,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("dotenv/config");
 const env_1 = __importDefault(require("@fastify/env"));
 const fastify_type_provider_zod_1 = require("fastify-type-provider-zod");
+const knexfile_1 = __importDefault(require("../../knexfile"));
+const knexFile = knexfile_1.default.development;
 exports.default = async (fastify) => {
     await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/cors'))));
     await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/helmet'))));
@@ -43,7 +45,7 @@ exports.default = async (fastify) => {
         // TODO: Reinstate once working within docker
         // password: String(process.env.REDIS_PASSWORD),
     });
-    await fastify.register(Promise.resolve().then(() => __importStar(require('./knex'))));
+    await fastify.register(Promise.resolve().then(() => __importStar(require('./knex'))), knexFile);
     await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/rate-limit'))), {
         max: 100,
         timeWindow: '1 minute',
