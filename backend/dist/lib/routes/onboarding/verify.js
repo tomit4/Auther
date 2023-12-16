@@ -30,6 +30,7 @@ exports.default = (fastify, options, done) => {
                     throw new Error('Sorry, but you took too long to answer your email, please sign up again.');
                 if (!dataFromRedis)
                     throw new Error('No data found by that email address, please sign up again.');
+                // TODO: Also check the db again to see if the email already exists, throw err if so
             }
             catch (err) {
                 if (err instanceof Error) {

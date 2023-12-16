@@ -29,9 +29,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fp = __importStar(require("fastify-plugin"));
 const knex_1 = __importDefault(require("knex"));
 const knexPlugin = (fastify, options, done) => {
-    if (!fastify.knex) {
+    if (!fastify.knex)
         fastify.decorate('knex', (0, knex_1.default)(options));
-    }
     done();
 };
 const plugin = fp.default(knexPlugin, {

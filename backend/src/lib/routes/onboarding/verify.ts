@@ -58,6 +58,7 @@ export default (
                     throw new Error(
                         'No data found by that email address, please sign up again.',
                     )
+                // TODO: Also check the db again to see if the email already exists, throw err if so
             } catch (err) {
                 if (err instanceof Error) {
                     return reply.code(400).send({

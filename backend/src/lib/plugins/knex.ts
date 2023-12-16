@@ -17,9 +17,7 @@ const knexPlugin: FastifyPluginCallback = (
     options: FastifyPluginOptions,
     done: HookHandlerDoneFunction,
 ) => {
-    if (!fastify.knex) {
-        fastify.decorate('knex', knex(options))
-    }
+    if (!fastify.knex) fastify.decorate('knex', knex(options))
     done()
 }
 

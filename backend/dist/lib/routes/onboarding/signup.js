@@ -57,6 +57,7 @@ exports.default = (fastify, options, done) => {
                     const { error } = zParsedPassword;
                     throw new Error(String(error.issues[0].message));
                 }
+                // TODO: write a knex.query to check if email exists in db also
                 if (await redis.get(hashedEmail))
                     throw new Error('You have already submitted your email, please check your inbox.');
                 const emailSent = await (0, send_email_1.default)(String(email), String(hashedEmail));
