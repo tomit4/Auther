@@ -97,7 +97,9 @@ export default (
                         'Error occurred while sending email, are your Brevo credentials up to date? :=>',
                         emailSent.error,
                     )
-                    throw new Error(String(emailSent.error))
+                    throw new Error(
+                        'An error occurred while sending email, please contact support.',
+                    )
                 }
             } catch (err) {
                 if (err instanceof Error) {
