@@ -21,6 +21,10 @@ const config: { [key: string]: Knex.Config } = {
             directory: './db/migrations',
             extension: 'ts',
         },
+        seeds: {
+            directory: './db/seeds',
+            extension: 'ts,',
+        },
     },
 
     staging: {
@@ -40,6 +44,10 @@ const config: { [key: string]: Knex.Config } = {
             directory: './db/migrations',
             extension: 'ts',
         },
+        seeds: {
+            directory: './db/seeds',
+            extension: 'ts,',
+        },
     },
 
     production: {
@@ -58,6 +66,10 @@ const config: { [key: string]: Knex.Config } = {
         migrations: {
             directory: './db/migrations',
             extension: 'ts',
+        },
+        seeds: {
+            directory: './db/seeds',
+            extension: 'ts,',
         },
     },
 }

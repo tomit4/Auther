@@ -44,6 +44,10 @@ const config = {
             directory: './db/migrations',
             extension: 'ts',
         },
+        seeds: {
+            directory: './db/seeds',
+            extension: 'ts,',
+        },
     },
     staging: {
         client: 'pg',
@@ -62,6 +66,10 @@ const config = {
             directory: './db/migrations',
             extension: 'ts',
         },
+        seeds: {
+            directory: './db/seeds',
+            extension: 'ts,',
+        },
     },
     production: {
         client: 'pg',
@@ -79,6 +87,10 @@ const config = {
         migrations: {
             directory: './db/migrations',
             extension: 'ts',
+        },
+        seeds: {
+            directory: './db/seeds',
+            extension: 'ts,',
         },
     },
 };
