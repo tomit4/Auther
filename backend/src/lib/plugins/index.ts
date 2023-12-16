@@ -10,6 +10,7 @@ import {
 export default async (fastify: FastifyInstance): Promise<void> => {
     await fastify.register(import('@fastify/cors'))
     await fastify.register(import('@fastify/helmet'))
+    await fastify.register(import('fastify-bcrypt'))
     await fastify.register(import('@fastify/cookie'), {
         secret: 'replaceme',
         hook: 'onRequest',

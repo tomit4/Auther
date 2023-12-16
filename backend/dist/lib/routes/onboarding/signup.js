@@ -22,6 +22,10 @@ exports.default = (fastify, options, done) => {
                     email: zod_1.z.string().optional(),
                     error: zod_1.z.string().optional(),
                 }),
+                400: zod_1.z.object({
+                    ok: zod_1.z.boolean(),
+                    error: zod_1.z.string(),
+                }),
             },
         },
         handler: async (request, reply) => {
@@ -58,7 +62,7 @@ exports.default = (fastify, options, done) => {
                 const emailSent = await (0, send_email_1.default)(String(email), String(hashedEmail));
                 if (!emailSent.wasSuccessfull) {
                     fastify.log.error('Error occurred while sending email, are your Brevo credentials up to date? :=>', emailSent.error);
-                    throw new Error(String(emailSent.error));
+                    throw new Error('An error occurred while sending email, please contact support.');
                 }
             }
             catch (err) {
