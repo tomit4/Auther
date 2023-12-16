@@ -20,7 +20,7 @@ const grabStoredCookie = (cookieKey: string): string => {
         prev[key] = value.join('=')
         return prev
     }, {})
-    const cookieVal = cookieKey in cookies ? cookies[`${cookieKey}`] : undefined
+    const cookieVal = cookieKey in cookies ? cookies[cookieKey] : undefined
     return cookieVal
 }
 
