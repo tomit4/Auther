@@ -42,6 +42,10 @@ export default (
                     email: z.string().optional(),
                     error: z.string().optional(),
                 }),
+                400: z.object({
+                    ok: z.boolean(),
+                    error: z.string(),
+                }),
             },
         },
         handler: async (
