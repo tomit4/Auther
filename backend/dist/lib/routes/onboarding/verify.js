@@ -22,7 +22,7 @@ exports.default = (fastify, options, done) => {
         },
         handler: async (request, reply) => {
             const { hashedEmail } = request.body;
-            const { redis } = fastify;
+            const { redis, knex } = fastify;
             const dataIsExpired = (await redis.ttl(hashedEmail)) < 0;
             const dataFromRedis = await redis.get(hashedEmail);
             try {
@@ -30,7 +30,17 @@ exports.default = (fastify, options, done) => {
                     throw new Error('Sorry, but you took too long to answer your email, please sign up again.');
                 if (!dataFromRedis)
                     throw new Error('No data found by that email address, please sign up again.');
-                // TODO: Also check the db again to see if the email already exists, throw err if so
+                const userAlreadyInDb = await knex('users')
+                    .where('email', hashedEmail)
+                    .first();
+                if (userAlreadyInDb)
+                    throw new Error('You have already signed up, please log in.');
+                await knex
+                    .insert({
+                    email: hashedEmail,
+                    password: 'password',
+                })
+                    .into('users');
             }
             catch (err) {
                 if (err instanceof Error) {
@@ -40,7 +50,6 @@ exports.default = (fastify, options, done) => {
                     });
                 }
             }
-            // TODO: persist email in db
             // TODO: generate and send back hashed JWT in cookie headers
             return reply.code(200).send({
                 ok: true,
