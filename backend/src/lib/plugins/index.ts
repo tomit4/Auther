@@ -1,5 +1,4 @@
-import 'dotenv/config'
-import { FastifyInstance } from 'fastify'
+import type { FastifyInstance } from 'fastify'
 import fastifyEnv from '@fastify/env'
 import {
     jsonSchemaTransform,

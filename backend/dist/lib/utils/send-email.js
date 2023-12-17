@@ -28,6 +28,7 @@ const Brevo = __importStar(require("@getbrevo/brevo"));
 // TODO: Consider wrapping this as a fastify service plugin/class
 // Configuration for Brevo
 const apiInstance = new Brevo.TransactionalEmailsApi();
+// ISSUE: https://github.com/getbrevo/brevo-node/issues/1
 // TS-ERROR: Property 'authentications' is protected and only accessible
 // within class 'TransactionalEmailsApi' and its subclasses.
 // @ts-ignore

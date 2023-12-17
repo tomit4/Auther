@@ -1,11 +1,11 @@
-import {
+import type {
     FastifyInstance,
     FastifyPluginOptions,
     FastifyReply,
     FastifyRequest,
     HookHandlerDoneFunction,
 } from 'fastify'
-import { ZodTypeProvider } from 'fastify-type-provider-zod'
+import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
 type BodyReq = {
