@@ -30,10 +30,9 @@ exports.default = (fastify, options, done) => {
         },
         handler: async (request, reply) => {
             const { email, password } = request.body;
-            const { redis, knex } = fastify;
+            const { redis, knex, bcrypt } = fastify;
             const hashedEmail = (0, hasher_1.default)(email);
-            // TODO: change with encryption
-            const encryptedPassword = password;
+            const hashedPassword = await bcrypt.hash(password);
             // TODO: replicate zod checks on front end
             const emailSchema = zod_1.z.string().email();
             const passwordSchemaRegex = new RegExp([
@@ -84,7 +83,7 @@ exports.default = (fastify, options, done) => {
                     });
                 }
             }
-            await redis.set(hashedEmail, encryptedPassword, 'EX', 60);
+            await redis.set(hashedEmail, hashedPassword, 'EX', 60);
             return reply
                 .setCookie('appname-hash', hashedEmail, {
                 path: '/verify',

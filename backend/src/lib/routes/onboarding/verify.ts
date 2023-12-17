@@ -46,10 +46,10 @@ export default (
             reply: FastifyReply,
         ): Promise<VerifyRes> => {
             const { hashedEmail } = request.body
-            const { redis, knex } = fastify
+            const { redis, knex, bcrypt } = fastify
             try {
                 const redisCacheExpired = (await redis.ttl(hashedEmail)) < 0
-                const encryptedPasswordFromRedis = await redis.get(hashedEmail)
+                const hashedPasswordFromRedis = await redis.get(hashedEmail)
                 const userAlreadyInDb = await knex('users')
                     .where('email', hashedEmail)
                     .first()
@@ -57,7 +57,7 @@ export default (
                     throw new Error(
                         'Sorry, but you took too long to answer your email, please sign up again.',
                     )
-                if (!encryptedPasswordFromRedis)
+                if (!hashedPasswordFromRedis)
                     throw new Error(
                         'No data found by that email address, please sign up again.',
                     )
@@ -68,9 +68,22 @@ export default (
                 await knex
                     .insert({
                         email: hashedEmail,
-                        password: encryptedPasswordFromRedis,
+                        password: hashedPasswordFromRedis,
                     })
                     .into('users')
+                // TESTING LOGIN FAILING THUS FAR
+                /*
+                const userPassword = await knex('users')
+                    .where('email', hashedEmail)
+                    .select('password')
+                    .first()
+                console.log('userPassword :=>', userPassword)
+                const passwordMatch = bcrypt.compare(
+                    hashedPasswordFromRedis,
+                    userPassword,
+                )
+                console.log('passwordMatch :=>', passwordMatch)
+                */
                 await redis.del(hashedEmail)
             } catch (err) {
                 if (err instanceof Error) {
