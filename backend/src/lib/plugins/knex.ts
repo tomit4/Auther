@@ -1,17 +1,11 @@
 import type {
-    FastifyInstance,
     FastifyPluginOptions,
     FastifyPluginCallback,
     HookHandlerDoneFunction,
 } from 'fastify'
+import type { FastifyInstanceWithCustomPlugins } from '../types'
 import * as fp from 'fastify-plugin'
 import knex from 'knex'
-import type { Knex } from 'knex'
-
-// NOTE: Copy or put this in its own file to be exported out to routes
-type FastifyInstanceWithCustomPlugins = FastifyInstance & {
-    knex?: Knex
-}
 
 const knexPlugin: FastifyPluginCallback = (
     fastify: FastifyInstanceWithCustomPlugins,

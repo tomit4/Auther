@@ -30,7 +30,7 @@ exports.default = (fastify, options, done) => {
         },
         handler: async (request, reply) => {
             const { email, password } = request.body;
-            const { redis } = fastify;
+            const { redis, knex } = fastify;
             const hashedEmail = (0, hasher_1.default)(email);
             // TODO: change with encryption
             const hashedPassword = password;

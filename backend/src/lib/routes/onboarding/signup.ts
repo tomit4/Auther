@@ -1,11 +1,11 @@
 import type {
-    FastifyInstance,
     FastifyPluginOptions,
     FastifyReply,
     FastifyRequest,
     HookHandlerDoneFunction,
 } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
+import type { FastifyInstanceWithCustomPlugins } from '../../types'
 import { z } from 'zod'
 import sendEmail from '../../utils/send-email'
 import hasher from '../../utils/hasher'
@@ -23,7 +23,7 @@ type SignUpRes = {
 }
 
 export default (
-    fastify: FastifyInstance,
+    fastify: FastifyInstanceWithCustomPlugins,
     options: FastifyPluginOptions,
     done: HookHandlerDoneFunction,
 ) => {
@@ -53,7 +53,7 @@ export default (
             reply: FastifyReply,
         ): Promise<SignUpRes> => {
             const { email, password } = request.body
-            const { redis } = fastify
+            const { redis, knex } = fastify
             const hashedEmail = hasher(email)
             // TODO: change with encryption
             const hashedPassword = password
@@ -84,7 +84,13 @@ export default (
                     const { error } = zParsedPassword
                     throw new Error(String(error.issues[0].message))
                 }
-                // TODO: write a knex.query to check if email exists in db also
+                const userAlreadyInDb = knex
+                    ? await knex('users').where('email', hashedEmail).first()
+                    : undefined
+                if (userAlreadyInDb)
+                    throw new Error(
+                        'You have already signed up, please log in.',
+                    )
                 if (await redis.get(hashedEmail))
                     throw new Error(
                         'You have already submitted your email, please check your inbox.',

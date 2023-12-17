@@ -1,10 +1,10 @@
 import type {
-    FastifyInstance,
     FastifyPluginOptions,
     FastifyReply,
     FastifyRequest,
     HookHandlerDoneFunction,
 } from 'fastify'
+import type { FastifyInstanceWithCustomPlugins } from '../../types'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
@@ -19,7 +19,7 @@ type VerifyRes = {
 }
 
 export default (
-    fastify: FastifyInstance,
+    fastify: FastifyInstanceWithCustomPlugins,
     options: FastifyPluginOptions,
     done: HookHandlerDoneFunction,
 ) => {
@@ -46,7 +46,7 @@ export default (
             reply: FastifyReply,
         ): Promise<VerifyRes> => {
             const { hashedEmail } = request.body
-            const { redis } = fastify
+            const { redis, knex } = fastify
             const dataIsExpired = (await redis.ttl(hashedEmail)) < 0
             const dataFromRedis = await redis.get(hashedEmail)
             try {
@@ -58,7 +58,19 @@ export default (
                     throw new Error(
                         'No data found by that email address, please sign up again.',
                     )
-                // TODO: Also check the db again to see if the email already exists, throw err if so
+                const userAlreadyInDb = knex
+                    ? await knex('users').where('email', hashedEmail).first()
+                    : undefined
+                if (userAlreadyInDb)
+                    throw new Error(
+                        'You have already signed up, please log in.',
+                    )
+                await knex
+                    ?.insert({
+                        email: hashedEmail,
+                        password: 'password',
+                    })
+                    .into('users')
             } catch (err) {
                 if (err instanceof Error) {
                     return reply.code(400).send({
@@ -67,7 +79,6 @@ export default (
                     })
                 }
             }
-            // TODO: persist email in db
             // TODO: generate and send back hashed JWT in cookie headers
             return reply.code(200).send({
                 ok: true,
