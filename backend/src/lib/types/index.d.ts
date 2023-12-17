@@ -1,7 +1,7 @@
 import type { FastifyPluginCallback } from 'fastify'
 import type { Knex } from 'knex'
 
-type FastifyKnexPluginType = FastifyPluginCallback<fastifyKnex.Knex>
+type FastifyKnexPluginType = FastifyPluginCallback<fastifyKnex.Knex.Config>
 
 declare module 'fastify' {
     interface FastifyInstance {

@@ -5,7 +5,7 @@ import type {
     HookHandlerDoneFunction,
 } from 'fastify'
 import * as fp from 'fastify-plugin'
-import knex from 'knex'
+import knex, { type Knex } from 'knex'
 
 const knexPlugin: FastifyPluginCallback = (
     fastify: FastifyInstance,
@@ -13,17 +13,17 @@ const knexPlugin: FastifyPluginCallback = (
     next: HookHandlerDoneFunction,
 ) => {
     try {
-        const handler = knex(options)
+        const knexInstance: Knex = knex(options)
         if (!fastify.knex)
             fastify
-                .decorate('knex', handler)
+                .decorate('knex', knexInstance)
                 .addHook(
                     'onClose',
                     (
                         fastifyInstance: FastifyInstance,
                         done: HookHandlerDoneFunction,
                     ) => {
-                        if (fastifyInstance.knex === handler)
+                        if (fastifyInstance.knex === knexInstance)
                             fastifyInstance.knex.destroy()
                         done()
                     },
@@ -34,8 +34,8 @@ const knexPlugin: FastifyPluginCallback = (
     }
 }
 
-const plugin = fp.default(knexPlugin, {
-    name: 'fastify-knex-plugin',
+const fastifyKnex = fp.default(knexPlugin, {
+    name: 'fastify-knex',
 })
 
-export default plugin
+export default fastifyKnex
