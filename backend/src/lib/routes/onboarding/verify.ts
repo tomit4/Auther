@@ -1,10 +1,10 @@
 import type {
+    FastifyInstance,
     FastifyPluginOptions,
     FastifyReply,
     FastifyRequest,
     HookHandlerDoneFunction,
 } from 'fastify'
-import type { FastifyInstanceWithCustomPlugins } from '../../types'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
@@ -19,7 +19,7 @@ type VerifyRes = {
 }
 
 export default (
-    fastify: FastifyInstanceWithCustomPlugins,
+    fastify: FastifyInstance,
     options: FastifyPluginOptions,
     done: HookHandlerDoneFunction,
 ) => {
@@ -58,15 +58,15 @@ export default (
                     throw new Error(
                         'No data found by that email address, please sign up again.',
                     )
-                const userAlreadyInDb = knex
-                    ? await knex('users').where('email', hashedEmail).first()
-                    : undefined
+                const userAlreadyInDb = await knex('users')
+                    .where('email', hashedEmail)
+                    .first()
                 if (userAlreadyInDb)
                     throw new Error(
                         'You have already signed up, please log in.',
                     )
                 await knex
-                    ?.insert({
+                    .insert({
                         email: hashedEmail,
                         password: 'password',
                     })

@@ -1,11 +1,11 @@
 import type {
+    FastifyInstance,
     FastifyPluginOptions,
     FastifyReply,
     FastifyRequest,
     HookHandlerDoneFunction,
 } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
-import type { FastifyInstanceWithCustomPlugins } from '../../types'
 import { z } from 'zod'
 import sendEmail from '../../utils/send-email'
 import hasher from '../../utils/hasher'
@@ -23,7 +23,7 @@ type SignUpRes = {
 }
 
 export default (
-    fastify: FastifyInstanceWithCustomPlugins,
+    fastify: FastifyInstance,
     options: FastifyPluginOptions,
     done: HookHandlerDoneFunction,
 ) => {
@@ -84,9 +84,9 @@ export default (
                     const { error } = zParsedPassword
                     throw new Error(String(error.issues[0].message))
                 }
-                const userAlreadyInDb = knex
-                    ? await knex('users').where('email', hashedEmail).first()
-                    : undefined
+                const userAlreadyInDb = await knex('users')
+                    .where('email', hashedEmail)
+                    .first()
                 if (userAlreadyInDb)
                     throw new Error(
                         'You have already signed up, please log in.',
