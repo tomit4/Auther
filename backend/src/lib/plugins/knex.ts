@@ -7,6 +7,12 @@ import type {
 import * as fp from 'fastify-plugin'
 import knex, { type Knex } from 'knex'
 
+declare module 'fastify' {
+    interface FastifyInstance {
+        knex: Knex
+    }
+}
+
 const knexPlugin: FastifyPluginCallback = (
     fastify: FastifyInstance,
     options: FastifyPluginOptions,
