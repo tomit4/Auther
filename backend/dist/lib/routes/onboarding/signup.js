@@ -33,22 +33,32 @@ exports.default = (fastify, options, done) => {
             const { redis, knex } = fastify;
             const hashedEmail = (0, hasher_1.default)(email);
             // TODO: change with encryption
-            const hashedPassword = password;
-            // TODO:  hash/salt email and encrypt password
-            // set in redis hash_email_string: encrypted_password
-            // NOTE: If the user answers the transac email within time limit,
-            // the encrypted password is pulled from the redis cache and stored
-            // in the postgresql database, it is then removed from the redis cache.
+            const encryptedPassword = password;
             // TODO: replicate zod checks on front end
             const emailSchema = zod_1.z.string().email();
-            const passwordSchema = zod_1.z
-                .string()
-                .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])[A-Za-z\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{10,}$/, {
-                message: 'Password must be at least 10 characters in length and contain at least one lowercase letter, one uppercase letter, one digit, and one special character',
+            const passwordSchemaRegex = new RegExp([
+                /^(?=.*[a-z])/, // At least one lowercase letter
+                /(?=.*[A-Z])/, // At least one uppercase letter
+                /(?=.*\d)/, // At least one digit
+                /(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/, // At least one special character
+                /[A-Za-z\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{10,}$/, // At least 10 characters long
+            ]
+                .map(r => r.source)
+                .join(''));
+            const passwordSchemaErrMsg = 'Password must be at least 10 characters in length and contain at \
+                least one lowercase letter, one uppercase letter, one digit, and one \
+                special character';
+            const passwordSchema = zod_1.z.string().regex(passwordSchemaRegex, {
+                message: passwordSchemaErrMsg,
             });
             try {
                 const zParsedEmail = emailSchema.safeParse(email);
                 const zParsedPassword = passwordSchema.safeParse(password);
+                const userAlreadyInDb = await knex('users')
+                    .where('email', hashedEmail)
+                    .first();
+                const userAlreadyInCache = await redis.get(hashedEmail);
+                const emailSent = await (0, send_email_1.default)(String(email), String(hashedEmail));
                 if (!zParsedEmail.success) {
                     const { error } = zParsedEmail;
                     throw new Error(String(error.issues[0].message));
@@ -57,14 +67,10 @@ exports.default = (fastify, options, done) => {
                     const { error } = zParsedPassword;
                     throw new Error(String(error.issues[0].message));
                 }
-                const userAlreadyInDb = await knex('users')
-                    .where('email', hashedEmail)
-                    .first();
                 if (userAlreadyInDb)
                     throw new Error('You have already signed up, please log in.');
-                if (await redis.get(hashedEmail))
+                if (userAlreadyInCache)
                     throw new Error('You have already submitted your email, please check your inbox.');
-                const emailSent = await (0, send_email_1.default)(String(email), String(hashedEmail));
                 if (!emailSent.wasSuccessfull) {
                     fastify.log.error('Error occurred while sending email, are your Brevo credentials up to date? :=>', emailSent.error);
                     throw new Error('An error occurred while sending email, please contact support.');
@@ -78,7 +84,7 @@ exports.default = (fastify, options, done) => {
                     });
                 }
             }
-            await redis.set(hashedEmail, hashedPassword, 'EX', 60);
+            await redis.set(hashedEmail, encryptedPassword, 'EX', 60);
             return reply
                 .setCookie('appname-hash', hashedEmail, {
                 path: '/verify',

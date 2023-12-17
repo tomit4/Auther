@@ -23,24 +23,25 @@ exports.default = (fastify, options, done) => {
         handler: async (request, reply) => {
             const { hashedEmail } = request.body;
             const { redis, knex } = fastify;
-            const dataIsExpired = (await redis.ttl(hashedEmail)) < 0;
-            const dataFromRedis = await redis.get(hashedEmail);
             try {
-                if (dataIsExpired)
-                    throw new Error('Sorry, but you took too long to answer your email, please sign up again.');
-                if (!dataFromRedis)
-                    throw new Error('No data found by that email address, please sign up again.');
+                const redisCacheExpired = (await redis.ttl(hashedEmail)) < 0;
+                const encryptedPasswordFromRedis = await redis.get(hashedEmail);
                 const userAlreadyInDb = await knex('users')
                     .where('email', hashedEmail)
                     .first();
+                if (redisCacheExpired)
+                    throw new Error('Sorry, but you took too long to answer your email, please sign up again.');
+                if (!encryptedPasswordFromRedis)
+                    throw new Error('No data found by that email address, please sign up again.');
                 if (userAlreadyInDb)
                     throw new Error('You have already signed up, please log in.');
                 await knex
                     .insert({
                     email: hashedEmail,
-                    password: 'password',
+                    password: encryptedPasswordFromRedis,
                 })
                     .into('users');
+                await redis.del(hashedEmail);
             }
             catch (err) {
                 if (err instanceof Error) {
