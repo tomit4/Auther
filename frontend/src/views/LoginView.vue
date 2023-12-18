@@ -8,7 +8,7 @@ const passwordInput: Ref<null> = ref(null)
 const errMessage: Ref<null> = ref(null)
 const resSuccessful: Ref<string> = ref('')
 
-const emailRoute = import.meta.env.VITE_EMAIL_ROUTE
+const loginRoute = import.meta.env.VITE_LOGIN_ROUTE
 // TODO: place in a utility class/file
 const delay = (ms: number): Promise<void> => {
     return new Promise(resolve => setTimeout(resolve, ms))
@@ -29,12 +29,13 @@ const handleSubmit = async (
             email: emailInput,
             password: passwordInput,
         }
-        const res = await fetch(emailRoute, {
+        const res = await fetch(loginRoute, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
             body: JSON.stringify(data),
         })
+        /*
         const jsonRes = await res.json()
         if (!res.ok || jsonRes.error) {
             const errMsg = {
@@ -49,6 +50,7 @@ const handleSubmit = async (
             await delay(1000)
             router.push('/auth')
         }
+        */
     } catch (err) {
         console.error(err)
     }
