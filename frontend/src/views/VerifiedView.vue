@@ -45,7 +45,7 @@ onMounted(async () => {
             errMessage.value = errMsg.error
             // TODO: set up watcher to display count down before redirect
             await delay(1000)
-            router.push('/signup')
+            router.push('/')
         } else {
             resSuccessful.value = jsonRes.msg
             // TODO: grab a JWT from backend for
