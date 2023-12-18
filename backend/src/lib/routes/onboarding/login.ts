@@ -7,8 +7,8 @@ import type {
     HookHandlerDoneFunction,
 } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
-// import { z } from 'zod'
-//
+import { z } from 'zod'
+
 type BodyReq = {
     email: string
     loginPassword: string
@@ -28,7 +28,6 @@ export default (
     fastify.withTypeProvider<ZodTypeProvider>().route({
         method: 'POST',
         url: '/login',
-        /*
         schema: {
             body: z.object({
                 email: z.string(),
@@ -37,17 +36,18 @@ export default (
             response: {
                 200: z.object({
                     ok: z.boolean(),
-                    msg: z.string().optional(),
-                    email: z.string().optional(),
-                    error: z.string().optional(),
+                    msg: z.string(),
                 }),
-                400: z.object({
+                401: z.object({
+                    ok: z.boolean(),
+                    error: z.string(),
+                }),
+                500: z.object({
                     ok: z.boolean(),
                     error: z.string(),
                 }),
             },
         },
-        */
         handler: async (
             request: FastifyRequest<{ Body: BodyReq }>,
             reply: FastifyReply,

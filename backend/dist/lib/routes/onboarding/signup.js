@@ -18,11 +18,10 @@ exports.default = (fastify, options, done) => {
             response: {
                 200: zod_1.z.object({
                     ok: zod_1.z.boolean(),
-                    msg: zod_1.z.string().optional(),
-                    email: zod_1.z.string().optional(),
-                    error: zod_1.z.string().optional(),
+                    msg: zod_1.z.string(),
+                    email: zod_1.z.string(),
                 }),
-                400: zod_1.z.object({
+                500: zod_1.z.object({
                     ok: zod_1.z.boolean(),
                     error: zod_1.z.string(),
                 }),
@@ -89,6 +88,7 @@ exports.default = (fastify, options, done) => {
             await redis.set(`${hashedEmail}-email`, email, 'EX', 60);
             await redis.set(`${hashedEmail}-password`, hashedPassword, 'EX', 60);
             return reply
+                .code(200)
                 .setCookie('appname-hash', hashedEmail, {
                 path: '/verify',
                 maxAge: 60 * 60,

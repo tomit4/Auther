@@ -38,11 +38,10 @@ export default (
             response: {
                 200: z.object({
                     ok: z.boolean(),
-                    msg: z.string().optional(),
-                    email: z.string().optional(),
-                    error: z.string().optional(),
+                    msg: z.string(),
+                    email: z.string(),
                 }),
-                400: z.object({
+                500: z.object({
                     ok: z.boolean(),
                     error: z.string(),
                 }),
@@ -127,6 +126,7 @@ export default (
             await redis.set(`${hashedEmail}-email`, email, 'EX', 60)
             await redis.set(`${hashedEmail}-password`, hashedPassword, 'EX', 60)
             return reply
+                .code(200)
                 .setCookie('appname-hash', hashedEmail, {
                     path: '/verify',
                     maxAge: 60 * 60,

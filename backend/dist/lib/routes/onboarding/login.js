@@ -1,29 +1,30 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const zod_1 = require("zod");
 exports.default = (fastify, options, done) => {
     fastify.withTypeProvider().route({
         method: 'POST',
         url: '/login',
-        /*
         schema: {
-            body: z.object({
-                email: z.string(),
-                password: z.string(),
+            body: zod_1.z.object({
+                email: zod_1.z.string(),
+                password: zod_1.z.string(),
             }),
             response: {
-                200: z.object({
-                    ok: z.boolean(),
-                    msg: z.string().optional(),
-                    email: z.string().optional(),
-                    error: z.string().optional(),
+                200: zod_1.z.object({
+                    ok: zod_1.z.boolean(),
+                    msg: zod_1.z.string(),
                 }),
-                400: z.object({
-                    ok: z.boolean(),
-                    error: z.string(),
+                401: zod_1.z.object({
+                    ok: zod_1.z.boolean(),
+                    error: zod_1.z.string(),
+                }),
+                500: zod_1.z.object({
+                    ok: zod_1.z.boolean(),
+                    error: zod_1.z.string(),
                 }),
             },
         },
-        */
         handler: async (request, reply) => {
             const { knex, bcrypt } = fastify;
             const { email, loginPassword } = request.body;

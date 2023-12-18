@@ -35,7 +35,7 @@ export default (
                     ok: z.boolean(),
                     msg: z.string(),
                 }),
-                400: z.object({
+                500: z.object({
                     ok: z.boolean(),
                     error: z.string(),
                 }),

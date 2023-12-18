@@ -14,7 +14,7 @@ exports.default = (fastify, options, done) => {
                     ok: zod_1.z.boolean(),
                     msg: zod_1.z.string(),
                 }),
-                400: zod_1.z.object({
+                500: zod_1.z.object({
                     ok: zod_1.z.boolean(),
                     error: zod_1.z.string(),
                 }),
