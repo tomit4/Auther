@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 const router = useRouter()
-const handleSignUp = async (): Promise<void> => {
+const handleSignUp = (): void => {
     router.push('/signup')
+}
+const handleLogin = (): void => {
+    router.push('/login')
 }
 </script>
 
@@ -20,16 +23,14 @@ const handleSignUp = async (): Promise<void> => {
                 Sign Up
             </button>
             <br />
-            <!--
             <button
-                @click="handleLogin(String(input))"
+                @click="handleLogin()"
                 type="submit"
                 value="Submit"
                 className="btn login-btn"
             >
                 Login
             </button>
-            -->
         </div>
     </div>
 </template>

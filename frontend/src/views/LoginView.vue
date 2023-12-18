@@ -14,6 +14,10 @@ const delay = (ms: number): Promise<void> => {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
+/*
+ * TODO: Change logic/routes here to be
+ * different from SignUp (currently is the same)
+ */
 const handleSubmit = async (
     emailInput: string,
     passwordInput: string,
@@ -53,10 +57,10 @@ const handleSubmit = async (
 
 <template>
     <div>
-        <h1>Sign Up</h1>
+        <h1>Login</h1>
         <br />
         <span className="email-form">
-            <label className="email-label" for="email">Email Me At:</label>
+            <label className="email-label" for="email">Enter Your Email:</label>
             <input
                 type="email"
                 id="email"
@@ -73,7 +77,7 @@ const handleSubmit = async (
             />
             <br />
             <label className="password-label" for="password"
-                >Create A Password:</label
+                >Enter Your Password:</label
             >
             <input
                 type="password"

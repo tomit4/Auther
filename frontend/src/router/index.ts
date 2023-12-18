@@ -1,10 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import SplashView from '../views/SplashView.vue'
-import SignUpView from '../views/SignUpView.vue'
-import WaitingForActionView from '../views/WaitingForActionView.vue'
-import VerifiedView from '../views/VerifiedView.vue'
+
 import AppView from '../views/AppView.vue'
+import LoginView from '../views/LoginView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
+import SignUpView from '../views/SignUpView.vue'
+import SplashView from '../views/SplashView.vue'
+import VerifiedView from '../views/VerifiedView.vue'
+import WaitingForActionView from '../views/WaitingForActionView.vue'
 
 const routes = [
     {
@@ -16,6 +18,11 @@ const routes = [
         path: '/signup',
         component: SignUpView,
         name: 'SignUpView',
+    },
+    {
+        path: '/login',
+        component: LoginView,
+        name: 'LoginView',
     },
     {
         path: '/auth',
