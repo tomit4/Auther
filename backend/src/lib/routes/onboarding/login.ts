@@ -1,3 +1,4 @@
+import { ALL } from 'dns'
 import type {
     FastifyInstance,
     FastifyPluginOptions,
@@ -7,12 +8,13 @@ import type {
 } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 // import { z } from 'zod'
-/*
+//
 type BodyReq = {
     email: string
-    password: string
+    loginPassword: string
 }
 
+/*
 type SignUpRes = {
     ok: boolean
     msg?: string
@@ -49,12 +51,25 @@ export default (
         },
         */
         handler: async (
-            // request: FastifyRequest<{ Body: BodyReq }>,
-            request: FastifyRequest,
+            request: FastifyRequest<{ Body: BodyReq }>,
             reply: FastifyReply,
             // ): Promise<SignUpRes> => {
         ) => {
-            console.log('hit login route :=>')
+            const { knex, bcrypt } = fastify
+            const { email, loginPassword } = request.body
+            try {
+                const { password } = await knex('users')
+                    .select('password')
+                    .where('email', email)
+                    .first()
+                const passwordHashesmatch = await bcrypt
+                    .compare(loginPassword, password)
+                    .then(match => match)
+                    .catch(err => console.error(err.message))
+                console.log('passwordHashesmatch :=>', passwordHashesmatch)
+            } catch (err) {
+                console.error('ERROR :=>', err)
+            }
         },
     })
     done()

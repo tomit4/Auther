@@ -1,12 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-// import { z } from 'zod'
 /*
-type BodyReq = {
-    email: string
-    password: string
-}
-
 type SignUpRes = {
     ok: boolean
     msg?: string
@@ -38,10 +32,23 @@ exports.default = (fastify, options, done) => {
             },
         },
         */
-        handler: async (
-        // request: FastifyRequest<{ Body: BodyReq }>,
-        request, reply) => {
-            console.log('hit login route :=>');
+        handler: async (request, reply) => {
+            const { knex, bcrypt } = fastify;
+            const { email, loginPassword } = request.body;
+            try {
+                const { password } = await knex('users')
+                    .select('password')
+                    .where('email', email)
+                    .first();
+                const passwordHashesmatch = await bcrypt
+                    .compare(loginPassword, password)
+                    .then(match => match)
+                    .catch(err => console.error(err.message));
+                console.log('passwordHashesmatch :=>', passwordHashesmatch);
+            }
+            catch (err) {
+                console.error('ERROR :=>', err);
+            }
         },
     });
     done();

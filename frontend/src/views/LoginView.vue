@@ -27,7 +27,7 @@ const handleSubmit = async (
         resSuccessful.value = ''
         const data = {
             email: emailInput,
-            password: passwordInput,
+            loginPassword: passwordInput,
         }
         const res = await fetch(loginRoute, {
             method: 'POST',
