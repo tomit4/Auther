@@ -35,7 +35,6 @@ const handleSubmit = async (
             credentials: 'include',
             body: JSON.stringify(data),
         })
-        /*
         const jsonRes = await res.json()
         if (!res.ok || jsonRes.error) {
             const errMsg = {
@@ -45,12 +44,11 @@ const handleSubmit = async (
             errMessage.value = errMsg.error
             throw Error(`An error occurred: ${JSON.stringify(errMsg)}`)
         } else {
-            resSuccessful.value = jsonRes.email
+            resSuccessful.value = jsonRes.msg
             // TODO: set up watcher to display count down before redirect
             await delay(1000)
-            router.push('/auth')
+            router.push('/app')
         }
-        */
     } catch (err) {
         console.error(err)
     }

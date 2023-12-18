@@ -1,13 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-/*
-type SignUpRes = {
-    ok: boolean
-    msg?: string
-    email?: string
-    error?: string
-}
-*/
 exports.default = (fastify, options, done) => {
     fastify.withTypeProvider().route({
         method: 'POST',
@@ -40,15 +32,36 @@ exports.default = (fastify, options, done) => {
                     .select('password')
                     .where('email', email)
                     .first();
-                const passwordHashesmatch = await bcrypt
+                const passwordHashesMatch = await bcrypt
                     .compare(loginPassword, password)
                     .then(match => match)
-                    .catch(err => console.error(err.message));
-                console.log('passwordHashesmatch :=>', passwordHashesmatch);
+                    .catch(err => err);
+                /*
+                .setCookie('appname-jwt', '', {
+                    path: '/app',
+                    maxAge: 360 // change to 15 minutes when done (alongside expire of jwt),
+                })
+                */
+                if (!passwordHashesMatch) {
+                    return reply.code(401).send({
+                        ok: false,
+                        error: 'Incorrect email or password. Please try again.',
+                    });
+                }
             }
             catch (err) {
-                console.error('ERROR :=>', err);
+                if (err instanceof Error) {
+                    fastify.log.error('ERROR :=>', err.message);
+                    return reply.code(500).send({
+                        ok: false,
+                        error: err.message,
+                    });
+                }
             }
+            return reply.code(200).send({
+                ok: true,
+                msg: 'You have been successfully authenticated! Redirecting you to the app...',
+            });
         },
     });
     done();

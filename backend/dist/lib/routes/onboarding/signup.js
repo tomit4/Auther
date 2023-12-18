@@ -79,7 +79,8 @@ exports.default = (fastify, options, done) => {
             }
             catch (err) {
                 if (err instanceof Error) {
-                    return reply.code(400).send({
+                    fastify.log.error('ERROR :=>', err.message);
+                    return reply.code(500).send({
                         ok: false,
                         error: err.message,
                     });
