@@ -54,9 +54,10 @@ exports.default = (fastify, options, done) => {
                 const zParsedEmail = emailSchema.safeParse(email);
                 const zParsedPassword = passwordSchema.safeParse(password);
                 const userAlreadyInDb = await knex('users')
-                    .where('email', hashedEmail)
+                    .where('hashed_email', hashedEmail)
                     .first();
-                const userAlreadyInCache = await redis.get(hashedEmail);
+                const userAlreadyInCache = (await redis.get(`${hashedEmail}-email`)) ||
+                    (await redis.get(`${hashedEmail}-password`));
                 const emailSent = await (0, send_email_1.default)(String(email), String(hashedEmail));
                 if (!zParsedEmail.success) {
                     const { error } = zParsedEmail;
@@ -83,7 +84,8 @@ exports.default = (fastify, options, done) => {
                     });
                 }
             }
-            await redis.set(hashedEmail, hashedPassword, 'EX', 60);
+            await redis.set(`${hashedEmail}-email`, email, 'EX', 60);
+            await redis.set(`${hashedEmail}-password`, hashedPassword, 'EX', 60);
             return reply
                 .setCookie('appname-hash', hashedEmail, {
                 path: '/verify',
