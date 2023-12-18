@@ -30,7 +30,7 @@ export default (
         schema: {
             body: z.object({
                 email: z.string(),
-                password: z.string(),
+                loginPassword: z.string(),
             }),
             response: {
                 200: z.object({

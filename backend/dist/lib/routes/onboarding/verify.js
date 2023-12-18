@@ -40,7 +40,6 @@ exports.default = (fastify, options, done) => {
                 await knex
                     .insert({
                     email: emailFromRedis,
-                    hashed_email: hashedEmail,
                     password: hashedPasswordFromRedis,
                 })
                     .into('users');

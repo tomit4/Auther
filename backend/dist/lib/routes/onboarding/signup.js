@@ -54,7 +54,7 @@ exports.default = (fastify, options, done) => {
                 const zParsedEmail = emailSchema.safeParse(email);
                 const zParsedPassword = passwordSchema.safeParse(password);
                 const userAlreadyInDb = await knex('users')
-                    .where('hashed_email', hashedEmail)
+                    .where('email', email)
                     .first();
                 const userAlreadyInCache = (await redis.get(`${hashedEmail}-email`)) ||
                     (await redis.get(`${hashedEmail}-password`));
