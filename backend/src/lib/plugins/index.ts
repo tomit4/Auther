@@ -13,7 +13,7 @@ export default async (fastify: FastifyInstance): Promise<void> => {
     await fastify.register(import('@fastify/helmet'))
     await fastify.register(import('fastify-bcrypt'))
     await fastify.register(import('@fastify/cookie'), {
-        secret: 'replaceme',
+        secret: String(process.env.COOKIE_SECRET),
         hook: 'onRequest',
     })
     await fastify.register(import('@fastify/redis'), {
@@ -28,7 +28,7 @@ export default async (fastify: FastifyInstance): Promise<void> => {
         timeWindow: '1 minute',
     })
     await fastify.register(import('@fastify/jwt'), {
-        secret: 'replaceme',
+        secret: String(process.env.JWT_SECRET),
     })
     await fastify.register(import('@fastify/swagger'), {
         openapi: {

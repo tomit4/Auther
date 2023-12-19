@@ -35,7 +35,7 @@ exports.default = async (fastify) => {
     await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/helmet'))));
     await fastify.register(Promise.resolve().then(() => __importStar(require('fastify-bcrypt'))));
     await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/cookie'))), {
-        secret: 'replaceme',
+        secret: String(process.env.COOKIE_SECRET),
         hook: 'onRequest',
     });
     await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/redis'))), {
@@ -50,7 +50,7 @@ exports.default = async (fastify) => {
         timeWindow: '1 minute',
     });
     await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/jwt'))), {
-        secret: 'replaceme',
+        secret: String(process.env.JWT_SECRET),
     });
     await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/swagger'))), {
         openapi: {
