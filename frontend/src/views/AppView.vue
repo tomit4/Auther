@@ -1,10 +1,17 @@
 <script setup lang="ts">
-// TODO: onMounted immediately queries the backend to check if JWT is valid
+import { onMounted } from 'vue'
+const authRoute = import.meta.env.VITE_AUTH_ROUTE
 
-/* TODO: implement logic that deals with session/access tokens 
-    (i.e. one expires short term, and simply checks against longer 
-    term session token, if session token is valid, reissue access, 
-    otherwise log out) */
+// TODO: Change the logic here to grab the jwt from localstorage and set it in the authorization headers.
+// TODO: set up a single route that will talk to the backend which is protected. this route is also protected using vue-router. if 401 (unauthorized) is returned, reroute to home, otherwise give access to sensitive data (in this case email and password, why not for demo purposes only obviously).
+
+// Simply sends the cookies over to be verifed in /auth on backend
+onMounted(async () => {
+    await fetch(authRoute, {
+        method: 'GET',
+        credentials: 'include',
+    })
+})
 </script>
 
 <template>

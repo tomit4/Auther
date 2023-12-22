@@ -46,7 +46,7 @@ export default (
             reply: FastifyReply,
         ): Promise<VerifyRes> => {
             const { hashedEmail } = request.body
-            const { redis, knex } = fastify
+            const { redis, knex, jwt } = fastify
             try {
                 const redisCacheExpired =
                     (await redis.ttl(`${hashedEmail}-email`)) < 0 ||
@@ -70,6 +70,8 @@ export default (
                     throw new Error(
                         'You have already signed up, please log in.',
                     )
+                // TODO: consider changing to hashedEmail instead
+                // of emailFromRedis and what that would entail
                 await knex
                     .insert({
                         email: emailFromRedis,
@@ -95,17 +97,22 @@ export default (
                     })
                 }
             }
-            /* TODO: generate and send back hashed JWT in cookie headers (logged in)
-            .setCookie('appname-jwt', 'hashed_jwt', {
-                path: '/app',
-                maxAge: 3600 (equivalent to jwt ttl)
-            })
-            */
+            const token = jwt.sign(
+                { email: hashedEmail },
+                { expiresIn: process.env.JWT_EXPIRES_IN },
+            )
             return reply
                 .code(200)
                 .setCookie('appname-hash', '', {
                     path: '/verify',
                     maxAge: 0,
+                })
+                .setCookie('appname-jwt', token, {
+                    // NOTE: don't set path, doesn't send cookies over fetch for some reason
+                    secure: true, // send cookie over HTTPS only
+                    httpOnly: true,
+                    sameSite: true, // alternative CSRF protection
+                    // maxAge: 3600,
                 })
                 .send({
                     ok: true,

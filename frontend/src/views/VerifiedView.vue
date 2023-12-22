@@ -37,6 +37,7 @@ onMounted(async () => {
             body: JSON.stringify(data),
         })
         const jsonRes = await res.json()
+        // TODO: grab the jwt from the return body and set it in local storage
         if (!res.ok || jsonRes.error) {
             const errMsg = {
                 ok: res.ok,
