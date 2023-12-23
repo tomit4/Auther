@@ -7,11 +7,11 @@ import type {
 } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 // import { z } from 'zod'
-/*
-type BodyReq = {
-    hashedEmail: string
-}
 
+type BodyReq = {
+    token: string
+}
+/*
 type VerifyRes = {
     ok: boolean
     msg?: string
@@ -26,6 +26,8 @@ export default (
     fastify.withTypeProvider<ZodTypeProvider>().route({
         method: 'GET',
         url: '/auth',
+        // TODO: extend type FastifyInstance to include authenticate...
+        onRequest: [fastify.authenticate],
         /*
         schema: {
             body: z.object({
@@ -44,8 +46,7 @@ export default (
         },
         */
         handler: async (
-            // request: FastifyRequest<{ Body: BodyReq }>,
-            request: FastifyRequest,
+            request: FastifyRequest<{ Body: BodyReq }>,
             reply: FastifyReply,
             // ): Promise<VerifyRes> => {
         ) => {
@@ -58,7 +59,16 @@ export default (
             // NOTE: these auth headers can only be set in the fetch() request if the jwt is set in localstorage or a
             // not http-only (insecure) cookie. Thusly this technique will have to be utilized to have an actually working
             // secure backend api that gives access to sensitive user info IF the auth headers contain a valid jwt.
-            console.log('request.cookies :=>', request.cookies)
+            //
+
+            // console.log('request.cookies :=>', request.cookies) // TODO: utilize for refresh token
+            // Works, errors out if jwt expired
+            // TODO: extend out try/catch/throw error handling
+            // TODO: Send sensitive info to user to be rendered on front end
+            return reply.code(200).send({
+                ok: true,
+                msg: 'authenticated',
+            })
         },
     })
     done()

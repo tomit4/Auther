@@ -7,10 +7,29 @@ const authRoute = import.meta.env.VITE_AUTH_ROUTE
 
 // Simply sends the cookies over to be verifed in /auth on backend
 onMounted(async () => {
-    await fetch(authRoute, {
+    const token = localStorage.getItem('appname-token')
+    const res = await fetch(authRoute, {
         method: 'GET',
         credentials: 'include',
+        headers: { Authorization: `Bearer ${token}` },
     })
+    try {
+        const jsonRes = await res.json()
+        if (!res.ok || jsonRes.error) {
+            const errMsg = {
+                ok: res.ok,
+                error: jsonRes.error ? jsonRes.error : 'Unknown error occurred',
+            }
+            throw Error(`An error occurred: ${JSON.stringify(errMsg)}`)
+        } else {
+            console.log('jsonRes :=>', jsonRes)
+        }
+    } catch (err) {
+        if (err instanceof Error) {
+            // TODO: render error to user
+            console.error('ERROR :=>', err.message) // {"ok":false,"error":"Unauthorized"}
+        }
+    }
 })
 </script>
 

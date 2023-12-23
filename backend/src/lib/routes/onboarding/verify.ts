@@ -11,13 +11,12 @@ import { z } from 'zod'
 type BodyReq = {
     hashedEmail: string
 }
-
 type VerifyRes = {
     ok: boolean
     msg?: string
     error?: string
+    token?: string
 }
-
 export default (
     fastify: FastifyInstance,
     options: FastifyPluginOptions,
@@ -34,6 +33,7 @@ export default (
                 200: z.object({
                     ok: z.boolean(),
                     msg: z.string(),
+                    token: z.string(),
                 }),
                 500: z.object({
                     ok: z.boolean(),
@@ -101,22 +101,27 @@ export default (
                 { email: hashedEmail },
                 { expiresIn: process.env.JWT_EXPIRES_IN },
             )
+            console.log('token :=>', token)
+            console.log('typeof token :=>', typeof token)
+            /*
+            .setCookie('appname-jwt', token, {
+            // NOTE: don't set path, doesn't send cookies over fetch for some reason
+            secure: true, // send cookie over HTTPS only
+            httpOnly: true,
+            sameSite: true, // alternative CSRF protection
+            // maxAge: 3600,
+            })
+            */
             return reply
                 .code(200)
                 .setCookie('appname-hash', '', {
                     path: '/verify',
                     maxAge: 0,
                 })
-                .setCookie('appname-jwt', token, {
-                    // NOTE: don't set path, doesn't send cookies over fetch for some reason
-                    secure: true, // send cookie over HTTPS only
-                    httpOnly: true,
-                    sameSite: true, // alternative CSRF protection
-                    // maxAge: 3600,
-                })
                 .send({
                     ok: true,
                     msg: 'Your email has been verified, redirecting you to the app...',
+                    token: token,
                 })
         },
     })

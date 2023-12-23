@@ -1,4 +1,4 @@
-import type { FastifyInstance } from 'fastify'
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import fastifyEnv from '@fastify/env'
 import {
     jsonSchemaTransform,
@@ -30,6 +30,18 @@ export default async (fastify: FastifyInstance): Promise<void> => {
     await fastify.register(import('@fastify/jwt'), {
         secret: String(process.env.JWT_SECRET),
     })
+    // TODO: put in own path/files,
+    // TODO: extend type FastifyInstance out to include authenticate
+    fastify.decorate(
+        'authenticate',
+        async (request: FastifyRequest, reply: FastifyReply) => {
+            try {
+                await request.jwtVerify()
+            } catch (err) {
+                reply.send(err)
+            }
+        },
+    )
     await fastify.register(import('@fastify/swagger'), {
         openapi: {
             info: {

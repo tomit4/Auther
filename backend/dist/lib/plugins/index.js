@@ -52,6 +52,16 @@ exports.default = async (fastify) => {
     await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/jwt'))), {
         secret: String(process.env.JWT_SECRET),
     });
+    // TODO: put in own path/files,
+    // TODO: extend type FastifyInstance out to include authenticate
+    fastify.decorate('authenticate', async (request, reply) => {
+        try {
+            await request.jwtVerify();
+        }
+        catch (err) {
+            reply.send(err);
+        }
+    });
     await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/swagger'))), {
         openapi: {
             info: {
