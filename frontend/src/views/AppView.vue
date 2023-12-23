@@ -26,7 +26,12 @@ onMounted(async () => {
         }
     } catch (err) {
         if (err instanceof Error) {
-            // TODO: render error to user
+            // NOTE: If the localStorage token is invalid,
+            // we then need to check to see if the refresh token is still valid (cookie token),
+            // if the refresh/cookie token is still valid,
+            // then we need to generate a new jwt on the backend and set it here in local storage,
+            // else
+            // then we need to render the error to the user briefly before redirecting them back home.
             console.error('ERROR :=>', err.message) // {"ok":false,"error":"Unauthorized"}
         }
     }
