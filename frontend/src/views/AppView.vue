@@ -1,6 +1,19 @@
 <script setup lang="ts">
-const handleLogOut = (): void => {
-    console.log('log out logic goes here :=>')
+import { useRouter } from 'vue-router'
+const logoutRoute = import.meta.env.VITE_LOGOUT_ROUTE
+
+const router = useRouter()
+const handleLogOut = async (): Promise<void> => {
+    const logOutRes = await fetch(logoutRoute, {
+        method: 'GET',
+        credentials: 'include',
+    })
+    if (logOutRes.status === 200) {
+        localStorage.removeItem('appname-session-token')
+        // hack, just refreshes it to remove form input
+        // router.push('/login').then(() => window.location.reload())
+        router.push('/login')
+    } else console.error('ERROR while logging out :=>', logOutRes)
 }
 
 const handleChangePassword = (): void => {

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 const authRoute = import.meta.env.VITE_AUTH_ROUTE
 const refreshRoute = import.meta.env.VITE_REFRESH_ROUTE
+const logoutRoute = import.meta.env.VITE_LOGOUT_ROUTE
 
 import AppView from '../views/AppView.vue'
 import LoginView from '../views/LoginView.vue'
@@ -72,16 +73,22 @@ router.beforeEach(async (to): Promise<string | undefined> => {
                 credentials: 'include',
                 headers: { ContentType: 'application/json' },
             })
-            if (refreshCheck.status !== 500) {
+            if (refreshCheck.status === 200) {
                 const jsonRes = await refreshCheck.json()
                 localStorage.setItem(
                     'appname-session-token',
                     jsonRes.sessionToken,
                 )
             } else {
-                localStorage.removeItem('appname-session-token')
-                // TODO: hit route on backend that resets http only refresh token cookie to maxAge=0
-                return '/login'
+                const logOutRes = await fetch(logoutRoute, {
+                    method: 'GET',
+                    credentials: 'include',
+                })
+                if (logOutRes.status === 200) {
+                    localStorage.removeItem('appname-session-token')
+                    return '/login'
+                }
+                console.error('ERROR while logging out :=>', logOutRes)
             }
         }
     } else if (!to.meta.is404 && !to.meta.requiresAuth && sessionToken) {

@@ -4,8 +4,8 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const emailInput: Ref<string> = ref('')
-const passwordInput: Ref<null> = ref(null)
-const errMessage: Ref<null> = ref(null)
+const passwordInput: Ref<string> = ref('')
+const errMessage: Ref<string> = ref('')
 const resSuccessful: Ref<string> = ref('')
 
 const loginRoute = import.meta.env.VITE_LOGIN_ROUTE as string
@@ -14,12 +14,14 @@ const delay = (ms: number): Promise<void> => {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
+// BUG: Form doesn't clear on submit,
+// on re routing back to login, form inputs remain
 const handleSubmit = async (
     emailInput: string,
     passwordInput: string,
 ): Promise<void> => {
     try {
-        errMessage.value = null
+        errMessage.value = ''
         resSuccessful.value = ''
         const data = {
             email: emailInput,
@@ -71,7 +73,7 @@ const handleSubmit = async (
                 placeholder="jondoe@example.com"
                 v-model="emailInput"
                 @keyup.enter="
-                    handleSubmit(String(emailInput), String(passwordInput))
+                    handleSubmit(emailInput as string, passwordInput as string)
                 "
                 v-focus
                 required
@@ -89,7 +91,7 @@ const handleSubmit = async (
                 placeholder="Password1234!"
                 v-model="passwordInput"
                 @keyup.enter="
-                    handleSubmit(String(emailInput), String(passwordInput))
+                    handleSubmit(emailInput as string, passwordInput as string)
                 "
                 required
             />
@@ -99,7 +101,9 @@ const handleSubmit = async (
             <!-- TODO: Setup a vue watcher to tell if email/password are valid 
                 and notify user if they are/aren't -->
             <button
-                @click="handleSubmit(String(emailInput), String(passwordInput))"
+                @click="
+                    handleSubmit(emailInput as string, passwordInput as string)
+                "
                 type="submit"
                 value="Submit"
                 className="submit-btn"
