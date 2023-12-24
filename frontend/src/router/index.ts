@@ -26,6 +26,7 @@ const routes = [
         component: LoginView,
         name: 'LoginView',
     },
+    // TODO: protect if not coming from signup (redirect back to signup if not coming from there)
     {
         path: '/auth',
         component: WaitingForActionView,
@@ -53,7 +54,7 @@ const router = createRouter({
     history: createWebHistory(),
     routes,
 })
-
+// TODO: redirect to app if already logged in from anywhere else in page (i.e. signup, etc.)
 router.beforeEach(async to => {
     const sessionToken = localStorage.getItem('appname-session-token')
     if (to.meta.requiresAuth && sessionToken) {
