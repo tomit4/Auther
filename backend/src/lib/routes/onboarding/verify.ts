@@ -89,7 +89,6 @@ export default (
                     })
                 }
             }
-            // TODO: Implement the following logic in login.ts
             const sessionToken = jwt.sign(
                 { email: hashedEmail },
                 { expiresIn: process.env.JWT_SESSION_EXP },

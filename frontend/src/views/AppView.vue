@@ -1,4 +1,11 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const handleLogOut = (): void => {
+    console.log('log out logic goes here :=>')
+}
+const handleDeleteProfile = (): void => {
+    console.log('delete profile logic goes here :=>')
+}
+</script>
 
 <template>
     <!-- TODO: If logged in (which you should be thanks to vue-router),
@@ -6,15 +13,32 @@
         to hammer home the point that this is a protected route -->
     <!-- TODO: Build out a secondary ProvileView.vue that requires auth and 
         shows aforementioned sensitive info there instead of here -->
-    <!-- TODO: Build a Logout button as well as a delete my profile button 
-        and implement said logic -->
-    <!-- TODO: Hitting log out button displays log out form -->
-    <!-- TODO: Hitting delete my profile button displays form 
+    <!-- TODO: Hitting log out button displays log out form and hides delete button -->
+    <!-- TODO: Hitting delete my profile button displays form/hides logout button
         form asks for email/password, sends transac email for confirmation, 
         then upon confirmation, deletion of account is complete-->
     <div>
-        <h1>Welcome To My App!</h1>
-        <h2>here you should be signed up and logged in!</h2>
+        <h1>App</h1>
+        <!-- TODO: Put Route Link To ProfileView Page -->
+        <div className="app-dash">
+            <button
+                @click="handleLogOut()"
+                type="submit"
+                value="Submit"
+                className="btn logout-btn"
+            >
+                Log Out
+            </button>
+            <br />
+            <button
+                @click="handleDeleteProfile()"
+                type="submit"
+                value="Submit"
+                className="btn delete-profile-btn"
+            >
+                Delete My Profile
+            </button>
+        </div>
     </div>
 </template>
 
@@ -23,7 +47,19 @@ h1 {
     margin-top: 2.5em;
     font-size: 160%;
 }
-h2 {
-    font-size: 120%;
+.app-dash {
+    margin-top: 1em;
+}
+.btn {
+    cursor: pointer;
+    padding: 0.5em;
+    font-weight: 700;
+    font-size: 100%;
+    border: 2px solid black;
+    border-radius: 5px;
+    margin: 0.5em auto;
+}
+.delete-profile-btn {
+    width: 9.5em;
 }
 </style>
