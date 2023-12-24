@@ -36,6 +36,7 @@ const authPlugin: FastifyPluginCallback = async (
                 },
             )
         }
+        next()
     } catch (err) {
         if (err instanceof Error) next(err)
     }

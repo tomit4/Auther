@@ -37,6 +37,7 @@ const authPlugin = async (fastify, options, next) => {
                 }
             });
         }
+        next();
     }
     catch (err) {
         if (err instanceof Error)
