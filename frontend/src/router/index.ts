@@ -56,7 +56,7 @@ const router = createRouter({
     routes,
 })
 // TODO: redirect to app if already logged in from anywhere else in page (i.e. signup, etc.)
-router.beforeEach(async to => {
+router.beforeEach(async (to): Promise<string | undefined> => {
     const sessionToken = localStorage.getItem('appname-session-token')
     if (to.meta.requiresAuth && sessionToken) {
         const res = await fetch(authRoute, {

@@ -6,7 +6,7 @@ const router = useRouter()
 const errMessage: Ref<string> = ref('')
 const resSuccessful: Ref<string> = ref('')
 
-const verifyRoute = import.meta.env.VITE_VERIFY_ROUTE
+const verifyRoute = import.meta.env.VITE_VERIFY_ROUTE as string
 
 // TODO: place in utility class/file
 const delay = (ms: number): Promise<void> => {
