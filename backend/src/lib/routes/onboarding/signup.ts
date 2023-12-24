@@ -31,8 +31,7 @@ export default (
         url: '/signup',
         schema: {
             body: z.object({
-                email: z.string(),
-                // TODO: see below regarding regex
+                email: z.string().email(),
                 password: z.string(),
             }),
             response: {
@@ -55,7 +54,6 @@ export default (
             const hashedEmail = hasher(email)
             const hashedPassword = await bcrypt.hash(password)
             // TODO: replicate zod checks on front end
-            // And then put this logic into your validation schema above
             const emailSchema = z.string().email()
             const passwordSchemaRegex = new RegExp(
                 [

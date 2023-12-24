@@ -32,7 +32,6 @@ export default (
         schema: {
             body: z.object({
                 email: z.string(),
-                // TODO: validate with regex from signup
                 loginPassword: z.string(),
             }),
             response: {
@@ -55,10 +54,41 @@ export default (
             request: FastifyRequest<{ Body: BodyReq }>,
             reply: FastifyReply,
         ): Promise<AuthRes> => {
+            /* TODO: implement only a certain amount of login attempts before warning is sent to email
+             * and timeout is implemented before another round of attempts can be made */
             const { knex, bcrypt, jwt } = fastify
             const { email, loginPassword } = request.body
             const hashedEmail = hasher(email)
+            const emailSchema = z.string().email()
+            const passwordSchemaRegex = new RegExp(
+                [
+                    /^(?=.*[a-z])/, // At least one lowercase letter
+                    /(?=.*[A-Z])/, // At least one uppercase letter
+                    /(?=.*\d)/, // At least one digit
+                    /(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/, // At least one special character
+                    /[A-Za-z\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{10,}$/, // At least 10 characters long
+                ]
+                    .map(r => r.source)
+                    .join(''),
+            )
+            const passwordSchemaErrMsg =
+                'Password must be at least 10 characters in length and contain at \
+                least one lowercase letter, one uppercase letter, one digit, and one \
+                special character'
+            const passwordSchema = z.string().regex(passwordSchemaRegex, {
+                message: passwordSchemaErrMsg,
+            })
             try {
+                const zParsedEmail = emailSchema.safeParse(email)
+                const zParsedPassword = passwordSchema.safeParse(loginPassword)
+                if (!zParsedEmail.success) {
+                    const { error } = zParsedEmail
+                    throw new Error(String(error.issues[0].message))
+                }
+                if (!zParsedPassword.success) {
+                    const { error } = zParsedPassword
+                    throw new Error(String(error.issues[0].message))
+                }
                 const { password } = await knex('users')
                     .select('password')
                     .where('email', email)
@@ -75,7 +105,7 @@ export default (
                 }
             } catch (err) {
                 if (err instanceof Error) {
-                    fastify.log.error('ERROR :=>', err.message)
+                    fastify.log.error('ERROR :=>', err)
                     return reply.code(500).send({
                         ok: false,
                         error: err.message,

@@ -12,8 +12,7 @@ exports.default = (fastify, options, done) => {
         url: '/signup',
         schema: {
             body: zod_1.z.object({
-                email: zod_1.z.string(),
-                // TODO: see below regarding regex
+                email: zod_1.z.string().email(),
                 password: zod_1.z.string(),
             }),
             response: {
@@ -33,7 +32,6 @@ exports.default = (fastify, options, done) => {
             const hashedEmail = (0, hasher_1.default)(email);
             const hashedPassword = await bcrypt.hash(password);
             // TODO: replicate zod checks on front end
-            // And then put this logic into your validation schema above
             const emailSchema = zod_1.z.string().email();
             const passwordSchemaRegex = new RegExp([
                 /^(?=.*[a-z])/, // At least one lowercase letter
