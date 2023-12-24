@@ -1,45 +1,44 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
 const authRoute = import.meta.env.VITE_AUTH_ROUTE
+const refreshRoute = import.meta.env.VITE_REFRESH_ROUTE
 
-// TODO: Change the logic here to grab the jwt from localstorage and set it in the authorization headers.
-// TODO: set up a single route that will talk to the backend which is protected. this route is also protected using vue-router. if 401 (unauthorized) is returned, reroute to home, otherwise give access to sensitive data (in this case email and password, why not for demo purposes only obviously).
-
-// Simply sends the cookies over to be verifed in /auth on backend
 onMounted(async () => {
-    const token = localStorage.getItem('appname-token')
-    const res = await fetch(authRoute, {
-        method: 'GET',
-        credentials: 'include',
-        headers: { Authorization: `Bearer ${token}` },
-    })
+    const sessionToken = localStorage.getItem('appname-session-token')
     try {
-        const jsonRes = await res.json()
-        if (!res.ok || jsonRes.error) {
-            const errMsg = {
-                ok: res.ok,
-                error: jsonRes.error ? jsonRes.error : 'Unknown error occurred',
+        const res = await fetch(authRoute, {
+            method: 'GET',
+            headers: { Authorization: `Bearer ${sessionToken}` },
+        })
+        if (res.status === 401) {
+            const refreshCheck = await fetch(refreshRoute, {
+                method: 'GET',
+                credentials: 'include',
+                headers: { ContentType: 'application/json' },
+            })
+            if (refreshCheck.status === 500) {
+                router.push('/login')
+            } else {
+                const jsonRes = await refreshCheck.json()
+                localStorage.setItem(
+                    'appname-session-token',
+                    jsonRes.sessionToken,
+                )
             }
-            throw Error(`An error occurred: ${JSON.stringify(errMsg)}`)
-        } else {
-            console.log('jsonRes :=>', jsonRes)
         }
     } catch (err) {
         if (err instanceof Error) {
-            // NOTE: If the localStorage token is invalid,
-            // we then need to check to see if the refresh token is still valid (cookie token),
-            // if the refresh/cookie token is still valid,
-            // then we need to generate a new jwt on the backend and set it here in local storage,
-            // else
-            // then we need to render the error to the user briefly before redirecting them back home.
-            console.error('ERROR :=>', err.message) // {"ok":false,"error":"Unauthorized"}
+            console.error('ERROR :=>', err)
         }
     }
 })
 </script>
 
 <template>
-    <!-- TODO: protect this route with auth/login (i.e. JWT/DB logic)-->
+    <!-- TODO: protect this route with auth/login via vue-router as well -->
     <div>
         <h1>Welcome To My App!</h1>
         <h2>here you should be signed up and logged in!</h2>

@@ -49,7 +49,7 @@ onMounted(async () => {
             router.push('/')
         } else {
             resSuccessful.value = jsonRes.msg
-            localStorage.setItem('appname-token', jsonRes.token)
+            localStorage.setItem('appname-session-token', jsonRes.sessionToken)
             // TODO: grab a JWT from backend for
             // further authentication in /app route
             // TODO: set up watcher to display count down before redirect
