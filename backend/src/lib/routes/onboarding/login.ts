@@ -89,10 +89,17 @@ export default (
                     const { error } = zParsedPassword
                     throw new Error(error.issues[0].message as string)
                 }
-                const { password } = await knex('users')
+                const userByEmail = await knex('users')
                     .select('password')
-                    .where('email', email)
+                    .where('email', hashedEmail)
                     .first()
+                if (!userByEmail) {
+                    return reply.code(401).send({
+                        ok: false,
+                        error: 'Incorrect email or password. Please try again.',
+                    })
+                }
+                const { password } = userByEmail
                 const passwordHashesMatch = await bcrypt
                     .compare(loginPassword, password)
                     .then(match => match)

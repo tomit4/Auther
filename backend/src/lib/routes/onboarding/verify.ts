@@ -71,10 +71,9 @@ export default (
                     throw new Error(
                         'You have already signed up, please log in.',
                     )
-                // TODO: Change to hashedEmail instead
                 await knex
                     .insert({
-                        email: emailFromRedis,
+                        email: hashedEmail,
                         password: hashedPasswordFromRedis,
                     })
                     .into('users')

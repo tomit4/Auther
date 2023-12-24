@@ -32,8 +32,7 @@ export default async (
             email: email,
         },
     ]
-    sendSmtpEmail.templateId = process.env
-        .BREVO_TEMPLATE_ID as unknown as number
+    sendSmtpEmail.templateId = Number(process.env.BREVO_TEMPLATE_ID)
     sendSmtpEmail.params = {
         link: `${process.env.BREVO_LINK}/verify/${hashedEmail}`,
     }
