@@ -39,6 +39,8 @@ onMounted(async () => {
 
 <template>
     <!-- TODO: protect this route with auth/login via vue-router as well -->
+    <!-- NOTE: Current implementation flashes this protected page before re 
+        routing to /login, thusly we probably need to use vue-router to protect this route-->
     <div>
         <h1>Welcome To My App!</h1>
         <h2>here you should be signed up and logged in!</h2>
