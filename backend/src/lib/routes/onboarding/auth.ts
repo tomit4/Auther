@@ -22,7 +22,6 @@ export default (
     fastify.withTypeProvider<ZodTypeProvider>().route({
         method: 'GET',
         url: '/auth',
-        // TODO: extend type FastifyInstance to include authenticate...
         onRequest: fastify.authenticate,
         schema: {
             response: {

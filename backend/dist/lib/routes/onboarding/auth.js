@@ -6,7 +6,6 @@ exports.default = (fastify, options, done) => {
     fastify.withTypeProvider().route({
         method: 'GET',
         url: '/auth',
-        // TODO: extend type FastifyInstance to include authenticate...
         onRequest: fastify.authenticate,
         schema: {
             response: {
