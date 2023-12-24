@@ -44,6 +44,9 @@ const handleSubmit = async (
             errMessage.value = errMsg.error
             throw Error(`An error occurred: ${JSON.stringify(errMsg)}`)
         } else {
+            /* NOTE: you can possibly use userAgent string in redis cache
+             * to prevent multiple device login */
+            console.log('userAgent :=>', navigator.userAgent)
             resSuccessful.value = jsonRes.msg
             localStorage.setItem('appname-session-token', jsonRes.sessionToken)
             // TODO: set up watcher to display count down before redirect
