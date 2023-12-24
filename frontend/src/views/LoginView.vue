@@ -14,10 +14,6 @@ const delay = (ms: number): Promise<void> => {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-/*
- * TODO: Change logic/routes here to be
- * different from SignUp (currently is the same)
- */
 const handleSubmit = async (
     emailInput: string,
     passwordInput: string,
@@ -60,6 +56,7 @@ const handleSubmit = async (
 </script>
 
 <template>
+    <!-- TODO: Implement 'Forgot My Password' -->
     <div>
         <h1>Login</h1>
         <br />
