@@ -2,6 +2,11 @@
 const handleLogOut = (): void => {
     console.log('log out logic goes here :=>')
 }
+
+const handleChangePassword = (): void => {
+    console.log('change password logic goes here :=>')
+}
+
 const handleDeleteProfile = (): void => {
     console.log('delete profile logic goes here :=>')
 }
@@ -14,7 +19,11 @@ const handleDeleteProfile = (): void => {
     <!-- TODO: Build out a secondary ProvileView.vue that requires auth and 
         shows aforementioned sensitive info there instead of here -->
     <!-- TODO: Hitting log out button displays log out form and hides delete button -->
-    <!-- TODO: Hitting delete my profile button displays form/hides logout button
+    <!-- TODO: Hitting change password button displays form/hides other buttons
+        form asks for email/password, sends transac email for confirmation, 
+        then upon confirmation, user is redirected back to similar sign up page that asks 
+        for new password (email is filled out by redis cache)-->
+    <!-- TODO: Hitting delete my profile button displays form/hides other buttons
         form asks for email/password, sends transac email for confirmation, 
         then upon confirmation, deletion of account is complete-->
     <div>
@@ -28,6 +37,15 @@ const handleDeleteProfile = (): void => {
                 className="btn logout-btn"
             >
                 Log Out
+            </button>
+            <br />
+            <button
+                @click="handleChangePassword()"
+                type="submit"
+                value="Submit"
+                className="btn change-password-btn"
+            >
+                Change Password
             </button>
             <br />
             <button
@@ -59,6 +77,7 @@ h1 {
     border-radius: 5px;
     margin: 0.5em auto;
 }
+.change-password-btn,
 .delete-profile-btn {
     width: 9.5em;
 }
