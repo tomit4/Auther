@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, onBeforeRouteLeave } from 'vue-router'
 
 const router = useRouter()
 const emailInput: Ref<string> = ref('')
-const passwordInput: Ref<null> = ref(null)
-const errMessage: Ref<null> = ref(null)
+const passwordInput: Ref<string> = ref('')
+const errMessage: Ref<string> = ref('')
 const resSuccessful: Ref<string> = ref('')
 
 const emailRoute = import.meta.env.VITE_EMAIL_ROUTE as string
@@ -19,7 +19,7 @@ const handleSubmit = async (
     passwordInput: string,
 ): Promise<void> => {
     try {
-        errMessage.value = null
+        errMessage.value = ''
         resSuccessful.value = ''
         const data = {
             email: emailInput,
@@ -49,6 +49,13 @@ const handleSubmit = async (
         console.error(err)
     }
 }
+
+onBeforeRouteLeave(() => {
+    emailInput.value = ''
+    passwordInput.value = ''
+    errMessage.value = ''
+    resSuccessful.value = ''
+})
 </script>
 
 <template>
@@ -66,7 +73,7 @@ const handleSubmit = async (
                 placeholder="jondoe@example.com"
                 v-model="emailInput"
                 @keyup.enter="
-                    handleSubmit(String(emailInput), String(passwordInput))
+                    handleSubmit(emailInput as string, passwordInput as string)
                 "
                 v-focus
                 required
@@ -84,7 +91,7 @@ const handleSubmit = async (
                 placeholder="Password1234!"
                 v-model="passwordInput"
                 @keyup.enter="
-                    handleSubmit(String(emailInput), String(passwordInput))
+                    handleSubmit(emailInput as string, passwordInput as string)
                 "
                 required
             />
@@ -94,7 +101,9 @@ const handleSubmit = async (
             <!-- TODO: Setup a vue watcher to tell if email/password are valid 
                 and notify user if they are/aren't -->
             <button
-                @click="handleSubmit(String(emailInput), String(passwordInput))"
+                @click="
+                    handleSubmit(emailInput as string, passwordInput as string)
+                "
                 type="submit"
                 value="Submit"
                 className="submit-btn"

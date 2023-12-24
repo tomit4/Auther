@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, onBeforeRouteLeave } from 'vue-router'
 
 const router = useRouter()
 const emailInput: Ref<string> = ref('')
@@ -14,8 +14,6 @@ const delay = (ms: number): Promise<void> => {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-// BUG: Form doesn't clear on submit,
-// on re routing back to login, form inputs remain
 const handleSubmit = async (
     emailInput: string,
     passwordInput: string,
@@ -55,6 +53,13 @@ const handleSubmit = async (
         console.error(err)
     }
 }
+
+onBeforeRouteLeave(() => {
+    emailInput.value = ''
+    passwordInput.value = ''
+    errMessage.value = ''
+    resSuccessful.value = ''
+})
 </script>
 
 <template>

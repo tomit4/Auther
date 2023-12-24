@@ -10,8 +10,6 @@ const handleLogOut = async (): Promise<void> => {
     })
     if (logOutRes.status === 200) {
         localStorage.removeItem('appname-session-token')
-        // hack, just refreshes it to remove form input
-        // router.push('/login').then(() => window.location.reload())
         router.push('/login')
     } else console.error('ERROR while logging out :=>', logOutRes)
 }
