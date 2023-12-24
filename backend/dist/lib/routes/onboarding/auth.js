@@ -7,7 +7,7 @@ exports.default = (fastify, options, done) => {
         method: 'GET',
         url: '/auth',
         // TODO: extend type FastifyInstance to include authenticate...
-        onRequest: [fastify.authenticate],
+        onRequest: fastify.authenticate,
         schema: {
             response: {
                 200: zod_1.z.object({

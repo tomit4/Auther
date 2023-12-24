@@ -23,25 +23,14 @@ export default async (fastify: FastifyInstance): Promise<void> => {
         // password: String(process.env.REDIS_PASSWORD),
     })
     await fastify.register(import('./knex'), knexFile)
+    await fastify.register(import('@fastify/jwt'), {
+        secret: process.env.JWT_SECRET as string,
+    })
+    await fastify.register(import('./authenticate'))
     await fastify.register(import('@fastify/rate-limit'), {
         max: 100,
         timeWindow: '1 minute',
     })
-    await fastify.register(import('@fastify/jwt'), {
-        secret: String(process.env.JWT_SECRET),
-    })
-    // TODO: put in own path/files,
-    // TODO: extend type FastifyInstance out to include authenticate
-    fastify.decorate(
-        'authenticate',
-        async (request: FastifyRequest, reply: FastifyReply) => {
-            try {
-                await request.jwtVerify()
-            } catch (err) {
-                reply.send(err)
-            }
-        },
-    )
     await fastify.register(import('@fastify/swagger'), {
         openapi: {
             info: {
