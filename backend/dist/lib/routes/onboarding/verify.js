@@ -38,10 +38,9 @@ exports.default = (fastify, options, done) => {
                     throw new Error('No data found by that email address, please sign up again.');
                 if (userAlreadyInDb)
                     throw new Error('You have already signed up, please log in.');
-                // TODO: Change to hashedEmail instead
                 await knex
                     .insert({
-                    email: emailFromRedis,
+                    email: hashedEmail,
                     password: hashedPasswordFromRedis,
                 })
                     .into('users');

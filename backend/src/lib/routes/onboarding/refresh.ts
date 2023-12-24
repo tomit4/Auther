@@ -6,7 +6,7 @@ import type {
     HookHandlerDoneFunction,
 } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
-import { VerifyPayloadType } from '@fastify/jwt'
+import type { VerifyPayloadType } from '@fastify/jwt'
 import { z } from 'zod'
 
 type RefreshRes = {
