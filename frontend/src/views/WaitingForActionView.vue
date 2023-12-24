@@ -1,4 +1,8 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+/* TODO: set up vue-router logic that checks it's 'from' field,
+ * if coming from /signup, nor problem, otherwise, redirect back to '/'
+ */
+</script>
 
 <template>
     <div>

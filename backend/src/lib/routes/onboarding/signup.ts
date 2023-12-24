@@ -32,6 +32,7 @@ export default (
         schema: {
             body: z.object({
                 email: z.string(),
+                // TODO: see below regarding regex
                 password: z.string(),
             }),
             response: {

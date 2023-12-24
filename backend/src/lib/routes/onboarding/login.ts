@@ -32,6 +32,7 @@ export default (
         schema: {
             body: z.object({
                 email: z.string(),
+                // TODO: validate with regex from signup
                 loginPassword: z.string(),
             }),
             response: {

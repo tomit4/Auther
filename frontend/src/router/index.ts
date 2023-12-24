@@ -11,32 +11,27 @@ import VerifiedView from '../views/VerifiedView.vue'
 import WaitingForActionView from '../views/WaitingForActionView.vue'
 
 const routes = [
-    // TODO: if already logged in (redirect to /app)
     {
         path: '/',
         component: SplashView,
         name: 'SplashView',
     },
-    // TODO: if already logged in (redirect to /app)
     {
         path: '/signup',
         component: SignUpView,
         name: 'SignUpView',
     },
-    // TODO: if already logged in (redirect to /app)
     {
         path: '/login',
         component: LoginView,
         name: 'LoginView',
     },
     // TODO: protect if not coming from signup (redirect back to signup if not coming from there)
-    // TODO: if already logged in (redirect to /app)
     {
         path: '/auth',
         component: WaitingForActionView,
         name: 'WaitingForActionView',
     },
-    // TODO: if already logged in (redirect to /app)
     {
         path: '/verify/:hash',
         component: VerifiedView,
@@ -48,11 +43,11 @@ const routes = [
         name: 'AppView',
         meta: { requiresAuth: true },
     },
-    // TODO: if already logged in (redirect to /app)
     {
         path: '/:catchAll(.*)*',
         component: NotFoundView,
         name: 'NotFoundView',
+        meta: { is404: true },
     },
 ]
 
@@ -86,7 +81,9 @@ router.beforeEach(async to => {
                 return '/login'
             }
         }
-    } else if (to.meta.requiresAuth) {
+    } else if (!to.meta.is404 && !to.meta.requiresAuth && sessionToken) {
+        return '/app'
+    } else if (to.meta.requiresAuth && !sessionToken) {
         return '/login'
     }
 })

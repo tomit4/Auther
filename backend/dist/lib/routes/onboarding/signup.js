@@ -13,6 +13,7 @@ exports.default = (fastify, options, done) => {
         schema: {
             body: zod_1.z.object({
                 email: zod_1.z.string(),
+                // TODO: see below regarding regex
                 password: zod_1.z.string(),
             }),
             response: {

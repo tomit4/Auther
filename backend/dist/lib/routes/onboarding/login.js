@@ -12,6 +12,7 @@ exports.default = (fastify, options, done) => {
         schema: {
             body: zod_1.z.object({
                 email: zod_1.z.string(),
+                // TODO: validate with regex from signup
                 loginPassword: zod_1.z.string(),
             }),
             response: {
