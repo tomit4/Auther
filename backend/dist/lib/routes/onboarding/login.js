@@ -57,11 +57,11 @@ exports.default = (fastify, options, done) => {
                 const zParsedPassword = passwordSchema.safeParse(loginPassword);
                 if (!zParsedEmail.success) {
                     const { error } = zParsedEmail;
-                    throw new Error(String(error.issues[0].message));
+                    throw new Error(error.issues[0].message);
                 }
                 if (!zParsedPassword.success) {
                     const { error } = zParsedPassword;
-                    throw new Error(String(error.issues[0].message));
+                    throw new Error(error.issues[0].message);
                 }
                 const { password } = await knex('users')
                     .select('password')

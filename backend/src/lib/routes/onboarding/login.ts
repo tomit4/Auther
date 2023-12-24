@@ -83,11 +83,11 @@ export default (
                 const zParsedPassword = passwordSchema.safeParse(loginPassword)
                 if (!zParsedEmail.success) {
                     const { error } = zParsedEmail
-                    throw new Error(String(error.issues[0].message))
+                    throw new Error(error.issues[0].message as string)
                 }
                 if (!zParsedPassword.success) {
                     const { error } = zParsedPassword
-                    throw new Error(String(error.issues[0].message))
+                    throw new Error(error.issues[0].message as string)
                 }
                 const { password } = await knex('users')
                     .select('password')
@@ -114,11 +114,11 @@ export default (
             }
             const sessionToken = jwt.sign(
                 { email: hashedEmail },
-                { expiresIn: process.env.JWT_SESSION_EXP },
+                { expiresIn: process.env.JWT_SESSION_EXP as string },
             )
             const refreshToken = jwt.sign(
                 { email: hashedEmail },
-                { expiresIn: process.env.JWT_REFRESH_EXP },
+                { expiresIn: process.env.JWT_REFRESH_EXP as string },
             )
             return reply
                 .code(200)

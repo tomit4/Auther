@@ -13,14 +13,14 @@ export default async (fastify: FastifyInstance): Promise<void> => {
     await fastify.register(import('@fastify/helmet'))
     await fastify.register(import('fastify-bcrypt'))
     await fastify.register(import('@fastify/cookie'), {
-        secret: String(process.env.COOKIE_SECRET),
+        secret: process.env.COOKIE_SECRET as string,
         hook: 'onRequest',
     })
     await fastify.register(import('@fastify/redis'), {
-        host: String(process.env.REDIS_HOST),
-        port: Number(process.env.REDIS_PORT),
+        host: process.env.REDIS_HOST as string,
+        port: process.env.REDIS_PORT as unknown as number,
         // TODO: Reinstate once working within docker
-        // password: String(process.env.REDIS_PASSWORD),
+        // password: process.env.REDIS_PASSWORD as string,
     })
     await fastify.register(import('./knex'), knexFile)
     await fastify.register(import('@fastify/jwt'), {

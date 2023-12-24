@@ -55,7 +55,7 @@ export default (
                     const hashedEmail = refreshTokenIsValid.email
                     const sessionToken = jwt.sign(
                         { email: hashedEmail },
-                        { expiresIn: process.env.JWT_SESSION_EXP },
+                        { expiresIn: process.env.JWT_SESSION_EXP as string },
                     )
                     return reply.code(200).send({
                         ok: true,

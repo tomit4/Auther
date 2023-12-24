@@ -56,14 +56,14 @@ exports.default = (fastify, options, done) => {
                     .first();
                 const userAlreadyInCache = (await redis.get(`${hashedEmail}-email`)) ||
                     (await redis.get(`${hashedEmail}-password`));
-                const emailSent = await (0, send_email_1.default)(String(email), String(hashedEmail));
+                const emailSent = await (0, send_email_1.default)(email, hashedEmail);
                 if (!zParsedEmail.success) {
                     const { error } = zParsedEmail;
-                    throw new Error(String(error.issues[0].message));
+                    throw new Error(error.issues[0].message);
                 }
                 if (!zParsedPassword.success) {
                     const { error } = zParsedPassword;
-                    throw new Error(String(error.issues[0].message));
+                    throw new Error(error.issues[0].message);
                 }
                 if (userAlreadyInDb)
                     throw new Error('You have already signed up, please log in.');

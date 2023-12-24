@@ -91,11 +91,11 @@ export default (
             }
             const sessionToken = jwt.sign(
                 { email: hashedEmail },
-                { expiresIn: process.env.JWT_SESSION_EXP },
+                { expiresIn: process.env.JWT_SESSION_EXP as string },
             )
             const refreshToken = jwt.sign(
                 { email: hashedEmail },
-                { expiresIn: process.env.JWT_REFRESH_EXP },
+                { expiresIn: process.env.JWT_REFRESH_EXP as string },
             )
             return reply
                 .code(200)

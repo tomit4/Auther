@@ -15,7 +15,7 @@ const apiInstance = new Brevo.TransactionalEmailsApi()
 // within class 'TransactionalEmailsApi' and its subclasses.
 // @ts-ignore
 const apiKey: Brevo.ApiKeyAuth = apiInstance.authentications.apiKey
-apiKey.apiKey = String(process.env.BREVO_KEY)
+apiKey.apiKey = process.env.BREVO_KEY as string
 const sendSmtpEmail = new Brevo.SendSmtpEmail()
 
 export default async (
@@ -32,7 +32,8 @@ export default async (
             email: email,
         },
     ]
-    sendSmtpEmail.templateId = Number(process.env.BREVO_TEMPLATE_ID)
+    sendSmtpEmail.templateId = process.env
+        .BREVO_TEMPLATE_ID as unknown as number
     sendSmtpEmail.params = {
         link: `${process.env.BREVO_LINK}/verify/${hashedEmail}`,
     }

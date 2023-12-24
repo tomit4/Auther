@@ -83,16 +83,16 @@ export default (
                     (await redis.get(`${hashedEmail}-email`)) ||
                     (await redis.get(`${hashedEmail}-password`))
                 const emailSent = await sendEmail(
-                    String(email),
-                    String(hashedEmail),
+                    email as string,
+                    hashedEmail as string,
                 )
                 if (!zParsedEmail.success) {
                     const { error } = zParsedEmail
-                    throw new Error(String(error.issues[0].message))
+                    throw new Error(error.issues[0].message as string)
                 }
                 if (!zParsedPassword.success) {
                     const { error } = zParsedPassword
-                    throw new Error(String(error.issues[0].message))
+                    throw new Error(error.issues[0].message as string)
                 }
                 if (userAlreadyInDb)
                     throw new Error(

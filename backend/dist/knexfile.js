@@ -30,11 +30,11 @@ const config = {
     development: {
         client: 'pg',
         connection: {
-            host: String(process.env.PG_HOST),
-            port: Number(process.env.PG_PORT),
-            database: String(process.env.PG_DB),
-            user: String(process.env.PG_USER),
-            password: String(process.env.PG_PASS),
+            host: process.env.PG_HOST,
+            port: process.env.PG_PORT,
+            database: process.env.PG_DB,
+            user: process.env.PG_USER,
+            password: process.env.PG_PASS,
         },
         pool: {
             min: 2,
@@ -52,11 +52,11 @@ const config = {
     staging: {
         client: 'pg',
         connection: {
-            host: String(process.env.PG_HOST),
-            port: Number(process.env.PG_PORT),
-            database: String(process.env.PG_DB),
-            user: String(process.env.PG_USER),
-            password: String(process.env.PG_PASS),
+            host: process.env.PG_HOST,
+            port: process.env.PG_PORT,
+            database: process.env.PG_DB,
+            user: process.env.PG_USER,
+            password: process.env.PG_PASS,
         },
         pool: {
             min: 2,
@@ -74,11 +74,11 @@ const config = {
     production: {
         client: 'pg',
         connection: {
-            host: String(process.env.PG_HOST),
-            port: Number(process.env.PG_PORT),
-            database: String(process.env.PG_DB),
-            user: String(process.env.PG_USER),
-            password: String(process.env.PG_PASS),
+            host: process.env.PG_HOST,
+            port: process.env.PG_PORT,
+            database: process.env.PG_DB,
+            user: process.env.PG_USER,
+            password: process.env.PG_PASS,
         },
         pool: {
             min: 2,

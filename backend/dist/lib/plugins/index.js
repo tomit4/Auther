@@ -35,14 +35,14 @@ exports.default = async (fastify) => {
     await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/helmet'))));
     await fastify.register(Promise.resolve().then(() => __importStar(require('fastify-bcrypt'))));
     await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/cookie'))), {
-        secret: String(process.env.COOKIE_SECRET),
+        secret: process.env.COOKIE_SECRET,
         hook: 'onRequest',
     });
     await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/redis'))), {
-        host: String(process.env.REDIS_HOST),
-        port: Number(process.env.REDIS_PORT),
+        host: process.env.REDIS_HOST,
+        port: process.env.REDIS_PORT,
         // TODO: Reinstate once working within docker
-        // password: String(process.env.REDIS_PASSWORD),
+        // password: process.env.REDIS_PASSWORD as string,
     });
     await fastify.register(Promise.resolve().then(() => __importStar(require('./knex'))), knexFile);
     await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/jwt'))), {

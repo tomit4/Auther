@@ -7,7 +7,7 @@ require("dotenv/config");
 const crypto_1 = __importDefault(require("crypto"));
 exports.default = (string) => {
     return crypto_1.default
-        .createHmac('sha256', String(process.env.HASH_SALT))
+        .createHmac('sha256', process.env.HASH_SALT)
         .update(string)
         .digest('hex');
 };

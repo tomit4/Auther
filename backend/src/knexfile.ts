@@ -7,11 +7,11 @@ const config: { [key: string]: Knex.Config } = {
     development: {
         client: 'pg',
         connection: {
-            host: String(process.env.PG_HOST),
-            port: Number(process.env.PG_PORT),
-            database: String(process.env.PG_DB),
-            user: String(process.env.PG_USER),
-            password: String(process.env.PG_PASS),
+            host: process.env.PG_HOST as string,
+            port: process.env.PG_PORT as unknown as number,
+            database: process.env.PG_DB as string,
+            user: process.env.PG_USER as string,
+            password: process.env.PG_PASS as string,
         },
         pool: {
             min: 2,
@@ -30,11 +30,11 @@ const config: { [key: string]: Knex.Config } = {
     staging: {
         client: 'pg',
         connection: {
-            host: String(process.env.PG_HOST),
-            port: Number(process.env.PG_PORT),
-            database: String(process.env.PG_DB),
-            user: String(process.env.PG_USER),
-            password: String(process.env.PG_PASS),
+            host: process.env.PG_HOST as string,
+            port: process.env.PG_PORT as unknown as number,
+            database: process.env.PG_DB as string,
+            user: process.env.PG_USER as string,
+            password: process.env.PG_PASS as string,
         },
         pool: {
             min: 2,
@@ -53,11 +53,11 @@ const config: { [key: string]: Knex.Config } = {
     production: {
         client: 'pg',
         connection: {
-            host: String(process.env.PG_HOST),
-            port: Number(process.env.PG_PORT),
-            database: String(process.env.PG_DB),
-            user: String(process.env.PG_USER),
-            password: String(process.env.PG_PASS),
+            host: process.env.PG_HOST as string,
+            port: process.env.PG_PORT as unknown as number,
+            database: process.env.PG_DB as string,
+            user: process.env.PG_USER as string,
+            password: process.env.PG_PASS as string,
         },
         pool: {
             min: 2,
