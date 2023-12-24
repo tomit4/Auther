@@ -40,7 +40,7 @@ const handleSubmit = async (
             errMessage.value = errMsg.error
             throw Error(`An error occurred: ${JSON.stringify(errMsg)}`)
         } else {
-            resSuccessful.value = jsonRes.email
+            resSuccessful.value = jsonRes.msg
             // TODO: set up watcher to display count down before redirect
             await delay(1000)
             router.push('/auth')
@@ -106,7 +106,7 @@ const handleSubmit = async (
             <p>{{ errMessage }}</p>
         </span>
         <span v-else-if="resSuccessful.length">
-            <p>Your Email Was Successfully Sent to {{ resSuccessful }}!</p>
+            <p>{{ resSuccessful }}</p>
         </span>
         <span v-else />
     </div>

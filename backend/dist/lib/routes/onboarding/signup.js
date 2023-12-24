@@ -19,7 +19,6 @@ exports.default = (fastify, options, done) => {
                 200: zod_1.z.object({
                     ok: zod_1.z.boolean(),
                     msg: zod_1.z.string(),
-                    email: zod_1.z.string(),
                 }),
                 500: zod_1.z.object({
                     ok: zod_1.z.boolean(),
@@ -95,8 +94,7 @@ exports.default = (fastify, options, done) => {
             })
                 .send({
                 ok: true,
-                msg: `Email sent to ${email}`,
-                email: String(email),
+                msg: `Your Email Was Successfully Sent to ${email}!`,
             });
         },
     });

@@ -18,7 +18,6 @@ type BodyReq = {
 type SignUpRes = {
     ok: boolean
     msg?: string
-    email?: string
     error?: string
 }
 
@@ -39,7 +38,6 @@ export default (
                 200: z.object({
                     ok: z.boolean(),
                     msg: z.string(),
-                    email: z.string(),
                 }),
                 500: z.object({
                     ok: z.boolean(),
@@ -133,8 +131,7 @@ export default (
                 })
                 .send({
                     ok: true,
-                    msg: `Email sent to ${email}`,
-                    email: String(email),
+                    msg: `Your Email Was Successfully Sent to ${email}!`,
                 })
         },
     })

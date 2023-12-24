@@ -7,6 +7,7 @@ import type {
 } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
+import hasher from '../../utils/hasher'
 
 type BodyReq = {
     email: string
@@ -17,6 +18,7 @@ type AuthRes = {
     ok: boolean
     msg?: string
     error?: string
+    sessionToken?: string
 }
 
 export default (
@@ -36,6 +38,7 @@ export default (
                 200: z.object({
                     ok: z.boolean(),
                     msg: z.string(),
+                    sessionToken: z.string(),
                 }),
                 401: z.object({
                     ok: z.boolean(),
@@ -51,8 +54,9 @@ export default (
             request: FastifyRequest<{ Body: BodyReq }>,
             reply: FastifyReply,
         ): Promise<AuthRes> => {
-            const { knex, bcrypt } = fastify
+            const { knex, bcrypt, jwt } = fastify
             const { email, loginPassword } = request.body
+            const hashedEmail = hasher(email)
             try {
                 const { password } = await knex('users')
                     .select('password')
@@ -77,10 +81,27 @@ export default (
                     })
                 }
             }
-            return reply.code(200).send({
-                ok: true,
-                msg: 'You have been successfully authenticated! Redirecting you to the app...',
-            })
+            const sessionToken = jwt.sign(
+                { email: hashedEmail },
+                { expiresIn: process.env.JWT_SESSION_EXP },
+            )
+            const refreshToken = jwt.sign(
+                { email: hashedEmail },
+                { expiresIn: process.env.JWT_REFRESH_EXP },
+            )
+            return reply
+                .code(200)
+                .setCookie('appname-refresh-token', refreshToken, {
+                    secure: true,
+                    httpOnly: true,
+                    sameSite: true,
+                    // maxAge: 3600, // unsure if to use, research
+                })
+                .send({
+                    ok: true,
+                    msg: 'You have been successfully authenticated! Redirecting you to the app...',
+                    sessionToken: sessionToken,
+                })
         },
     })
     done()

@@ -36,7 +36,6 @@ const handleSubmit = async (
             body: JSON.stringify(data),
         })
         const jsonRes = await res.json()
-        // TODO: grab the jwt from the return body and set it in local storage
         if (!res.ok || jsonRes.error) {
             const errMsg = {
                 ok: res.ok,
@@ -46,6 +45,7 @@ const handleSubmit = async (
             throw Error(`An error occurred: ${JSON.stringify(errMsg)}`)
         } else {
             resSuccessful.value = jsonRes.msg
+            localStorage.setItem('appname-session-token', jsonRes.sessionToken)
             // TODO: set up watcher to display count down before redirect
             await delay(1000)
             router.push('/app')
@@ -111,7 +111,7 @@ const handleSubmit = async (
             <p>{{ errMessage }}</p>
         </span>
         <span v-else-if="resSuccessful.length">
-            <p>Your Email Was Successfully Sent to {{ resSuccessful }}!</p>
+            <p>{{ resSuccessful }}</p>
         </span>
         <span v-else />
     </div>

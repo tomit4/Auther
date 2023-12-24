@@ -11,27 +11,32 @@ import VerifiedView from '../views/VerifiedView.vue'
 import WaitingForActionView from '../views/WaitingForActionView.vue'
 
 const routes = [
+    // TODO: if already logged in (redirect to /app)
     {
         path: '/',
         component: SplashView,
         name: 'SplashView',
     },
+    // TODO: if already logged in (redirect to /app)
     {
         path: '/signup',
         component: SignUpView,
         name: 'SignUpView',
     },
+    // TODO: if already logged in (redirect to /app)
     {
         path: '/login',
         component: LoginView,
         name: 'LoginView',
     },
     // TODO: protect if not coming from signup (redirect back to signup if not coming from there)
+    // TODO: if already logged in (redirect to /app)
     {
         path: '/auth',
         component: WaitingForActionView,
         name: 'WaitingForActionView',
     },
+    // TODO: if already logged in (redirect to /app)
     {
         path: '/verify/:hash',
         component: VerifiedView,
@@ -43,6 +48,7 @@ const routes = [
         name: 'AppView',
         meta: { requiresAuth: true },
     },
+    // TODO: if already logged in (redirect to /app)
     {
         path: '/:catchAll(.*)*',
         component: NotFoundView,
@@ -74,7 +80,11 @@ router.beforeEach(async to => {
                     'appname-session-token',
                     jsonRes.sessionToken,
                 )
-            } else return '/login'
+            } else {
+                localStorage.removeItem('appname-session-token')
+                // TODO: hit route on backend that resets http only refresh token cookie to maxAge=0
+                return '/login'
+            }
         }
     } else if (to.meta.requiresAuth) {
         return '/login'

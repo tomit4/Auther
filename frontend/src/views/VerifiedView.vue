@@ -37,7 +37,6 @@ onMounted(async () => {
             body: JSON.stringify(data),
         })
         const jsonRes = await res.json()
-        // TODO: grab the jwt from the return body and set it in local storage
         if (!res.ok || jsonRes.error) {
             const errMsg = {
                 ok: res.ok,
@@ -50,8 +49,6 @@ onMounted(async () => {
         } else {
             resSuccessful.value = jsonRes.msg
             localStorage.setItem('appname-session-token', jsonRes.sessionToken)
-            // TODO: grab a JWT from backend for
-            // further authentication in /app route
             // TODO: set up watcher to display count down before redirect
             await delay(1000)
             router.push('/app')
