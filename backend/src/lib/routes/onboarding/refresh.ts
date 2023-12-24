@@ -7,19 +7,15 @@ import type {
 } from 'fastify'
 // import type { VerifyPayloadType } from '@fastify/jwt'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
-// import { z } from 'zod'
-/*
-type BodyReq = {
-    token: string
-}
-*/
-/*
-type VerifyRes = {
+import { z } from 'zod'
+
+type RefreshRes = {
     ok: boolean
     msg?: string
     error?: string
+    sessionToken?: string
 }
-*/
+
 /* Best attempt at addressing type error below, but not working thus far
 declare module '@fastify/jwt' {
     interface FastifyJWT {
@@ -40,16 +36,12 @@ export default (
     fastify.withTypeProvider<ZodTypeProvider>().route({
         method: 'GET',
         url: '/refresh',
-        // TODO: extend type FastifyInstance to include authenticate...
-        /*
         schema: {
-            body: z.object({
-                hashedEmail: z.string(),
-            }),
             response: {
                 200: z.object({
                     ok: z.boolean(),
                     msg: z.string(),
+                    sessionToken: z.string(),
                 }),
                 500: z.object({
                     ok: z.boolean(),
@@ -57,38 +49,33 @@ export default (
                 }),
             },
         },
-        */
         handler: async (
             request: FastifyRequest,
-            // request: FastifyRequest<{ Body: BodyReq }>,
             reply: FastifyReply,
-            // ): Promise<VerifyRes> => {
-        ) => {
+        ): Promise<RefreshRes> => {
             const { jwt } = fastify
             const refreshToken = request.cookies['appname-refresh-token']
             if (refreshToken) {
                 const refreshTokenIsValid = jwt.verify(refreshToken)
-                // NOTE: we may not need the hashedEmail here, but we'll still
-                // need to address the type error once we set up resetting
-                // password or deleting acccount as we'll need either the
-                // email or the hashedEmail
+                // NOTE: we may not need the hashedEmail here in the sessionToken payload,
+                // but we'll still need to address the type error once we set up resetting
+                // password or deleting acccount as we'll need either the email or the hashedEmail
                 // TODO: addresss type error
                 const hashedEmail = refreshTokenIsValid.email
                 const sessionToken = jwt.sign(
                     { email: hashedEmail },
                     { expiresIn: process.env.JWT_SESSION_EXP },
                 )
-                reply.code(200).send({
+                return reply.code(200).send({
                     ok: true,
                     msg: 'Successfully refreshed session.',
                     sessionToken: sessionToken,
                 })
-            } else {
-                reply.code(500).send({
-                    ok: false,
-                    error: 'Invalid refresh token. Redirecting to home...',
-                })
             }
+            return reply.code(500).send({
+                ok: false,
+                error: 'Invalid refresh token. Redirecting to home...',
+            })
         },
     })
     done()

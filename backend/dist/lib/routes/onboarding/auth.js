@@ -1,12 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-/*
-type VerifyRes = {
-    ok: boolean
-    msg?: string
-    error?: string
-}
-*/
+const zod_1 = require("zod");
 // Verifies Session Token (shorter lived jwt)
 exports.default = (fastify, options, done) => {
     fastify.withTypeProvider().route({
@@ -14,26 +8,15 @@ exports.default = (fastify, options, done) => {
         url: '/auth',
         // TODO: extend type FastifyInstance to include authenticate...
         onRequest: [fastify.authenticate],
-        /*
         schema: {
-            body: z.object({
-                hashedEmail: z.string(),
-            }),
             response: {
-                200: z.object({
-                    ok: z.boolean(),
-                    msg: z.string(),
-                }),
-                500: z.object({
-                    ok: z.boolean(),
-                    error: z.string(),
+                200: zod_1.z.object({
+                    ok: zod_1.z.boolean(),
+                    msg: zod_1.z.string(),
                 }),
             },
         },
-        */
         handler: async (request, reply) => {
-            // TODO: extend out try/catch/throw error handling
-            // TODO: Send sensitive info to user to be rendered on front end
             return reply.code(200).send({
                 ok: true,
                 msg: 'authenticated',

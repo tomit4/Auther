@@ -32,7 +32,7 @@ exports.default = (fastify, options, done) => {
             const { redis, knex, bcrypt } = fastify;
             const hashedEmail = (0, hasher_1.default)(email);
             const hashedPassword = await bcrypt.hash(password);
-            // TODO: replicate zod checks on front enA
+            // TODO: replicate zod checks on front end
             // And then put this logic into your validation schema above
             const emailSchema = zod_1.z.string().email();
             const passwordSchemaRegex = new RegExp([

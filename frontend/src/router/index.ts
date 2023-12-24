@@ -36,7 +36,6 @@ const routes = [
         component: VerifiedView,
         name: 'VerifiedView',
     },
-    // TODO: protect this route with auth/login
     {
         path: '/app',
         component: AppView,
@@ -55,10 +54,9 @@ const router = createRouter({
     routes,
 })
 
-// NOTE: not quite working yet
-router.beforeEach(async (to, from, next) => {
-    if (to.meta.requiresAuth && localStorage.getItem('appname-session-token')) {
-        const sessionToken = localStorage.getItem('appname-session-token')
+router.beforeEach(async to => {
+    const sessionToken = localStorage.getItem('appname-session-token')
+    if (to.meta.requiresAuth && sessionToken) {
         const res = await fetch(authRoute, {
             method: 'GET',
             headers: { Authorization: `Bearer ${sessionToken}` },
@@ -75,10 +73,10 @@ router.beforeEach(async (to, from, next) => {
                     'appname-session-token',
                     jsonRes.sessionToken,
                 )
-            }
+            } else return '/login'
         }
-    } else {
-        next()
+    } else if (to.meta.requiresAuth) {
+        return '/login'
     }
 })
 

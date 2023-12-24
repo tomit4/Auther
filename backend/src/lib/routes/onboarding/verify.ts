@@ -57,7 +57,7 @@ export default (
                     `${hashedEmail}-password`,
                 )
                 const userAlreadyInDb = await knex('users')
-                    .where('email', hashedEmail)
+                    .where('email', emailFromRedis)
                     .first()
                 if (redisCacheExpired)
                     throw new Error(
@@ -71,8 +71,7 @@ export default (
                     throw new Error(
                         'You have already signed up, please log in.',
                     )
-                // TODO: consider changing to hashedEmail instead
-                // of emailFromRedis and what that would entail
+                // TODO: Change to hashedEmail instead
                 await knex
                     .insert({
                         email: emailFromRedis,
@@ -81,14 +80,6 @@ export default (
                     .into('users')
                 await redis.del(`${hashedEmail}-email`)
                 await redis.del(`${hashedEmail}-password`)
-                // TODO: use the following in /login after grabbing password from db
-                // and compare user's password typed in
-                /*
-                await bcrypt
-                    .compare('Password1234!', hashedPasswordFromRedis)
-                    .then(res => console.log('res :=>', res)) // true!!
-                    .catch(err => console.error('ERROR :=>', err))
-                */
             } catch (err) {
                 if (err instanceof Error) {
                     fastify.log.error('ERROR :=>', err.message)
@@ -98,6 +89,7 @@ export default (
                     })
                 }
             }
+            // TODO: Implement the following logic in login.ts
             const sessionToken = jwt.sign(
                 { email: hashedEmail },
                 { expiresIn: process.env.JWT_SESSION_EXP },

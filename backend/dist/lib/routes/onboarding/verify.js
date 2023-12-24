@@ -30,7 +30,7 @@ exports.default = (fastify, options, done) => {
                 const emailFromRedis = await redis.get(`${hashedEmail}-email`);
                 const hashedPasswordFromRedis = await redis.get(`${hashedEmail}-password`);
                 const userAlreadyInDb = await knex('users')
-                    .where('email', hashedEmail)
+                    .where('email', emailFromRedis)
                     .first();
                 if (redisCacheExpired)
                     throw new Error('Sorry, but you took too long to answer your email, please sign up again.');
@@ -38,8 +38,7 @@ exports.default = (fastify, options, done) => {
                     throw new Error('No data found by that email address, please sign up again.');
                 if (userAlreadyInDb)
                     throw new Error('You have already signed up, please log in.');
-                // TODO: consider changing to hashedEmail instead
-                // of emailFromRedis and what that would entail
+                // TODO: Change to hashedEmail instead
                 await knex
                     .insert({
                     email: emailFromRedis,
@@ -48,14 +47,6 @@ exports.default = (fastify, options, done) => {
                     .into('users');
                 await redis.del(`${hashedEmail}-email`);
                 await redis.del(`${hashedEmail}-password`);
-                // TODO: use the following in /login after grabbing password from db
-                // and compare user's password typed in
-                /*
-                await bcrypt
-                    .compare('Password1234!', hashedPasswordFromRedis)
-                    .then(res => console.log('res :=>', res)) // true!!
-                    .catch(err => console.error('ERROR :=>', err))
-                */
             }
             catch (err) {
                 if (err instanceof Error) {
@@ -66,6 +57,7 @@ exports.default = (fastify, options, done) => {
                     });
                 }
             }
+            // TODO: Implement the following logic in login.ts
             const sessionToken = jwt.sign({ email: hashedEmail }, { expiresIn: process.env.JWT_SESSION_EXP });
             const refreshToken = jwt.sign({ email: hashedEmail }, { expiresIn: process.env.JWT_REFRESH_EXP });
             return reply

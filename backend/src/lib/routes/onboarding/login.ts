@@ -62,12 +62,6 @@ export default (
                     .compare(loginPassword, password)
                     .then(match => match)
                     .catch(err => err)
-                /*
-                .setCookie('appname-jwt', '', {
-                    path: '/app',
-                    maxAge: 360 // change to 15 minutes when done (alongside expire of jwt),
-                })
-                */
                 if (!passwordHashesMatch) {
                     return reply.code(401).send({
                         ok: false,
