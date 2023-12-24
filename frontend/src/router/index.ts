@@ -59,7 +59,7 @@ const router = createRouter({
 router.beforeEach(async (to): Promise<string | undefined> => {
     const sessionToken = localStorage.getItem('appname-session-token')
     if (to.meta.requiresAuth && sessionToken) {
-        /* NOTE: you can possibly use userAgent string in redis cache
+        /* NOTE: you can possibly use userAgent string in redis cache or jwt
          * to prevent multiple device login */
         console.log('userAgent :=>', navigator.userAgent)
         const res = await fetch(authRoute, {
