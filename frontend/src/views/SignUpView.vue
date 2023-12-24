@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, type Ref } from 'vue'
+import { ref, type Ref, resolveDirective } from 'vue'
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
 
 const router = useRouter()
