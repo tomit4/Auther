@@ -27,9 +27,6 @@ const grabStoredCookie = (cookieKey: string): string => {
 onMounted(async () => {
     const cookie = grabStoredCookie('appname-hash')
     if (cookie === route.params.hash) {
-        /* NOTE: you can possibly use userAgent string in redis cache or jwt
-         * to prevent multiple device login */
-        console.log('userAgent :=>', navigator.userAgent)
         const data = {
             hashedEmail: cookie,
         }
