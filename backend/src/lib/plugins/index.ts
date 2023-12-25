@@ -42,6 +42,10 @@ export default async (fastify: FastifyInstance): Promise<void> => {
     await fastify.register(import('@fastify/rate-limit'), {
         global: false,
         max: 3000,
+        errorResponseBuilder: (request, context) => ({
+            statusCode: 429,
+            message: `You have failed too many login attempts, please try again in ${context.after}`,
+        }),
     })
     await fastify.register(import('@fastify/swagger'), {
         openapi: {
