@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const zod_1 = require("zod");
-// Logs Out User/Removes Refresh Token via HTTPS Cookie with maxAge=0
+// Logs Out User/Removes Refresh Token Cookie
 exports.default = (fastify, options, done) => {
     fastify.withTypeProvider().route({
         method: 'GET',
@@ -31,7 +31,6 @@ exports.default = (fastify, options, done) => {
                 if (typeof refreshTokenIsValid === 'object' &&
                     'email' in refreshTokenIsValid) {
                     const hashedEmail = refreshTokenIsValid.email;
-                    // NOTE: should be expired, but just in case
                     await redis.del(`${hashedEmail}-refresh-token`);
                 }
             }

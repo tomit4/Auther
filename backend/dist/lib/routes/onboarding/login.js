@@ -110,7 +110,6 @@ exports.default = (fastify, options, done) => {
                 secure: true,
                 httpOnly: true,
                 sameSite: true,
-                // maxAge: 3600, // unsure if to use, research
             })
                 .send({
                 ok: true,

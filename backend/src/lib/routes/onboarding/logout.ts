@@ -18,7 +18,7 @@ type LogOutRes = {
     message?: string
 }
 
-// Logs Out User/Removes Refresh Token via HTTPS Cookie with maxAge=0
+// Logs Out User/Removes Refresh Token Cookie
 export default (
     fastify: FastifyInstance,
     options: FastifyPluginOptions,
@@ -59,7 +59,6 @@ export default (
                     'email' in refreshTokenIsValid
                 ) {
                     const hashedEmail = refreshTokenIsValid.email
-                    // NOTE: should be expired, but just in case
                     await redis.del(`${hashedEmail}-refresh-token`)
                 }
             }
