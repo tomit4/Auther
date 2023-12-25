@@ -40,8 +40,8 @@ export default async (fastify: FastifyInstance): Promise<void> => {
     })
     await fastify.register(import('./authenticate'))
     await fastify.register(import('@fastify/rate-limit'), {
-        max: 100,
-        timeWindow: '1 minute',
+        global: false,
+        max: 3000,
     })
     await fastify.register(import('@fastify/swagger'), {
         openapi: {

@@ -55,8 +55,8 @@ exports.default = async (fastify) => {
     });
     await fastify.register(Promise.resolve().then(() => __importStar(require('./authenticate'))));
     await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/rate-limit'))), {
-        max: 100,
-        timeWindow: '1 minute',
+        global: false,
+        max: 3000,
     });
     await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/swagger'))), {
         openapi: {

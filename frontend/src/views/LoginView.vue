@@ -32,15 +32,13 @@ const handleSubmit = async (
             body: JSON.stringify(data),
         })
         const jsonRes = await res.json()
-        if (!res.ok || jsonRes.error) {
-            const errMsg = {
-                ok: res.ok,
-                error: jsonRes.error ? jsonRes.error : 'Unknown error occurred',
-            }
-            errMessage.value = errMsg.error
-            throw Error(`An error occurred: ${JSON.stringify(errMsg)}`)
+        if (!res.ok) {
+            errMessage.value = jsonRes.message
+                ? jsonRes.message
+                : 'Unknown error occurred'
+            throw Error(`An error occurred: ${JSON.stringify(jsonRes)}`)
         } else {
-            resSuccessful.value = jsonRes.msg
+            resSuccessful.value = jsonRes.message
             localStorage.setItem('appname-session-token', jsonRes.sessionToken)
             // TODO: set up watcher to display count down before redirect
             await delay(1000)

@@ -16,7 +16,7 @@ type BodyReq = {
 
 type AuthRes = {
     ok: boolean
-    msg?: string
+    message?: string
     error?: string
     sessionToken?: string
 }
@@ -29,6 +29,12 @@ export default (
     fastify.withTypeProvider<ZodTypeProvider>().route({
         method: 'POST',
         url: '/login',
+        config: {
+            rateLimit: {
+                max: 3,
+                timeWindow: 300000, // 5 minutes
+            },
+        },
         schema: {
             body: z.object({
                 email: z.string(),
@@ -37,16 +43,16 @@ export default (
             response: {
                 200: z.object({
                     ok: z.boolean(),
-                    msg: z.string(),
+                    message: z.string(),
                     sessionToken: z.string(),
                 }),
                 401: z.object({
                     ok: z.boolean(),
-                    error: z.string(),
+                    message: z.string(),
                 }),
                 500: z.object({
                     ok: z.boolean(),
-                    error: z.string(),
+                    message: z.string(),
                 }),
             },
         },
@@ -96,7 +102,8 @@ export default (
                 if (!userByEmail) {
                     return reply.code(401).send({
                         ok: false,
-                        error: 'Incorrect email or password. Please try again.',
+                        message:
+                            'Incorrect email or password. Please try again.',
                     })
                 }
                 const { password } = userByEmail
@@ -107,7 +114,8 @@ export default (
                 if (!passwordHashesMatch) {
                     return reply.code(401).send({
                         ok: false,
-                        error: 'Incorrect email or password. Please try again.',
+                        message:
+                            'Incorrect email or password. Please try again.',
                     })
                 }
             } catch (err) {
@@ -115,7 +123,7 @@ export default (
                     fastify.log.error('ERROR :=>', err)
                     return reply.code(500).send({
                         ok: false,
-                        error: err.message,
+                        message: err.message,
                     })
                 }
             }
@@ -144,7 +152,8 @@ export default (
                 })
                 .send({
                     ok: true,
-                    msg: 'You have been successfully authenticated! Redirecting you to the app...',
+                    message:
+                        'You have been successfully authenticated! Redirecting you to the app...',
                     sessionToken: sessionToken,
                 })
         },
