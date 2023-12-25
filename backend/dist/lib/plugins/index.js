@@ -30,8 +30,9 @@ const env_1 = __importDefault(require("@fastify/env"));
 const fastify_type_provider_zod_1 = require("fastify-type-provider-zod");
 const knexfile_1 = __importDefault(require("../../knexfile"));
 const knexFile = knexfile_1.default.development;
+const cors_1 = __importDefault(require("@fastify/cors"));
 exports.default = async (fastify) => {
-    await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/cors'))), {
+    await fastify.register(cors_1.default, {
         origin: true,
         credentials: true,
         allowHeaders: 'Content-Type, Authorization',

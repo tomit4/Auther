@@ -1,4 +1,4 @@
-import type { FastifyInstance } from 'fastify'
+import type { FastifyInstance, FastifyPluginAsync } from 'fastify'
 import fastifyEnv from '@fastify/env'
 import {
     jsonSchemaTransform,
@@ -7,13 +7,21 @@ import {
 } from 'fastify-type-provider-zod'
 import knexConfig from '../../knexfile'
 const knexFile = knexConfig.development
+import fastifyCors, { FastifyCorsOptions } from '@fastify/cors'
+
+type CustomFastifyCorsOptions = FastifyCorsOptions & {
+    allowHeaders?: string
+}
 
 export default async (fastify: FastifyInstance): Promise<void> => {
-    await fastify.register(import('@fastify/cors'), {
-        origin: true,
-        credentials: true,
-        allowHeaders: 'Content-Type, Authorization',
-    })
+    await fastify.register(
+        fastifyCors as FastifyPluginAsync<CustomFastifyCorsOptions>,
+        {
+            origin: true,
+            credentials: true,
+            allowHeaders: 'Content-Type, Authorization',
+        },
+    )
     await fastify.register(import('@fastify/helmet'))
     await fastify.register(import('fastify-bcrypt'))
     await fastify.register(import('@fastify/cookie'), {
