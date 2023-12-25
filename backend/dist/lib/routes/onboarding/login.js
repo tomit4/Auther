@@ -33,7 +33,7 @@ exports.default = (fastify, options, done) => {
         handler: async (request, reply) => {
             /* TODO: implement only a certain amount of login attempts before warning is sent to email
              * and timeout is implemented before another round of attempts can be made */
-            const { knex, bcrypt, jwt } = fastify;
+            const { redis, knex, bcrypt, jwt } = fastify;
             const { email, loginPassword } = request.body;
             const hashedEmail = (0, hasher_1.default)(email);
             const emailSchema = zod_1.z.string().email();
@@ -96,6 +96,8 @@ exports.default = (fastify, options, done) => {
             }
             const sessionToken = jwt.sign({ email: hashedEmail }, { expiresIn: process.env.JWT_SESSION_EXP });
             const refreshToken = jwt.sign({ email: hashedEmail }, { expiresIn: process.env.JWT_REFRESH_EXP });
+            // TODO: reset expiration to a .env variable
+            await redis.set(`${hashedEmail}-refresh-token`, refreshToken, 'EX', 180);
             return reply
                 .code(200)
                 .setCookie('appname-refresh-token', refreshToken, {

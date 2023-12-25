@@ -96,6 +96,13 @@ export default (
                 { email: hashedEmail },
                 { expiresIn: process.env.JWT_REFRESH_EXP as string },
             )
+            // TODO: reset expiration to a .env variable
+            await redis.set(
+                `${hashedEmail}-refresh-token`,
+                refreshToken,
+                'EX',
+                180,
+            )
             return reply
                 .code(200)
                 .setCookie('appname-hash', '', {

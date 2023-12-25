@@ -56,7 +56,7 @@ export default (
         ): Promise<AuthRes> => {
             /* TODO: implement only a certain amount of login attempts before warning is sent to email
              * and timeout is implemented before another round of attempts can be made */
-            const { knex, bcrypt, jwt } = fastify
+            const { redis, knex, bcrypt, jwt } = fastify
             const { email, loginPassword } = request.body
             const hashedEmail = hasher(email)
             const emailSchema = z.string().email()
@@ -126,6 +126,13 @@ export default (
             const refreshToken = jwt.sign(
                 { email: hashedEmail },
                 { expiresIn: process.env.JWT_REFRESH_EXP as string },
+            )
+            // TODO: reset expiration to a .env variable
+            await redis.set(
+                `${hashedEmail}-refresh-token`,
+                refreshToken,
+                'EX',
+                180,
             )
             return reply
                 .code(200)

@@ -120,6 +120,7 @@ export default (
                     })
                 }
             }
+            // TODO: reset expiration to a .env variable
             await redis.set(`${hashedEmail}-email`, email, 'EX', 60)
             await redis.set(`${hashedEmail}-password`, hashedPassword, 'EX', 60)
             return reply

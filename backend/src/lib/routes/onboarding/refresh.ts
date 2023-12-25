@@ -42,7 +42,7 @@ export default (
             request: FastifyRequest,
             reply: FastifyReply,
         ): Promise<RefreshRes> => {
-            const { jwt } = fastify
+            const { redis, jwt } = fastify
             const refreshToken = request.cookies['appname-refresh-token']
             if (refreshToken) {
                 const refreshTokenIsValid = jwt.verify(
@@ -53,6 +53,16 @@ export default (
                     'email' in refreshTokenIsValid
                 ) {
                     const hashedEmail = refreshTokenIsValid.email
+                    const refreshTokenFromRedis = await redis.get(
+                        `${hashedEmail}-refresh-token`,
+                    )
+                    // NOTE: try/catch may be better error handling?
+                    if (!refreshTokenFromRedis) {
+                        return reply.code(500).send({
+                            ok: false,
+                            error: 'Invalid refresh token. Redirecting to home...',
+                        })
+                    }
                     const sessionToken = jwt.sign(
                         { email: hashedEmail },
                         { expiresIn: process.env.JWT_SESSION_EXP as string },
