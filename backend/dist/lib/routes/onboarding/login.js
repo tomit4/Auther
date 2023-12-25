@@ -11,7 +11,7 @@ exports.default = (fastify, options, done) => {
         url: '/login',
         config: {
             rateLimit: {
-                max: 3,
+                max: 5,
                 timeWindow: 300000, // 5 minutes
             },
         },

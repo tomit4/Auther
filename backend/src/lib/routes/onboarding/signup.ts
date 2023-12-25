@@ -17,7 +17,7 @@ type BodyReq = {
 
 type SignUpRes = {
     ok: boolean
-    msg?: string
+    message?: string
     error?: string
 }
 
@@ -29,19 +29,25 @@ export default (
     fastify.withTypeProvider<ZodTypeProvider>().route({
         method: 'POST',
         url: '/signup',
+        config: {
+            rateLimit: {
+                max: 5,
+                timeWindow: 300000, // 5 minutes
+            },
+        },
         schema: {
             body: z.object({
-                email: z.string().email(),
+                email: z.string(),
                 password: z.string(),
             }),
             response: {
                 200: z.object({
                     ok: z.boolean(),
-                    msg: z.string(),
+                    message: z.string(),
                 }),
                 500: z.object({
                     ok: z.boolean(),
-                    error: z.string(),
+                    message: z.string(),
                 }),
             },
         },
@@ -116,7 +122,7 @@ export default (
                     fastify.log.error('ERROR :=>', err.message)
                     return reply.code(500).send({
                         ok: false,
-                        error: err.message,
+                        message: err.message,
                     })
                 }
             }
@@ -131,7 +137,7 @@ export default (
                 })
                 .send({
                     ok: true,
-                    msg: `Your Email Was Successfully Sent to ${email}!`,
+                    message: `Your Email Was Successfully Sent to ${email}!`,
                 })
         },
     })

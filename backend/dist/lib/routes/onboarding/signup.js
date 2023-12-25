@@ -10,19 +10,25 @@ exports.default = (fastify, options, done) => {
     fastify.withTypeProvider().route({
         method: 'POST',
         url: '/signup',
+        config: {
+            rateLimit: {
+                max: 5,
+                timeWindow: 300000, // 5 minutes
+            },
+        },
         schema: {
             body: zod_1.z.object({
-                email: zod_1.z.string().email(),
+                email: zod_1.z.string(),
                 password: zod_1.z.string(),
             }),
             response: {
                 200: zod_1.z.object({
                     ok: zod_1.z.boolean(),
-                    msg: zod_1.z.string(),
+                    message: zod_1.z.string(),
                 }),
                 500: zod_1.z.object({
                     ok: zod_1.z.boolean(),
-                    error: zod_1.z.string(),
+                    message: zod_1.z.string(),
                 }),
             },
         },
@@ -79,7 +85,7 @@ exports.default = (fastify, options, done) => {
                     fastify.log.error('ERROR :=>', err.message);
                     return reply.code(500).send({
                         ok: false,
-                        error: err.message,
+                        message: err.message,
                     });
                 }
             }
@@ -94,7 +100,7 @@ exports.default = (fastify, options, done) => {
             })
                 .send({
                 ok: true,
-                msg: `Your Email Was Successfully Sent to ${email}!`,
+                message: `Your Email Was Successfully Sent to ${email}!`,
             });
         },
     });
