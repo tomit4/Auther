@@ -29,7 +29,6 @@ const handleDeleteProfile = (): void => {
         to hammer home the point that this is a protected route -->
     <!-- TODO: Build out a secondary ProvileView.vue that requires auth and 
         shows aforementioned sensitive info there instead of here -->
-    <!-- TODO: Hitting log out button displays log out form and hides delete button -->
     <!-- TODO: Hitting change password button displays form/hides other buttons
         form asks for email/password, sends transac email for confirmation, 
         then upon confirmation, user is redirected back to similar sign up page that asks 
