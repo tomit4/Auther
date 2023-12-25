@@ -13,6 +13,9 @@ type LogOutRes = {
     ok: boolean
     msg?: string
     error?: string
+    statusCode?: number
+    code?: string
+    message?: string
 }
 
 // Logs Out User/Removes Refresh Token via HTTPS Cookie with maxAge=0
@@ -24,7 +27,6 @@ export default (
     fastify.withTypeProvider<ZodTypeProvider>().route({
         method: 'GET',
         url: '/logout',
-        /*
         schema: {
             response: {
                 200: z.object({
@@ -32,12 +34,13 @@ export default (
                     msg: z.string(),
                 }),
                 500: z.object({
-                    ok: z.boolean(),
+                    statusCode: z.number(),
+                    code: z.string(),
                     error: z.string(),
+                    message: z.string(),
                 }),
             },
         },
-        */
         handler: async (
             request: FastifyRequest,
             reply: FastifyReply,
