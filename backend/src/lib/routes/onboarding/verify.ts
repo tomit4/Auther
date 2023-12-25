@@ -98,10 +98,10 @@ export default (
             )
             // TODO: reset expiration to a .env variable
             await redis.set(
-                `${hashedEmail}-refresh-token`,
-                refreshToken,
+                `${hashedEmail}-session-token`,
+                sessionToken,
                 'EX',
-                180,
+                60,
             )
             return reply
                 .code(200)

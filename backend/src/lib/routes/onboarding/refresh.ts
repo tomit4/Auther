@@ -53,20 +53,15 @@ export default (
                     'email' in refreshTokenIsValid
                 ) {
                     const hashedEmail = refreshTokenIsValid.email
-                    const refreshTokenFromRedis = await redis.get(
-                        `${hashedEmail}-refresh-token`,
-                    )
-                    if (!refreshTokenFromRedis && refreshTokenIsValid) {
-                        await redis.set(
-                            `${hashedEmail}-refresh-token`,
-                            refreshToken,
-                            'EX',
-                            180,
-                        )
-                    }
                     const sessionToken = jwt.sign(
                         { email: hashedEmail },
                         { expiresIn: process.env.JWT_SESSION_EXP as string },
+                    )
+                    await redis.set(
+                        `${hashedEmail}-session-token`,
+                        sessionToken,
+                        'EX',
+                        60,
                     )
                     return reply.code(200).send({
                         ok: true,
