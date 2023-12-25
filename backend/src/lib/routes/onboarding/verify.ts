@@ -105,10 +105,7 @@ export default (
             )
             return reply
                 .code(200)
-                .setCookie('appname-hash', '', {
-                    path: '/verify',
-                    maxAge: 0,
-                })
+                .clearCookie('appname-hash', { path: '/verify' })
                 .setCookie('appname-refresh-token', refreshToken, {
                     secure: true,
                     httpOnly: true,
