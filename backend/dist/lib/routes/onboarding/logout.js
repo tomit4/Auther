@@ -23,7 +23,6 @@ exports.default = (fastify, options, done) => {
         handler: async (request, reply) => {
             const { redis, jwt } = fastify;
             const refreshToken = request.cookies['appname-refresh-token'];
-            // TODO: Definitely Refactor this with try/catch/throw, too nested...
             if (refreshToken) {
                 reply.clearCookie('appname-refresh-token', {
                     path: '/onboarding',
@@ -32,6 +31,7 @@ exports.default = (fastify, options, done) => {
                 if (typeof refreshTokenIsValid === 'object' &&
                     'email' in refreshTokenIsValid) {
                     const hashedEmail = refreshTokenIsValid.email;
+                    // NOTE: should be expired, but just in case
                     await redis.del(`${hashedEmail}-refresh-token`);
                 }
             }

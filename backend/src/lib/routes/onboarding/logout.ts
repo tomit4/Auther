@@ -47,7 +47,6 @@ export default (
         ): Promise<LogOutRes> => {
             const { redis, jwt } = fastify
             const refreshToken = request.cookies['appname-refresh-token']
-            // TODO: Definitely Refactor this with try/catch/throw, too nested...
             if (refreshToken) {
                 reply.clearCookie('appname-refresh-token', {
                     path: '/onboarding',
@@ -60,6 +59,7 @@ export default (
                     'email' in refreshTokenIsValid
                 ) {
                     const hashedEmail = refreshTokenIsValid.email
+                    // NOTE: should be expired, but just in case
                     await redis.del(`${hashedEmail}-refresh-token`)
                 }
             }
