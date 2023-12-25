@@ -56,7 +56,6 @@ exports.default = async (fastify) => {
     await fastify.register(Promise.resolve().then(() => __importStar(require('./authenticate'))));
     await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/rate-limit'))), {
         global: false,
-        max: 3000,
         errorResponseBuilder: (request, context) => ({
             statusCode: 429,
             message: `You have failed too many login attempts, please try again in ${context.after}`,
