@@ -37,8 +37,6 @@ exports.default = (fastify, options, done) => {
             },
         },
         handler: async (request, reply) => {
-            /* TODO: implement only a certain amount of login attempts before warning is sent to email
-             * and timeout is implemented before another round of attempts can be made */
             const { redis, knex, bcrypt, jwt } = fastify;
             const { email, loginPassword } = request.body;
             const hashedEmail = (0, hasher_1.default)(email);
