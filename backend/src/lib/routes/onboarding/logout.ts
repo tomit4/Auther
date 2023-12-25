@@ -49,6 +49,9 @@ export default (
             const refreshToken = request.cookies['appname-refresh-token']
             // TODO: Definitely Refactor this with try/catch/throw, too nested...
             if (refreshToken) {
+                reply.clearCookie('appname-refresh-token', {
+                    path: '/onboarding',
+                })
                 const refreshTokenIsValid = jwt.verify(
                     refreshToken,
                 ) as VerifyPayloadType
@@ -60,13 +63,10 @@ export default (
                     await redis.del(`${hashedEmail}-refresh-token`)
                 }
             }
-            return reply
-                .code(200)
-                .clearCookie('appname-refresh-token', { path: '/onboarding' })
-                .send({
-                    ok: true,
-                    msg: 'logged out',
-                })
+            return reply.code(200).send({
+                ok: true,
+                msg: 'logged out',
+            })
         },
     })
     done()

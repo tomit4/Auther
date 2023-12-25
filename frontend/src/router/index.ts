@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 const authRoute = import.meta.env.VITE_AUTH_ROUTE
 const refreshRoute = import.meta.env.VITE_REFRESH_ROUTE
 const logoutRoute = import.meta.env.VITE_LOGOUT_ROUTE
+const invalidTokenCode = import.meta.env.VITE_INVALID_TOKEN_CODE
 
 import AppView from '../views/AppView.vue'
 import LoginView from '../views/LoginView.vue'
@@ -77,19 +78,26 @@ router.beforeEach(async (to): Promise<string | undefined> => {
                     jsonRes.sessionToken,
                 )
             } else {
-                console.error(
-                    'ERROR while refreshing token :=>',
-                    await refreshCheck.json(),
-                )
+                const jsonRefreshCheck = await refreshCheck.json()
+                if (
+                    jsonRefreshCheck.statusCode === 500 &&
+                    jsonRefreshCheck.code !== invalidTokenCode
+                ) {
+                    console.error(
+                        'ERROR while refreshing token :=>',
+                        jsonRefreshCheck,
+                    )
+                }
                 const logOutRes = await fetch(logoutRoute, {
                     method: 'GET',
                     credentials: 'include',
                 })
-                if (logOutRes.status !== 200) {
-                    console.error(
-                        'ERROR while logging out :=>',
-                        await logOutRes.json(),
-                    )
+                const jsonLogOutRes = await logOutRes.json()
+                if (
+                    jsonLogOutRes.statusCode !== 200 &&
+                    jsonLogOutRes.code !== invalidTokenCode
+                ) {
+                    console.error('ERROR while logging out :=>', jsonLogOutRes)
                 }
                 localStorage.removeItem('appname-session-token')
                 return '/login'
