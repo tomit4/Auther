@@ -67,12 +67,6 @@ export default (
                         { email: hashedEmail },
                         { expiresIn: process.env.JWT_SESSION_EXP as string },
                     )
-                    await redis.set(
-                        `${hashedEmail}-refresh-token`,
-                        refreshToken,
-                        'EX',
-                        180,
-                    )
                     return reply.code(200).send({
                         ok: true,
                         msg: 'Successfully refreshed session.',
