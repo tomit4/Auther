@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// import ChangePassForm from '../components/ChangePassForm.vue'
 import { useRouter } from 'vue-router'
 const logoutRoute = import.meta.env.VITE_LOGOUT_ROUTE
 
@@ -67,6 +68,9 @@ const handleDeleteProfile = (): void => {
                 Delete My Profile
             </button>
         </div>
+        <!--
+        <ChangePassForm />
+        -->
     </div>
 </template>
 

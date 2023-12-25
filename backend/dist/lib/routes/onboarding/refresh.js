@@ -28,12 +28,8 @@ exports.default = (fastify, options, done) => {
                     'email' in refreshTokenIsValid) {
                     const hashedEmail = refreshTokenIsValid.email;
                     const refreshTokenFromRedis = await redis.get(`${hashedEmail}-refresh-token`);
-                    // NOTE: try/catch may be better error handling?
-                    if (!refreshTokenFromRedis) {
-                        return reply.code(500).send({
-                            ok: false,
-                            error: 'Invalid refresh token. Redirecting to home...',
-                        });
+                    if (!refreshTokenFromRedis && refreshTokenIsValid) {
+                        await redis.set(`${hashedEmail}-refresh-token`, refreshToken, 'EX', 180);
                     }
                     const sessionToken = jwt.sign({ email: hashedEmail }, { expiresIn: process.env.JWT_SESSION_EXP });
                     return reply.code(200).send({

@@ -14,6 +14,7 @@ const handleLogin = (): void => {
         <h1>Splash</h1>
         <br />
         <div className="onboard">
+            <!-- TODO: Change to router links -->
             <button
                 @click="handleSignUp()"
                 type="submit"

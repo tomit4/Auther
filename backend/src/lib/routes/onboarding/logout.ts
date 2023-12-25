@@ -42,6 +42,7 @@ export default (
         ): Promise<LogOutRes> => {
             const { redis, jwt } = fastify
             const refreshToken = request.cookies['appname-refresh-token']
+            // TODO: Definitely Refactor this with try/catch/throw, too nested...
             if (refreshToken) {
                 const refreshTokenIsValid = jwt.verify(
                     refreshToken,
@@ -51,22 +52,8 @@ export default (
                     'email' in refreshTokenIsValid
                 ) {
                     const hashedEmail = refreshTokenIsValid.email
-                    const refreshTokenFromRedis = await redis.get(
-                        `${hashedEmail}-refresh-token`,
-                    )
-                    if (!refreshTokenFromRedis) {
-                        return reply.code(500).send({
-                            ok: false,
-                            error: 'Invalid refresh token. Redirecting to home...',
-                        })
-                    }
                     await redis.del(`${hashedEmail}-refresh-token`)
                 }
-            } else {
-                return reply.code(500).send({
-                    ok: false,
-                    error: 'ERROR :=> No refresh token found, log out failed',
-                })
             }
             return reply
                 .code(200)
