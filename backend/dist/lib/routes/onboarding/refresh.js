@@ -31,7 +31,7 @@ exports.default = (fastify, options, done) => {
                     if (!refreshTokenFromRedis) {
                         return reply.code(401).send({
                             ok: false,
-                            error: 'Invalid refresh token. Redirecting to home...',
+                            error: 'No refresh token in cache, redirecting to home.',
                         });
                     }
                     const sessionToken = jwt.sign({ email: hashedEmail }, { expiresIn: process.env.JWT_SESSION_EXP });
