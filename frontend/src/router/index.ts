@@ -77,6 +77,10 @@ router.beforeEach(async (to): Promise<string | undefined> => {
                     jsonRes.sessionToken,
                 )
             } else {
+                console.error(
+                    'ERROR while refreshing token :=>',
+                    await refreshCheck.json(),
+                )
                 const logOutRes = await fetch(logoutRoute, {
                     method: 'GET',
                     credentials: 'include',

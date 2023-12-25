@@ -32,7 +32,7 @@ export default (
                     msg: z.string(),
                     sessionToken: z.string(),
                 }),
-                500: z.object({
+                401: z.object({
                     ok: z.boolean(),
                     error: z.string(),
                 }),
@@ -53,15 +53,24 @@ export default (
                     'email' in refreshTokenIsValid
                 ) {
                     const hashedEmail = refreshTokenIsValid.email
+                    const refreshTokenFromRedis = await redis.get(
+                        `${hashedEmail}-refresh-token`,
+                    )
+                    if (!refreshTokenFromRedis) {
+                        return reply.code(401).send({
+                            ok: false,
+                            error: 'Invalid refresh token. Redirecting to home...',
+                        })
+                    }
                     const sessionToken = jwt.sign(
                         { email: hashedEmail },
                         { expiresIn: process.env.JWT_SESSION_EXP as string },
                     )
                     await redis.set(
-                        `${hashedEmail}-session-token`,
-                        sessionToken,
+                        `${hashedEmail}-refresh-token`,
+                        refreshToken,
                         'EX',
-                        60,
+                        180,
                     )
                     return reply.code(200).send({
                         ok: true,
@@ -70,7 +79,7 @@ export default (
                     })
                 }
             }
-            return reply.code(500).send({
+            return reply.code(401).send({
                 ok: false,
                 error: 'Invalid refresh token. Redirecting to home...',
             })

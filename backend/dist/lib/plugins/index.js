@@ -31,7 +31,11 @@ const fastify_type_provider_zod_1 = require("fastify-type-provider-zod");
 const knexfile_1 = __importDefault(require("../../knexfile"));
 const knexFile = knexfile_1.default.development;
 exports.default = async (fastify) => {
-    await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/cors'))));
+    await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/cors'))), {
+        origin: true,
+        credentials: true,
+        allowHeaders: 'Content-Type, Authorization',
+    });
     await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/helmet'))));
     await fastify.register(Promise.resolve().then(() => __importStar(require('fastify-bcrypt'))));
     await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/cookie'))), {

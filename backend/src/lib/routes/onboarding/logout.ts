@@ -52,7 +52,7 @@ export default (
                     'email' in refreshTokenIsValid
                 ) {
                     const hashedEmail = refreshTokenIsValid.email
-                    await redis.del(`${hashedEmail}-session-token`)
+                    await redis.del(`${hashedEmail}-refresh-token`)
                 }
             }
             return reply
