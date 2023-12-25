@@ -81,11 +81,14 @@ router.beforeEach(async (to): Promise<string | undefined> => {
                     method: 'GET',
                     credentials: 'include',
                 })
-                if (logOutRes.status === 200) {
-                    localStorage.removeItem('appname-session-token')
-                    return '/login'
+                if (logOutRes.status !== 200) {
+                    console.error(
+                        'ERROR while logging out :=>',
+                        await logOutRes.json(),
+                    )
                 }
-                console.error('ERROR while logging out :=>', logOutRes)
+                localStorage.removeItem('appname-session-token')
+                return '/login'
             }
         }
     } else if (!to.meta.is404 && !to.meta.requiresAuth && sessionToken) {

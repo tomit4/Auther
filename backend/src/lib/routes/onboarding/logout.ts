@@ -51,6 +51,15 @@ export default (
                     'email' in refreshTokenIsValid
                 ) {
                     const hashedEmail = refreshTokenIsValid.email
+                    const refreshTokenFromRedis = await redis.get(
+                        `${hashedEmail}-refresh-token`,
+                    )
+                    if (!refreshTokenFromRedis) {
+                        return reply.code(500).send({
+                            ok: false,
+                            error: 'Invalid refresh token. Redirecting to home...',
+                        })
+                    }
                     await redis.del(`${hashedEmail}-refresh-token`)
                 }
             } else {
