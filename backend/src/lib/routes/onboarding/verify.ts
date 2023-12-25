@@ -99,7 +99,7 @@ export default (
             // TODO: reset expiration to a .env variable
             await redis.set(
                 `${hashedEmail}-refresh-token`,
-                refreshToken,
+                refreshToken as string,
                 'EX',
                 180,
             )
@@ -110,7 +110,6 @@ export default (
                     secure: true,
                     httpOnly: true,
                     sameSite: true,
-                    maxAge: 180,
                 })
                 .send({
                     ok: true,

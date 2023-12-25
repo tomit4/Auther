@@ -22,11 +22,12 @@ exports.default = (fastify, options, done) => {
         handler: async (request, reply) => {
             const { redis, jwt } = fastify;
             const refreshToken = request.cookies['appname-refresh-token'];
+            let hashedEmail;
             if (refreshToken) {
                 const refreshTokenIsValid = jwt.verify(refreshToken);
                 if (typeof refreshTokenIsValid === 'object' &&
                     'email' in refreshTokenIsValid) {
-                    const hashedEmail = refreshTokenIsValid.email;
+                    hashedEmail = refreshTokenIsValid.email;
                     const refreshTokenFromRedis = await redis.get(`${hashedEmail}-refresh-token`);
                     if (!refreshTokenFromRedis) {
                         return reply.code(401).send({
@@ -43,6 +44,7 @@ exports.default = (fastify, options, done) => {
                     });
                 }
             }
+            await redis.del(`${hashedEmail}-refresh-token`);
             return reply.code(401).send({
                 ok: false,
                 error: 'Invalid refresh token. Redirecting to home...',

@@ -24,6 +24,7 @@ export default (
     fastify.withTypeProvider<ZodTypeProvider>().route({
         method: 'GET',
         url: '/logout',
+        /*
         schema: {
             response: {
                 200: z.object({
@@ -36,6 +37,7 @@ export default (
                 }),
             },
         },
+        */
         handler: async (
             request: FastifyRequest,
             reply: FastifyReply,
