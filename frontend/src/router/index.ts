@@ -107,6 +107,18 @@ router.beforeEach(async (to): Promise<string | undefined> => {
     } else if (!to.meta.is404 && !to.meta.requiresAuth && sessionToken) {
         return '/app'
     } else if (to.meta.requiresAuth && !sessionToken) {
+        // NOTE: Repetitive, hence the need for refactor
+        const logOutRes = await fetch(logoutRoute, {
+            method: 'GET',
+            credentials: 'include',
+        })
+        const jsonLogOutRes = await logOutRes.json()
+        if (
+            jsonLogOutRes.statusCode !== 200 &&
+            jsonLogOutRes.code !== invalidTokenCode
+        ) {
+            console.error('ERROR while logging out :=>', jsonLogOutRes)
+        }
         return '/login'
     }
 })

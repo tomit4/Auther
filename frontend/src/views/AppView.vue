@@ -1,9 +1,21 @@
 <script setup lang="ts">
-// import ChangePassForm from '../components/ChangePassForm.vue'
+import ChangePassForm from '../components/ChangePassForm.vue'
+import { ref, type Ref } from 'vue'
 import { useRouter } from 'vue-router'
+const router = useRouter()
+const showDash: Ref<boolean> = ref(true)
+const showChangePassForm: Ref<boolean> = ref(false)
 const logoutRoute = import.meta.env.VITE_LOGOUT_ROUTE
 
-const router = useRouter()
+// NOTE: Just for demo purposes regarding vue props (possibly put user email here?)
+type PropTypes = {
+    msgCustom?: string
+}
+
+const props = withDefaults(defineProps<PropTypes>(), {
+    msgCustom: 'hello world',
+})
+
 const handleLogOut = async (): Promise<void> => {
     const logOutRes = await fetch(logoutRoute, {
         method: 'GET',
@@ -15,7 +27,9 @@ const handleLogOut = async (): Promise<void> => {
     } else console.error('ERROR while logging out :=>', logOutRes)
 }
 
-const handleChangePassword = (): void => {
+const toggleChangePasswordForm = (): void => {
+    showDash.value = !showDash.value
+    showChangePassForm.value = !showDash.value
     console.log('change password logic goes here :=>')
 }
 
@@ -38,11 +52,11 @@ const handleDeleteProfile = (): void => {
         form asks for email/password, sends transac email for confirmation, 
         then upon confirmation, deletion of account is complete-->
     <div>
-        <h1>App</h1>
         <!-- TODO: Put Route Link To ProfileView Page -->
-        <div className="app-dash">
+        <div v-if="showDash" className="app-dash">
+            <h1>App</h1>
             <button
-                @click="handleLogOut()"
+                @click="handleLogOut"
                 type="submit"
                 value="Submit"
                 className="btn logout-btn"
@@ -51,7 +65,7 @@ const handleDeleteProfile = (): void => {
             </button>
             <br />
             <button
-                @click="handleChangePassword()"
+                @click="toggleChangePasswordForm"
                 type="submit"
                 value="Submit"
                 className="btn change-password-btn"
@@ -60,7 +74,7 @@ const handleDeleteProfile = (): void => {
             </button>
             <br />
             <button
-                @click="handleDeleteProfile()"
+                @click="handleDeleteProfile"
                 type="submit"
                 value="Submit"
                 className="btn delete-profile-btn"
@@ -68,9 +82,13 @@ const handleDeleteProfile = (): void => {
                 Delete My Profile
             </button>
         </div>
-        <!--
-        <ChangePassForm />
-        -->
+        <div>
+            <ChangePassForm
+                v-if="!showDash && showChangePassForm"
+                @go-back="toggleChangePasswordForm"
+                :msg-custom="props.msgCustom"
+            />
+        </div>
     </div>
 </template>
 
