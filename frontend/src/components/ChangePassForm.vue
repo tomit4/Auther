@@ -18,6 +18,8 @@ const handleSubmit = async (passwordInput: string): Promise<void> => {
         body: JSON.stringify(data),
     })
     const jsonRes = await res.json()
+    // NOTE: If successful, redirect to check email page
+    // otherwise render error here
     console.log('jsonRes :=>', jsonRes)
 }
 </script>
