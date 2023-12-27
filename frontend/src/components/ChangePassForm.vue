@@ -8,7 +8,6 @@ defineProps({
 })
 
 const handleSubmit = async (passwordInput: string): Promise<void> => {
-    console.log('passWordInput :=>', passwordInput)
     const data = {
         inputPassword: passwordInput,
     }
@@ -27,9 +26,9 @@ const handleSubmit = async (passwordInput: string): Promise<void> => {
     <div>
         <p>You're about to change the password for {{ emailFromCache }}</p>
         <span className="email-form">
-            <label className="password-label" for="password"
-                >Enter Your Password:</label
-            >
+            <label className="password-label" for="password">
+                Enter Your Password:
+            </label>
             <input
                 type="password"
                 id="password"

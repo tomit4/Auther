@@ -1,6 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const zod_1 = require("zod");
+const send_email_1 = __importDefault(require("../../utils/send-email"));
 /*
 type AuthRes = {
     ok: boolean
@@ -46,31 +50,25 @@ exports.default = (fastify, options, done) => {
             const { redis, knex, bcrypt, jwt } = fastify;
             const { inputPassword } = request.body;
             const refreshToken = request.cookies['appname-refresh-token'];
-            let hashedEmail;
-            let rawEmailFromRedis;
-            let userByEmail;
             const refreshTokenIsValid = jwt.verify(refreshToken);
-            if (typeof refreshTokenIsValid === 'object' &&
-                'email' in refreshTokenIsValid) {
-                hashedEmail = refreshTokenIsValid.email;
-                if (!hashedEmail) {
-                    return reply.code(401).send({
-                        ok: false,
-                        error: 'No refresh token provided by client, redirecting to home.',
-                    });
-                }
-                rawEmailFromRedis = await redis.get(`${hashedEmail}-email`);
-                if (!rawEmailFromRedis) {
-                    return reply.code(401).send({
-                        ok: false,
-                        error: 'No refresh token in cache, redirecting to home.',
-                    });
-                }
-                userByEmail = await knex('users')
-                    .select('password')
-                    .where('email', hashedEmail)
-                    .first();
+            const hashedEmail = refreshTokenIsValid.email;
+            if (!hashedEmail) {
+                return reply.code(401).send({
+                    ok: false,
+                    error: 'No refresh token provided by client, redirecting to home.',
+                });
             }
+            const rawEmailFromRedis = await redis.get(`${hashedEmail}-email`);
+            if (!rawEmailFromRedis) {
+                return reply.code(401).send({
+                    ok: false,
+                    error: 'No refresh token in cache, redirecting to home.',
+                });
+            }
+            const userByEmail = await knex('users')
+                .select('password')
+                .where('email', hashedEmail)
+                .first();
             const passwordSchemaRegex = new RegExp([
                 /^(?=.*[a-z])/, // At least one lowercase letter
                 /(?=.*[A-Z])/, // At least one uppercase letter
@@ -99,9 +97,17 @@ exports.default = (fastify, options, done) => {
             if (!passwordHashesMatch) {
                 return reply.code(401).send({
                     ok: false,
-                    message: 'Incorrect email or password. Please try again.',
+                    message: 'Incorrect password. Please try again.',
                 });
             }
+            if (rawEmailFromRedis && hashedEmail) {
+                const emailSent = await (0, send_email_1.default)(rawEmailFromRedis, `change-password/${hashedEmail}`);
+                if (!emailSent.wasSuccessfull) {
+                    fastify.log.error('Error occurred while sending email, are your Brevo credentials up to date? :=>', emailSent.error);
+                    throw new Error('An error occurred while sending email, please contact support.');
+                }
+            }
+            // TODO: set hashedEmail-changing-password value in redis with TTL of 5 minutes
             return reply.code(200).send({
                 ok: true,
                 message: 'Your password is authenticated, please answer your email to continue change of password',

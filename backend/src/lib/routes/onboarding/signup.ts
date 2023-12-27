@@ -90,7 +90,7 @@ export default (
                     (await redis.get(`${hashedEmail}-password`))
                 const emailSent = await sendEmail(
                     email as string,
-                    hashedEmail as string,
+                    `verify/${hashedEmail}` as string,
                 )
                 if (!zParsedEmail.success) {
                     const { error } = zParsedEmail

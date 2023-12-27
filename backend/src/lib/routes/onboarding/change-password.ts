@@ -8,6 +8,7 @@ import type {
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import type { VerifyPayloadType } from '@fastify/jwt'
 import { z } from 'zod'
+import sendEmail from '../../utils/send-email'
 
 type BodyReq = {
     inputPassword: string
@@ -68,37 +69,27 @@ export default (
             const refreshToken = request.cookies[
                 'appname-refresh-token'
             ] as string
-            let hashedEmail: string
-            let rawEmailFromRedis: string | null
-            let userByEmail
             const refreshTokenIsValid = jwt.verify(
                 refreshToken,
-            ) as VerifyPayloadType
-
-            if (
-                typeof refreshTokenIsValid === 'object' &&
-                'email' in refreshTokenIsValid
-            ) {
-                hashedEmail = refreshTokenIsValid.email as string
-                if (!hashedEmail) {
-                    return reply.code(401).send({
-                        ok: false,
-                        error: 'No refresh token provided by client, redirecting to home.',
-                    })
-                }
-                rawEmailFromRedis = await redis.get(`${hashedEmail}-email`)
-                if (!rawEmailFromRedis) {
-                    return reply.code(401).send({
-                        ok: false,
-                        error: 'No refresh token in cache, redirecting to home.',
-                    })
-                }
-                userByEmail = await knex('users')
-                    .select('password')
-                    .where('email', hashedEmail)
-                    .first()
+            ) as VerifyPayloadType & { email: string }
+            const hashedEmail = refreshTokenIsValid.email as string
+            if (!hashedEmail) {
+                return reply.code(401).send({
+                    ok: false,
+                    error: 'No refresh token provided by client, redirecting to home.',
+                })
             }
-
+            const rawEmailFromRedis = await redis.get(`${hashedEmail}-email`)
+            if (!rawEmailFromRedis) {
+                return reply.code(401).send({
+                    ok: false,
+                    error: 'No refresh token in cache, redirecting to home.',
+                })
+            }
+            const userByEmail = await knex('users')
+                .select('password')
+                .where('email', hashedEmail)
+                .first()
             const passwordSchemaRegex = new RegExp(
                 [
                     /^(?=.*[a-z])/, // At least one lowercase letter
@@ -130,9 +121,25 @@ export default (
             if (!passwordHashesMatch) {
                 return reply.code(401).send({
                     ok: false,
-                    message: 'Incorrect email or password. Please try again.',
+                    message: 'Incorrect password. Please try again.',
                 })
             }
+            if (rawEmailFromRedis && hashedEmail) {
+                const emailSent = await sendEmail(
+                    rawEmailFromRedis as string,
+                    `change-password/${hashedEmail}` as string,
+                )
+                if (!emailSent.wasSuccessfull) {
+                    fastify.log.error(
+                        'Error occurred while sending email, are your Brevo credentials up to date? :=>',
+                        emailSent.error,
+                    )
+                    throw new Error(
+                        'An error occurred while sending email, please contact support.',
+                    )
+                }
+            }
+            // TODO: set hashedEmail-changing-password value in redis with TTL of 5 minutes
             return reply.code(200).send({
                 ok: true,
                 message:

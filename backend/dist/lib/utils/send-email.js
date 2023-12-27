@@ -35,7 +35,7 @@ const apiInstance = new Brevo.TransactionalEmailsApi();
 const apiKey = apiInstance.authentications.apiKey;
 apiKey.apiKey = process.env.BREVO_KEY;
 const sendSmtpEmail = new Brevo.SendSmtpEmail();
-exports.default = async (email, hashedEmail) => {
+exports.default = async (email, endpoint) => {
     sendSmtpEmail.sender = {
         name: 'My Test Company',
         email: 'mytestemail@email.com',
@@ -48,7 +48,8 @@ exports.default = async (email, hashedEmail) => {
     ];
     sendSmtpEmail.templateId = Number(process.env.BREVO_TEMPLATE_ID);
     sendSmtpEmail.params = {
-        link: `${process.env.BREVO_LINK}/verify/${hashedEmail}`,
+        // NOTE: verify must also change based off of sign up, change password, or delete
+        link: `${process.env.BREVO_LINK}/${endpoint}`,
     };
     return await apiInstance.sendTransacEmail(sendSmtpEmail).then(data => {
         return { wasSuccessfull: true, data: data };
