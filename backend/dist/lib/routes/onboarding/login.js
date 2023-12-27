@@ -102,6 +102,7 @@ exports.default = (fastify, options, done) => {
             const refreshToken = jwt.sign({ email: hashedEmail }, { expiresIn: process.env.JWT_REFRESH_EXP });
             // TODO: reset expiration to a .env variable
             await redis.set(`${hashedEmail}-refresh-token`, refreshToken, 'EX', 180);
+            await redis.set(`${hashedEmail}-email`, email, 'EX', 180);
             return reply
                 .code(200)
                 .setCookie('appname-refresh-token', refreshToken, {

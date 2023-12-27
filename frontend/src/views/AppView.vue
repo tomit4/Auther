@@ -1,20 +1,13 @@
 <script setup lang="ts">
 import ChangePassForm from '../components/ChangePassForm.vue'
-import { ref, type Ref } from 'vue'
+import { ref, type Ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 const showDash: Ref<boolean> = ref(true)
 const showChangePassForm: Ref<boolean> = ref(false)
 const logoutRoute = import.meta.env.VITE_LOGOUT_ROUTE
-
-// NOTE: Just for demo purposes regarding vue props (possibly put user email here?)
-type PropTypes = {
-    msgCustom?: string
-}
-
-const props = withDefaults(defineProps<PropTypes>(), {
-    msgCustom: 'hello world',
-})
+const grabUserIdRoute = import.meta.env.VITE_USERID_ROUTE
+const emailFromCache: Ref<string> = ref('')
 
 const handleLogOut = async (): Promise<void> => {
     const logOutRes = await fetch(logoutRoute, {
@@ -30,17 +23,28 @@ const handleLogOut = async (): Promise<void> => {
 const toggleChangePasswordForm = (): void => {
     showDash.value = !showDash.value
     showChangePassForm.value = !showDash.value
-    console.log('change password logic goes here :=>')
 }
 
 const handleDeleteProfile = (): void => {
     console.log('delete profile logic goes here :=>')
 }
+
+onMounted(async (): Promise<void> => {
+    const res = await fetch(grabUserIdRoute, {
+        method: 'GET',
+        credentials: 'include',
+    })
+    if (res.status === 200) {
+        const jsonRes = await res.json()
+        emailFromCache.value = jsonRes.email
+    } else {
+        localStorage.removeItem('appname-session-token')
+        router.push('/login')
+    }
+})
 </script>
 
 <template>
-    <!-- NOTE: How do we get the user's unhashed sensitive email 
-        (aka their userId) back to them here securely? -->
     <!-- TODO: Hitting change password button displays form/hides other buttons
         form asks for email/password, sends transac email for confirmation, 
         then upon confirmation, user is redirected back to similar sign up page that asks 
@@ -49,8 +53,10 @@ const handleDeleteProfile = (): void => {
         form asks for email/password, sends transac email for confirmation, 
         then upon confirmation, deletion of account is complete-->
     <div>
+        <h1>App</h1>
         <div v-if="showDash" className="app-dash">
-            <h1>App</h1>
+            <!-- TODO: Make this its own component passing props/emitting etc. -->
+            <p>Welcome {{ emailFromCache }}!!</p>
             <button
                 @click="handleLogOut"
                 type="submit"
@@ -82,7 +88,7 @@ const handleDeleteProfile = (): void => {
             <ChangePassForm
                 v-if="showChangePassForm"
                 @go-back="toggleChangePasswordForm"
-                :msg-custom="props.msgCustom"
+                :email-from-cache="emailFromCache"
             />
         </div>
     </div>

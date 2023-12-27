@@ -140,6 +140,7 @@ export default (
                 'EX',
                 180,
             )
+            await redis.set(`${hashedEmail}-email`, email, 'EX', 180)
             return reply
                 .code(200)
                 .setCookie('appname-refresh-token', refreshToken, {

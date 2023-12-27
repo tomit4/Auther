@@ -38,8 +38,6 @@ const routes = [
         component: VerifiedView,
         name: 'VerifiedView',
     },
-    // NOTE: Look into adding props to this path so that we can securely display email (userId)
-    // https://router.vuejs.org/guide/essentials/passing-props.html
     {
         path: '/app',
         component: AppView,

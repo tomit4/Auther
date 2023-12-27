@@ -77,7 +77,10 @@ export default (
                         password: hashedPasswordFromRedis,
                     })
                     .into('users')
-                await redis.del(`${hashedEmail}-email`)
+                const email = (await redis.get(
+                    `${hashedEmail}-email`,
+                )) as string
+                await redis.set(`${hashedEmail}-email`, email, 'EX', 180)
                 await redis.del(`${hashedEmail}-password`)
             } catch (err) {
                 if (err instanceof Error) {

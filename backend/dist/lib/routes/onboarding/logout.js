@@ -32,6 +32,7 @@ exports.default = (fastify, options, done) => {
                     'email' in refreshTokenIsValid) {
                     const hashedEmail = refreshTokenIsValid.email;
                     await redis.del(`${hashedEmail}-refresh-token`);
+                    await redis.del(`${hashedEmail}-email`);
                 }
             }
             return reply.code(200).send({

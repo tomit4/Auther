@@ -5,6 +5,7 @@ import authRoute from './onboarding/auth'
 import refreshRoute from './onboarding/refresh'
 import loginRoute from './onboarding/login'
 import logoutRoute from './onboarding/logout'
+import grabUserId from './onboarding/grabuserid'
 
 export default async (fastify: FastifyInstance): Promise<void> => {
     await fastify.register(signupRoute, { prefix: '/onboarding' })
@@ -13,4 +14,5 @@ export default async (fastify: FastifyInstance): Promise<void> => {
     await fastify.register(refreshRoute, { prefix: '/onboarding' })
     await fastify.register(loginRoute, { prefix: '/onboarding' })
     await fastify.register(logoutRoute, { prefix: '/onboarding' })
+    await fastify.register(grabUserId, { prefix: '/onboarding' })
 }

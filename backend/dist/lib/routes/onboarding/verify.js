@@ -44,7 +44,8 @@ exports.default = (fastify, options, done) => {
                     password: hashedPasswordFromRedis,
                 })
                     .into('users');
-                await redis.del(`${hashedEmail}-email`);
+                const email = (await redis.get(`${hashedEmail}-email`));
+                await redis.set(`${hashedEmail}-email`, email, 'EX', 180);
                 await redis.del(`${hashedEmail}-password`);
             }
             catch (err) {
