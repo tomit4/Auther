@@ -10,6 +10,7 @@ const refresh_1 = __importDefault(require("./onboarding/refresh"));
 const login_1 = __importDefault(require("./onboarding/login"));
 const logout_1 = __importDefault(require("./onboarding/logout"));
 const grabuserid_1 = __importDefault(require("./onboarding/grabuserid"));
+const change_password_1 = __importDefault(require("./onboarding/change-password"));
 exports.default = async (fastify) => {
     await fastify.register(signup_1.default, { prefix: '/onboarding' });
     await fastify.register(verify_1.default, { prefix: '/onboarding' });
@@ -18,4 +19,5 @@ exports.default = async (fastify) => {
     await fastify.register(login_1.default, { prefix: '/onboarding' });
     await fastify.register(logout_1.default, { prefix: '/onboarding' });
     await fastify.register(grabuserid_1.default, { prefix: '/onboarding' });
+    await fastify.register(change_password_1.default, { prefix: '/onboarding' });
 };

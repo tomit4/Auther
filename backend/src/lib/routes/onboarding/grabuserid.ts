@@ -1,4 +1,3 @@
-import type { VerifyPayloadType } from '@fastify/jwt'
 import type {
     FastifyInstance,
     FastifyPluginOptions,
@@ -7,6 +6,7 @@ import type {
     HookHandlerDoneFunction,
 } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
+import type { VerifyPayloadType } from '@fastify/jwt'
 import { z } from 'zod'
 
 type GrabUserCredsRes = {
