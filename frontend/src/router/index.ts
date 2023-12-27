@@ -28,7 +28,6 @@ const routes = [
         component: LoginView,
         name: 'LoginView',
     },
-    // TODO: protect if not coming from signup (redirect back to signup if not coming from there)
     {
         path: '/auth',
         component: WaitingForActionView,
@@ -39,6 +38,8 @@ const routes = [
         component: VerifiedView,
         name: 'VerifiedView',
     },
+    // NOTE: Look into adding props to this path so that we can securely display email (userId)
+    // https://router.vuejs.org/guide/essentials/passing-props.html
     {
         path: '/app',
         component: AppView,
@@ -59,7 +60,7 @@ const router = createRouter({
 })
 
 // TODO: Heavy refactor into smaller helper functions
-router.beforeEach(async (to): Promise<string | undefined> => {
+router.beforeEach(async (to, from): Promise<string | undefined> => {
     const sessionToken = localStorage.getItem('appname-session-token')
     if (to.meta.requiresAuth && sessionToken) {
         const res = await fetch(authRoute, {
@@ -120,6 +121,12 @@ router.beforeEach(async (to): Promise<string | undefined> => {
             console.error('ERROR while logging out :=>', jsonLogOutRes)
         }
         return '/login'
+    } else if (
+        !to.meta.requiresAuth &&
+        to.path === '/auth' &&
+        from.path !== '/signup'
+    ) {
+        return '/'
     }
 })
 

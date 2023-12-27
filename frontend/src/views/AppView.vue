@@ -39,11 +39,8 @@ const handleDeleteProfile = (): void => {
 </script>
 
 <template>
-    <!-- TODO: If logged in (which you should be thanks to vue-router),
-        you can now fetch sensitive info about the user, display it here 
-        to hammer home the point that this is a protected route -->
-    <!-- TODO: Build out a secondary ProvileView.vue that requires auth and 
-        shows aforementioned sensitive info there instead of here -->
+    <!-- NOTE: How do we get the user's unhashed sensitive email 
+        (aka their userId) back to them here securely? -->
     <!-- TODO: Hitting change password button displays form/hides other buttons
         form asks for email/password, sends transac email for confirmation, 
         then upon confirmation, user is redirected back to similar sign up page that asks 
@@ -52,7 +49,6 @@ const handleDeleteProfile = (): void => {
         form asks for email/password, sends transac email for confirmation, 
         then upon confirmation, deletion of account is complete-->
     <div>
-        <!-- TODO: Put Route Link To ProfileView Page -->
         <div v-if="showDash" className="app-dash">
             <h1>App</h1>
             <button
@@ -84,7 +80,7 @@ const handleDeleteProfile = (): void => {
         </div>
         <div>
             <ChangePassForm
-                v-if="!showDash && showChangePassForm"
+                v-if="showChangePassForm"
                 @go-back="toggleChangePasswordForm"
                 :msg-custom="props.msgCustom"
             />
