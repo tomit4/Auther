@@ -11,6 +11,7 @@
         "migrate-rollback": "cd src && npx ts-node ../node_modules/.bin/knex migrate:rollback",
         "seed-make": "cd src && knex seed:make -x ts",
         "seed-run": "cd src && npx ts-node ../node_modules/.bin/knex seed:run",
+        "reset": "npm run migrate-rollback && npm run migrate-latest && npm run seed-run",
         "dev": "tsnd --respawn --transpile-only --exit-child src/index.ts"
     },
     "keywords": [],
