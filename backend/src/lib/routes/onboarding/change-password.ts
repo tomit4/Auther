@@ -128,9 +128,12 @@ export default (
                 })
             }
             const newHashedPassword = await bcrypt.hash(newPassword)
-            await knex('users').where('email', hashedEmail).update({
-                password: newHashedPassword,
-            })
+            await knex('users')
+                .where('email', hashedEmail)
+                .andWhere('is_deleted', false)
+                .update({
+                    password: newHashedPassword,
+                })
             await redis.del(`${hashedEmail}-change-password-ask`)
             return reply
                 .code(200)

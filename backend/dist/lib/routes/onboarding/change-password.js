@@ -98,7 +98,10 @@ exports.default = (fastify, options, done) => {
                 });
             }
             const newHashedPassword = await bcrypt.hash(newPassword);
-            await knex('users').where('email', hashedEmail).update({
+            await knex('users')
+                .where('email', hashedEmail)
+                .andWhere('is_deleted', false)
+                .update({
                 password: newHashedPassword,
             });
             await redis.del(`${hashedEmail}-change-password-ask`);
