@@ -101,9 +101,8 @@ export default (
                     error: 'No refresh token provided by client, redirecting to home.',
                 })
             }
-            const redisCacheExpired = !(await redis.get(
-                `${hashedEmail}-change-password-ask`,
-            ))
+            const redisCacheExpired =
+                (await redis.ttl(`${hashedEmail}-change-password-ask`)) < 0
             if (redisCacheExpired) {
                 throw new Error(
                     'Sorry, but you took too long to answer your email, please log in and try again.',
@@ -131,6 +130,7 @@ export default (
             await knex('users').where('email', hashedEmail).update({
                 password: newHashedPassword,
             })
+            await redis.del(`${hashedEmail}-change-password-ask`)
             return reply
                 .code(200)
                 .clearCookie('appname-hash', { path: '/verify-change-pass' })
