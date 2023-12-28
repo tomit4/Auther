@@ -28,7 +28,7 @@ export default (
     done: HookHandlerDoneFunction,
 ) => {
     fastify.withTypeProvider<ZodTypeProvider>().route({
-        method: 'DELETE',
+        method: 'POST',
         url: '/delete-profile-ask',
         config: {
             rateLimit: {

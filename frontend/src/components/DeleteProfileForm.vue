@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
 const deleteProfileAskRoute = import.meta.env
     .VITE_DELETE_PROFILE_ASK_ROUTE as string
@@ -12,18 +14,30 @@ defineProps({
     emailFromCache: String,
 })
 
+// TODO: place in utility class/file
+const delay = (ms: number): Promise<void> => {
+    return new Promise(resolve => setTimeout(resolve, ms))
+}
+
 const handleSubmit = async (passwordInput: string): Promise<void> => {
     const data = {
         inputPassword: passwordInput,
     }
     const res = await fetch(deleteProfileAskRoute, {
-        method: 'DELETE',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify(data),
     })
     const jsonRes = await res.json()
-    console.log('jsonRes :=>', jsonRes)
+    if (!res.ok) {
+        errMessage.value = jsonRes.message
+    } else {
+        resSuccessful.value = jsonRes.message
+        await delay(1000)
+        localStorage.removeItem('appname-session-token')
+        router.push('/app')
+    }
 }
 </script>
 
@@ -42,6 +56,7 @@ const handleSubmit = async (passwordInput: string): Promise<void> => {
                 minlength="10"
                 placeholder="Password1234!"
                 v-model="passwordInput"
+                v-focus
                 @keyup.enter="handleSubmit(passwordInput as string)"
                 required
             />

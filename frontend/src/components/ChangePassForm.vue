@@ -47,6 +47,7 @@ const handleSubmit = async (passwordInput: string): Promise<void> => {
                 minlength="10"
                 placeholder="Password1234!"
                 v-model="passwordInput"
+                v-focus
                 @keyup.enter="handleSubmit(passwordInput as string)"
                 required
             />

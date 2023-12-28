@@ -15,7 +15,7 @@ type AuthRes = {
 */
 exports.default = (fastify, options, done) => {
     fastify.withTypeProvider().route({
-        method: 'DELETE',
+        method: 'POST',
         url: '/delete-profile-ask',
         config: {
             rateLimit: {

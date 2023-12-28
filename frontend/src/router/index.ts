@@ -11,6 +11,7 @@ import SignUpView from '../views/SignUpView.vue'
 import SplashView from '../views/SplashView.vue'
 import VerifiedView from '../views/VerifiedView.vue'
 import VerifiedChangePasswordView from '../views/VerifiedChangePasswordView.vue'
+import VerifiedDeleteProfileView from '../views/VerifiedDeleteProfileView.vue'
 import WaitingForActionView from '../views/WaitingForActionView.vue'
 
 const routes = [
@@ -43,6 +44,12 @@ const routes = [
         path: '/verify-change-pass/:hash',
         component: VerifiedChangePasswordView,
         name: 'VerifiedChangePasswordView',
+        meta: { requiresAuth: true },
+    },
+    {
+        path: '/verify-delete-profile/:hash',
+        component: VerifiedDeleteProfileView,
+        name: 'VerifiedDeleteProfileView',
         meta: { requiresAuth: true },
     },
     {
