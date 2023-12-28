@@ -5,6 +5,7 @@ export async function up(knex: Knex): Promise<void> {
         table.increments('id')
         table.string('email', 255).notNullable()
         table.string('password', 255).notNullable()
+        table.boolean('is_deleted').defaultTo(false)
         table.datetime('created_at', { useTz: false }).defaultTo(knex.fn.now())
     })
 }

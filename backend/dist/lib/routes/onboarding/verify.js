@@ -42,6 +42,7 @@ exports.default = (fastify, options, done) => {
                     .insert({
                     email: hashedEmail,
                     password: hashedPasswordFromRedis,
+                    is_deleted: false,
                 })
                     .into('users');
                 const email = (await redis.get(`${hashedEmail}-email`));

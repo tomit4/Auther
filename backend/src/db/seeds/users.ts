@@ -9,10 +9,12 @@ export async function seed(knex: Knex): Promise<void> {
         {
             email: 'testemail@email.com',
             password: 'mypAss1234!',
+            is_deleted: false,
         },
         {
             email: 'testemail2@email.com',
             password: 'mypAss1234!',
+            is_deleted: false,
         },
     ])
 }
