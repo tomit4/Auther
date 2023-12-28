@@ -81,6 +81,7 @@ exports.default = (fastify, options, done) => {
             const userPasswordByEmail = await knex('users')
                 .select('password')
                 .where('email', hashedEmail)
+                .andWhere('is_deleted', false)
                 .first();
             const { password } = userPasswordByEmail;
             const passwordHashesMatch = await bcrypt

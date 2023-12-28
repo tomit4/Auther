@@ -89,6 +89,7 @@ export default (
             const userByEmail = await knex('users')
                 .select('password')
                 .where('email', hashedEmail)
+                .andWhere('is_deleted', false)
                 .first()
             const passwordSchemaRegex = new RegExp(
                 [

@@ -58,6 +58,7 @@ export default (
                 )
                 const userAlreadyInDb = await knex('users')
                     .where('email', emailFromRedis)
+                    .andWhere('is_deleted', false)
                     .first()
                 if (redisCacheExpired)
                     throw new Error(

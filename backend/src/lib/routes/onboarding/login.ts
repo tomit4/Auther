@@ -96,6 +96,7 @@ export default (
                 const userByEmail = await knex('users')
                     .select('password')
                     .where('email', hashedEmail)
+                    .andWhere('is_deleted', false)
                     .first()
                 if (!userByEmail) {
                     return reply.code(401).send({

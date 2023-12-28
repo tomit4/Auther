@@ -68,6 +68,7 @@ exports.default = (fastify, options, done) => {
             const userByEmail = await knex('users')
                 .select('password')
                 .where('email', hashedEmail)
+                .andWhere('is_deleted', false)
                 .first();
             const passwordSchemaRegex = new RegExp([
                 /^(?=.*[a-z])/, // At least one lowercase letter
