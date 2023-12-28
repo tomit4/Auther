@@ -3,6 +3,9 @@ import { ref, type Ref } from 'vue'
 const passwordInput: Ref<string> = ref('')
 const changePasswordRoute = import.meta.env.VITE_CHANGE_PASSWORD_ROUTE as string
 
+const errMessage: Ref<string> = ref('')
+const resSuccessful: Ref<string> = ref('')
+
 defineProps({
     emailFromCache: String,
 })
@@ -18,9 +21,11 @@ const handleSubmit = async (passwordInput: string): Promise<void> => {
         body: JSON.stringify(data),
     })
     const jsonRes = await res.json()
-    // NOTE: If successful, redirect to check email page
-    // otherwise render error here
-    console.log('jsonRes :=>', jsonRes)
+    if (res.ok) {
+        resSuccessful.value = jsonRes.message
+    } else {
+        errMessage.value = jsonRes.message
+    }
 }
 </script>
 
@@ -57,6 +62,13 @@ const handleSubmit = async (passwordInput: string): Promise<void> => {
             </button>
         </span>
         <button className="btn" @click="$emit('goBack')">Go Back</button>
+        <span v-if="errMessage">
+            <p>{{ errMessage }}</p>
+        </span>
+        <span v-else-if="resSuccessful.length">
+            <p>{{ resSuccessful }}</p>
+        </span>
+        <span v-else />
     </div>
 </template>
 
