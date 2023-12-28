@@ -35,7 +35,7 @@ const handleSubmit = async (passwordInput: string): Promise<void> => {
 <template>
     <div>
         <p>You're about to change the password for {{ emailFromCache }}</p>
-        <span className="email-form">
+        <span className="password-form">
             <label className="password-label" for="password">
                 Enter Your Password:
             </label>
