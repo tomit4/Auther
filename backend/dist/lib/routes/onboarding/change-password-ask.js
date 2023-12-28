@@ -16,7 +16,7 @@ type AuthRes = {
 exports.default = (fastify, options, done) => {
     fastify.withTypeProvider().route({
         method: 'POST',
-        url: '/change-password',
+        url: '/change-password-ask',
         config: {
             rateLimit: {
                 max: 5,

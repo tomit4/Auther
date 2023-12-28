@@ -29,7 +29,7 @@ export default (
 ) => {
     fastify.withTypeProvider<ZodTypeProvider>().route({
         method: 'POST',
-        url: '/change-password',
+        url: '/change-password-ask',
         config: {
             rateLimit: {
                 max: 5,
