@@ -9,6 +9,7 @@ import grabUserId from './onboarding/grabuserid'
 import changePasswordAskRoute from './onboarding/change-password-ask'
 import changePassword from './onboarding/change-password'
 import deleteProfileAskRoute from './onboarding/delete-profile-ask'
+import deleteProfileRoute from './onboarding/delete-profile'
 
 export default async (fastify: FastifyInstance): Promise<void> => {
     await fastify.register(signupRoute, { prefix: '/onboarding' })
@@ -21,4 +22,5 @@ export default async (fastify: FastifyInstance): Promise<void> => {
     await fastify.register(changePasswordAskRoute, { prefix: '/onboarding' })
     await fastify.register(changePassword, { prefix: '/onboarding' })
     await fastify.register(deleteProfileAskRoute, { prefix: '/onboarding' })
+    await fastify.register(deleteProfileRoute, { prefix: '/onboarding' })
 }

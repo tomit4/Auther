@@ -57,7 +57,7 @@ export default (
                     `${hashedEmail}-password`,
                 )
                 const userAlreadyInDb = await knex('users')
-                    .where('email', emailFromRedis)
+                    .where('email', hashedEmail)
                     .first()
                 if (redisCacheExpired)
                     throw new Error(

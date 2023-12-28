@@ -30,7 +30,7 @@ exports.default = (fastify, options, done) => {
                 const emailFromRedis = await redis.get(`${hashedEmail}-email`);
                 const hashedPasswordFromRedis = await redis.get(`${hashedEmail}-password`);
                 const userAlreadyInDb = await knex('users')
-                    .where('email', emailFromRedis)
+                    .where('email', hashedEmail)
                     .first();
                 if (redisCacheExpired)
                     throw new Error('Sorry, but you took too long to answer your email, please sign up again.');

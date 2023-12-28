@@ -6,6 +6,7 @@ const router = useRouter()
 
 const grabUserIdRoute = import.meta.env.VITE_USERID_ROUTE
 const logoutRoute = import.meta.env.VITE_LOGOUT_ROUTE
+const deleteProfileRoute = import.meta.env.VITE_DELETE_PROFILE_ROUTE
 const invalidTokenCode = import.meta.env.VITE_INVALID_TOKEN_CODE
 
 const emailFromCache: Ref<string> = ref('')
@@ -33,7 +34,6 @@ onMounted(async () => {
     if (!cookie || cookie !== route.params.hash) {
         errMessage.value =
             'Invalid hash provided, please log back in and try again.'
-        // TODO: Repeated code, put into utility class
         const logOutRes = await fetch(logoutRoute, {
             method: 'GET',
             credentials: 'include',
@@ -46,9 +46,7 @@ onMounted(async () => {
             console.error('ERROR while logging out :=>', jsonLogOutRes)
         }
         localStorage.removeItem('appname-session-token')
-        // END repeated code
-        await delay(1000)
-        router.push('/login')
+        router.push('/app')
     }
 
     const res = await fetch(grabUserIdRoute, {
@@ -60,17 +58,35 @@ onMounted(async () => {
         emailFromCache.value = jsonRes.email
     } else {
         localStorage.removeItem('appname-session-token')
-        router.push('/login')
+        router.push('/app')
+    }
+
+    const deleteProfileRes = await fetch(deleteProfileRoute, {
+        method: 'DELETE',
+        credentials: 'include',
+    })
+    const jsonDeleteProfileRes = await deleteProfileRes.json()
+    if (deleteProfileRes.status === 200) {
+        localStorage.removeItem('appname-session-token')
+        delay(1000)
+        router.push('/')
+    } else {
+        errMessage.value = jsonDeleteProfileRes.message
+        localStorage.removeItem('appname-session-token')
+        delay(1000)
+        router.push('/app')
     }
 })
 </script>
 
 <template>
+    <!-- TODO: Figure out why this template doesn't render, 
+        it just redirects, probably due to router guards... see just above -->
     <div>
         <h1>App</h1>
         <p>
             You have successfully deleted profile for {{ emailFromCache }},
-            redirecting you back to login...
+            currently rerouting you...
         </p>
         <span v-if="errMessage">
             <p>{{ errMessage }}</p>

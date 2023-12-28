@@ -1,3 +1,4 @@
+import type { VerifyPayloadType } from '@fastify/jwt'
 import type {
     FastifyInstance,
     FastifyPluginOptions,
@@ -6,9 +7,8 @@ import type {
     HookHandlerDoneFunction,
 } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
-import type { VerifyPayloadType } from '@fastify/jwt'
-import { z } from 'zod'
-import sendEmail from '../../utils/send-email'
+// import { z } from 'zod'
+// import sendEmail from '../../utils/send-email'
 
 type BodyReq = {
     inputPassword: string
@@ -28,14 +28,8 @@ export default (
     done: HookHandlerDoneFunction,
 ) => {
     fastify.withTypeProvider<ZodTypeProvider>().route({
-        method: 'POST',
-        url: '/delete-profile-ask',
-        config: {
-            rateLimit: {
-                max: 5,
-                timeWindow: 300000, // 5 minutes
-            },
-        },
+        method: 'DELETE',
+        url: '/delete-profile',
         /*
         schema: {
             body: z.object({
@@ -64,31 +58,7 @@ export default (
             reply: FastifyReply,
             // ): Promise<AuthRes> => {
         ) => {
-            const { redis, knex, bcrypt, jwt } = fastify
-            const { inputPassword } = request.body
-            const passwordSchemaRegex = new RegExp(
-                [
-                    /^(?=.*[a-z])/, // At least one lowercase letter
-                    /(?=.*[A-Z])/, // At least one uppercase letter
-                    /(?=.*\d)/, // At least one digit
-                    /(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/, // At least one special character
-                    /[A-Za-z\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{10,}$/, // At least 10 characters long
-                ]
-                    .map(r => r.source)
-                    .join(''),
-            )
-            const passwordSchemaErrMsg =
-                'Password must be at least 10 characters in length and contain at \
-                least one lowercase letter, one uppercase letter, one digit, and one \
-                special character'
-            const passwordSchema = z.string().regex(passwordSchemaRegex, {
-                message: passwordSchemaErrMsg,
-            })
-            const zParsedPassword = passwordSchema.safeParse(inputPassword)
-            if (!zParsedPassword.success) {
-                const { error } = zParsedPassword
-                throw new Error(error.issues[0].message as string)
-            }
+            const { redis, knex, jwt } = fastify
             const refreshToken = request.cookies[
                 'appname-refresh-token'
             ] as string
@@ -102,6 +72,13 @@ export default (
                     error: 'No refresh token provided by client, redirecting to home.',
                 })
             }
+            const redisCacheExpired =
+                (await redis.ttl(`${hashedEmail}-delete-profile-ask`)) < 0
+            if (redisCacheExpired) {
+                throw new Error(
+                    'Sorry, but you took too long to answer your email, please log in and try again.',
+                )
+            }
             const rawEmailFromRedis = await redis.get(`${hashedEmail}-email`)
             if (!rawEmailFromRedis) {
                 return reply.code(401).send({
@@ -109,22 +86,33 @@ export default (
                     error: 'No refresh token in cache, redirecting to home.',
                 })
             }
-            const userPasswordByEmail = await knex('users')
-                .select('password')
+            const userByEmail = await knex('users')
                 .where('email', hashedEmail)
                 .andWhere('is_deleted', false)
                 .first()
-            const { password } = userPasswordByEmail
-            const passwordHashesMatch = await bcrypt
-                .compare(inputPassword, password)
-                .then(match => match)
-                .catch(err => err)
-            if (!passwordHashesMatch) {
+            if (!userByEmail) {
                 return reply.code(401).send({
                     ok: false,
-                    message: 'Incorrect password. Please try again.',
+                    error: 'No user found in db, redirecting home',
                 })
             }
+            await knex('users')
+                .where('email', hashedEmail)
+                .update({ is_deleted: true })
+            reply.clearCookie('appname-refresh-token', {
+                path: '/onboarding',
+            })
+            reply.clearCookie('appname-hash', {
+                path: '/verify-change-pass',
+            })
+            reply.clearCookie('appname-hash', {
+                path: '/verify-delete-profile',
+            })
+            reply.clearCookie('appname-hash', { path: '/verify' })
+            reply.clearCookie('appname-hash', { path: '/verify-change-pass' })
+
+            /* TODO: If anything goes wrong, send email to user letting  (encapsulate in helper func)
+             * them know of delete profile attempt and ask if it was them (requires new brevo template...)
             if (rawEmailFromRedis && hashedEmail) {
                 const emailSent = await sendEmail(
                     rawEmailFromRedis as string,
@@ -142,23 +130,17 @@ export default (
                     )
                 }
             }
-            await redis.set(
-                `${hashedEmail}-delete-profile-ask`,
-                hashedEmail,
-                'EX',
-                60,
-            )
-            return reply
-                .code(200)
-                .setCookie('appname-hash', hashedEmail, {
-                    path: '/verify-delete-profile',
-                    maxAge: 60 * 60,
-                })
-                .send({
-                    ok: true,
-                    message:
-                        'You have successfully requested to delete your profile, please check your email',
-                })
+            */
+
+            await redis.del(`${hashedEmail}-delete-profile-ask`)
+            await redis.del(`${hashedEmail}-email`)
+            await redis.del(`${hashedEmail}-refresh-token`)
+            await redis.del(`${hashedEmail}-change-password-ask`)
+            return reply.code(200).send({
+                ok: true,
+                message:
+                    'You have successfully deleted your profile, redirecting you home',
+            })
         },
     })
     done()

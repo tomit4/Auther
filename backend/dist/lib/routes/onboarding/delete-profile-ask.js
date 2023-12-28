@@ -78,16 +78,6 @@ exports.default = (fastify, options, done) => {
                     error: 'No refresh token provided by client, redirecting to home.',
                 });
             }
-            // TODO: place in /delete-profile route
-            /*
-            const redisCacheExpired =
-                (await redis.ttl(`${hashedEmail}-delete-profile-ask`)) < 0
-            if (redisCacheExpired) {
-                throw new Error(
-                    'Sorry, but you took too long to answer your email, please log in and try again.',
-                )
-            }
-            */
             const rawEmailFromRedis = await redis.get(`${hashedEmail}-email`);
             if (!rawEmailFromRedis) {
                 return reply.code(401).send({
@@ -120,8 +110,6 @@ exports.default = (fastify, options, done) => {
                 }
             }
             await redis.set(`${hashedEmail}-delete-profile-ask`, hashedEmail, 'EX', 60);
-            // TODO: place in /delete-profile route
-            // await redis.del(`${hashedEmail}-delete-profile-ask`)
             return reply
                 .code(200)
                 .setCookie('appname-hash', hashedEmail, {
