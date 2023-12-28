@@ -60,8 +60,7 @@ exports.default = (fastify, options, done) => {
                 // TODO: If the user deleted their profile and they sign up again,
                 // we should simply change is_deleted to false again...
                 const userAlreadyInDb = await knex('users')
-                    .where('email', email)
-                    .andWhere('is_deleted', false)
+                    .where('email', hashedEmail)
                     .first();
                 const userAlreadyInCache = (await redis.get(`${hashedEmail}-email`)) ||
                     (await redis.get(`${hashedEmail}-password`));
@@ -74,8 +73,14 @@ exports.default = (fastify, options, done) => {
                     const { error } = zParsedPassword;
                     throw new Error(error.issues[0].message);
                 }
-                if (userAlreadyInDb)
+                if (userAlreadyInDb && !userAlreadyInDb.is_deleted)
                     throw new Error('You have already signed up, please log in.');
+                if (userAlreadyInDb === null || userAlreadyInDb === void 0 ? void 0 : userAlreadyInDb.is_deleted) {
+                    await knex('users').where('email', hashedEmail).update({
+                        password: hashedPassword,
+                        is_deleted: false,
+                    });
+                }
                 if (userAlreadyInCache)
                     throw new Error('You have already submitted your email, please check your inbox.');
                 if (!emailSent.wasSuccessfull) {

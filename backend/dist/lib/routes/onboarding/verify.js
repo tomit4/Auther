@@ -31,21 +31,28 @@ exports.default = (fastify, options, done) => {
                 const hashedPasswordFromRedis = await redis.get(`${hashedEmail}-password`);
                 const userAlreadyInDb = await knex('users')
                     .where('email', emailFromRedis)
-                    .andWhere('is_deleted', false)
                     .first();
                 if (redisCacheExpired)
                     throw new Error('Sorry, but you took too long to answer your email, please sign up again.');
                 if (!emailFromRedis || !hashedPasswordFromRedis)
                     throw new Error('No data found by that email address, please sign up again.');
-                if (userAlreadyInDb)
+                if (userAlreadyInDb && !userAlreadyInDb.is_deleted)
                     throw new Error('You have already signed up, please log in.');
-                await knex
-                    .insert({
-                    email: hashedEmail,
-                    password: hashedPasswordFromRedis,
-                    is_deleted: false,
-                })
-                    .into('users');
+                if (userAlreadyInDb === null || userAlreadyInDb === void 0 ? void 0 : userAlreadyInDb.is_deleted) {
+                    await knex('users').where('email', hashedEmail).update({
+                        password: hashedPasswordFromRedis,
+                        is_deleted: false,
+                    });
+                }
+                else {
+                    await knex
+                        .insert({
+                        email: hashedEmail,
+                        password: hashedPasswordFromRedis,
+                        is_deleted: false,
+                    })
+                        .into('users');
+                }
                 const email = (await redis.get(`${hashedEmail}-email`));
                 await redis.set(`${hashedEmail}-email`, email, 'EX', 180);
                 await redis.del(`${hashedEmail}-password`);
