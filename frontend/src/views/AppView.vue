@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ChangePassForm from '../components/ChangePassForm.vue'
+import DeleteProfileForm from '../components/DeleteProfileForm.vue'
 import { ref, type Ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
@@ -9,6 +10,7 @@ const grabUserIdRoute = import.meta.env.VITE_USERID_ROUTE
 
 const showDash: Ref<boolean> = ref(true)
 const showChangePassForm: Ref<boolean> = ref(false)
+const showDeleteProfileForm: Ref<boolean> = ref(false)
 const emailFromCache: Ref<string> = ref('')
 
 const handleLogOut = async (): Promise<void> => {
@@ -27,8 +29,9 @@ const toggleChangePasswordForm = (): void => {
     showChangePassForm.value = !showDash.value
 }
 
-const handleDeleteProfile = (): void => {
-    console.log('delete profile logic goes here :=>')
+const toggleDeleteProfileForm = (): void => {
+    showDash.value = !showDash.value
+    showDeleteProfileForm.value = !showDash.value
 }
 
 onMounted(async (): Promise<void> => {
@@ -78,7 +81,7 @@ onMounted(async (): Promise<void> => {
             </button>
             <br />
             <button
-                @click="handleDeleteProfile"
+                @click="toggleDeleteProfileForm"
                 type="submit"
                 value="Submit"
                 className="btn delete-profile-btn"
@@ -90,6 +93,13 @@ onMounted(async (): Promise<void> => {
             <ChangePassForm
                 v-if="showChangePassForm"
                 @go-back="toggleChangePasswordForm"
+                :email-from-cache="emailFromCache"
+            />
+        </div>
+        <div>
+            <DeleteProfileForm
+                v-if="showDeleteProfileForm"
+                @go-back="toggleDeleteProfileForm"
                 :email-from-cache="emailFromCache"
             />
         </div>
