@@ -30,6 +30,9 @@ exports.default = (fastify, options, done) => {
                 reply.clearCookie('appname-hash', {
                     path: '/verify-change-pass',
                 });
+                reply.clearCookie('appname-hash', {
+                    path: '/verify-delete-profile',
+                });
                 const refreshTokenIsValid = jwt.verify(refreshToken);
                 if (typeof refreshTokenIsValid === 'object' &&
                     'email' in refreshTokenIsValid) {

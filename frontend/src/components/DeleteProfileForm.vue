@@ -32,12 +32,12 @@ const handleSubmit = async (passwordInput: string): Promise<void> => {
     const jsonRes = await res.json()
     if (!res.ok) {
         errMessage.value = jsonRes.message
+        localStorage.removeItem('appname-session-token')
     } else {
         resSuccessful.value = jsonRes.message
-        await delay(1000)
-        localStorage.removeItem('appname-session-token')
-        router.push('/app')
     }
+    await delay(1000)
+    router.push('/app')
 }
 </script>
 
