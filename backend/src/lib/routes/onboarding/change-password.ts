@@ -127,7 +127,7 @@ export default (
             if (rawEmailFromRedis && hashedEmail) {
                 const emailSent = await sendEmail(
                     rawEmailFromRedis as string,
-                    `change-password/${hashedEmail}` as string,
+                    `verify-change-pass/${hashedEmail}` as string,
                     process.env
                         .BREVO_CHANGE_PASSWORD_TEMPLATE_ID as unknown as number,
                 )

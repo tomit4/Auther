@@ -10,6 +10,7 @@ import NotFoundView from '../views/NotFoundView.vue'
 import SignUpView from '../views/SignUpView.vue'
 import SplashView from '../views/SplashView.vue'
 import VerifiedView from '../views/VerifiedView.vue'
+import VerifiedChangePasswordView from '../views/VerifiedChangePasswordView.vue'
 import WaitingForActionView from '../views/WaitingForActionView.vue'
 
 const routes = [
@@ -37,6 +38,12 @@ const routes = [
         path: '/verify/:hash',
         component: VerifiedView,
         name: 'VerifiedView',
+    },
+    {
+        path: '/verify-change-pass/:hash',
+        component: VerifiedChangePasswordView,
+        name: 'VerifiedChangePasswordView',
+        meta: { requiresAuth: true },
     },
     {
         path: '/app',
