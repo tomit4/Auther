@@ -20,7 +20,7 @@ const delay = (ms: number): Promise<void> => {
 }
 
 // TODO: place in utility class/file
-const grabStoredCookie = (cookieKey: string): string => {
+const grabStoredCookie = (cookieKey: string): string | undefined => {
     const cookies = document.cookie.split('; ').reduce((prev, current) => {
         const [key, ...value] = current.split('=')
         // TODO: consider refactoring this using a Map
