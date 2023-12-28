@@ -47,10 +47,6 @@ onMounted(async (): Promise<void> => {
 </script>
 
 <template>
-    <!-- TODO: Hitting change password button displays form/hides other buttons
-        form asks for email/password, sends transac email for confirmation, 
-        then upon confirmation, user is redirected back to similar sign up page that asks 
-        for new password (email is filled out by redis cache)-->
     <!-- TODO: Hitting delete my profile button displays form/hides other buttons
         form asks for email/password, sends transac email for confirmation, 
         then upon confirmation, deletion of account is complete-->
