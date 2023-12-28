@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
 
-const changePasswordRoute = import.meta.env
+const changePasswordAskRoute = import.meta.env
     .VITE_CHANGE_PASSWORD_ASK_ROUTE as string
 
 const passwordInput: Ref<string> = ref('')
@@ -16,7 +16,7 @@ const handleSubmit = async (passwordInput: string): Promise<void> => {
     const data = {
         inputPassword: passwordInput,
     }
-    const res = await fetch(changePasswordRoute, {
+    const res = await fetch(changePasswordAskRoute, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -29,6 +29,7 @@ const handleSubmit = async (passwordInput: string): Promise<void> => {
         errMessage.value = jsonRes.message
     }
 }
+// TODO: Change password field to be empty after submit
 </script>
 
 <template>

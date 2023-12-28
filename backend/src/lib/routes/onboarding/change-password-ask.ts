@@ -141,6 +141,9 @@ export default (
                     )
                 }
             }
+            // TODO: Just like in sign-up, set up a temporary redis key
+            // for 5 minutes that keeps track of whether the email was
+            // answered or not
             return reply
                 .code(200)
                 .setCookie('appname-hash', hashedEmail, {

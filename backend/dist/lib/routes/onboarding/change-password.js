@@ -1,10 +1,6 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const zod_1 = require("zod");
-const send_email_1 = __importDefault(require("../../utils/send-email"));
 /*
 type AuthRes = {
     ok: boolean
@@ -15,8 +11,8 @@ type AuthRes = {
 */
 exports.default = (fastify, options, done) => {
     fastify.withTypeProvider().route({
-        method: 'POST',
-        url: '/change-password-ask',
+        method: 'PATCH',
+        url: '/change-password',
         config: {
             rateLimit: {
                 max: 5,
@@ -48,27 +44,7 @@ exports.default = (fastify, options, done) => {
         */
         handler: async (request, reply) => {
             const { redis, knex, bcrypt, jwt } = fastify;
-            const { inputPassword } = request.body;
-            const refreshToken = request.cookies['appname-refresh-token'];
-            const refreshTokenIsValid = jwt.verify(refreshToken);
-            const hashedEmail = refreshTokenIsValid.email;
-            if (!hashedEmail) {
-                return reply.code(401).send({
-                    ok: false,
-                    error: 'No refresh token provided by client, redirecting to home.',
-                });
-            }
-            const rawEmailFromRedis = await redis.get(`${hashedEmail}-email`);
-            if (!rawEmailFromRedis) {
-                return reply.code(401).send({
-                    ok: false,
-                    error: 'No refresh token in cache, redirecting to home.',
-                });
-            }
-            const userByEmail = await knex('users')
-                .select('password')
-                .where('email', hashedEmail)
-                .first();
+            const { newPassword } = request.body;
             const passwordSchemaRegex = new RegExp([
                 /^(?=.*[a-z])/, // At least one lowercase letter
                 /(?=.*[A-Z])/, // At least one uppercase letter
@@ -84,42 +60,57 @@ exports.default = (fastify, options, done) => {
             const passwordSchema = zod_1.z.string().regex(passwordSchemaRegex, {
                 message: passwordSchemaErrMsg,
             });
-            const zParsedPassword = passwordSchema.safeParse(inputPassword);
+            const zParsedPassword = passwordSchema.safeParse(newPassword);
             if (!zParsedPassword.success) {
                 const { error } = zParsedPassword;
                 throw new Error(error.issues[0].message);
             }
-            const { password } = userByEmail;
-            const passwordHashesMatch = await bcrypt
-                .compare(inputPassword, password)
-                .then(match => match)
-                .catch(err => err);
-            if (!passwordHashesMatch) {
+            const refreshToken = request.cookies['appname-refresh-token'];
+            const refreshTokenIsValid = jwt.verify(refreshToken);
+            const hashedEmail = refreshTokenIsValid.email;
+            if (!hashedEmail) {
                 return reply.code(401).send({
                     ok: false,
-                    message: 'Incorrect password. Please try again.',
+                    error: 'No refresh token provided by client, redirecting to home.',
                 });
             }
-            if (rawEmailFromRedis && hashedEmail) {
-                const emailSent = await (0, send_email_1.default)(rawEmailFromRedis, `verify-change-pass/${hashedEmail}`, process.env
-                    .BREVO_CHANGE_PASSWORD_TEMPLATE_ID);
-                if (!emailSent.wasSuccessfull) {
-                    fastify.log.error('Error occurred while sending email, are your Brevo credentials up to date? :=>', emailSent.error);
-                    throw new Error('An error occurred while sending email, please contact support.');
-                }
+            // TODO: Also check redis store for key set up upon send of
+            // change-password email (see change-password-ask.ts)
+            const rawEmailFromRedis = await redis.get(`${hashedEmail}-email`);
+            if (!rawEmailFromRedis) {
+                return reply.code(401).send({
+                    ok: false,
+                    error: 'No refresh token in cache, redirecting to home.',
+                });
             }
-            // TODO: Just like in sign-up, set up a temporary redis key
-            // for 5 minutes that keeps track of whether the email was
-            // answered or not
+            const userPasswordByEmail = await knex('users')
+                .select('password')
+                .where('email', hashedEmail)
+                .first();
+            const { password } = userPasswordByEmail;
+            const passwordHashesMatch = await bcrypt
+                .compare(newPassword, password)
+                .then(match => match)
+                .catch(err => err);
+            // TODO: set up separate db table that keeps track of last 5 passwords
+            // for user and throws this 409 reply if new password is in table
+            // (i.e. newPassword cannot be the same as last 5 passwords)
+            if (passwordHashesMatch) {
+                return reply.code(409).send({
+                    ok: false,
+                    message: 'New password cannot be the same as old password.',
+                });
+            }
+            const newHashedPassword = await bcrypt.hash(newPassword);
+            await knex('users').where('email', hashedEmail).update({
+                password: newHashedPassword,
+            });
             return reply
                 .code(200)
-                .setCookie('appname-hash', hashedEmail, {
-                path: '/verify-change-pass',
-                maxAge: 60 * 60,
-            })
+                .clearCookie('appname-hash', { path: '/verify-change-pass' })
                 .send({
                 ok: true,
-                message: 'Your password is authenticated, please answer your email to continue change of password',
+                message: 'You have successfully changed your password!',
             });
         },
     });

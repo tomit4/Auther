@@ -5,6 +5,9 @@ const route = useRoute()
 const router = useRouter()
 
 const grabUserIdRoute = import.meta.env.VITE_USERID_ROUTE
+const changePasswordRoute = import.meta.env.VITE_CHANGE_PASSWORD_ROUTE
+const logoutRoute = import.meta.env.VITE_LOGOUT_ROUTE
+const invalidTokenCode = import.meta.env.VITE_INVALID_TOKEN_CODE
 
 const emailFromCache: Ref<string> = ref('')
 const passwordInput: Ref<string> = ref('')
@@ -29,13 +32,28 @@ const grabStoredCookie = (cookieKey: string): string => {
 }
 
 const handleSubmit = async (passwordInput: string): Promise<void> => {
-    /* TODO: POST new password to /change-password route,
-     * which will grab the email from the refresh token/redis cache
-     * as well as the cookie hash here, they must all match,
-     * (credentials, include), rate limit, etc.
-     * It will then bcrypt the new password and replace it in the db by hashedEmail.
-     */
-    console.log('handleSubmit hit with passwordInput being :=>', passwordInput)
+    try {
+        const data = {
+            newPassword: passwordInput,
+        }
+        const res = await fetch(changePasswordRoute, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(data),
+        })
+        const jsonRes = await res.json()
+        if (!res.ok) {
+            errMessage.value = jsonRes.message
+        } else {
+            resSuccessful.value = jsonRes.message
+            await delay(1000)
+            localStorage.removeItem('appname-session-token')
+            router.push('/app')
+        }
+    } catch (err) {
+        console.error('ERROR :=>', err)
+    }
 }
 
 onMounted(async () => {
@@ -43,6 +61,20 @@ onMounted(async () => {
     if (!cookie || cookie !== route.params.hash) {
         errMessage.value =
             'Invalid hash provided, please log back in and try again.'
+        // TODO: Repeated code, put into utility class
+        const logOutRes = await fetch(logoutRoute, {
+            method: 'GET',
+            credentials: 'include',
+        })
+        const jsonLogOutRes = await logOutRes.json()
+        if (
+            jsonLogOutRes.statusCode !== 200 &&
+            jsonLogOutRes.code !== invalidTokenCode
+        ) {
+            console.error('ERROR while logging out :=>', jsonLogOutRes)
+        }
+        localStorage.removeItem('appname-session-token')
+        // END repeated code
         await delay(1000)
         router.push('/login')
     }
@@ -93,7 +125,6 @@ onMounted(async () => {
                 Submit
             </button>
         </span>
-
         <span v-if="errMessage">
             <p>{{ errMessage }}</p>
         </span>
