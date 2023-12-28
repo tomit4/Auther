@@ -49,7 +49,11 @@ onMounted(async (): Promise<void> => {
 <template>
     <!-- TODO: Hitting delete my profile button displays form/hides other buttons
         form asks for email/password, sends transac email for confirmation, 
-        then upon confirmation, deletion of account is complete-->
+        then upon confirmation, deletion of account is complete -->
+    <!-- NOTE: Deletion of account includes a new table field in the db 'is_deleted'
+        which is set to true upon deletion -->
+    <!-- NOTE: This will require readjustment of our db queries as they stand 
+        currently to check for this new 'is_deleted' field -->
     <div>
         <h1>App</h1>
         <div v-if="showDash" className="app-dash">
