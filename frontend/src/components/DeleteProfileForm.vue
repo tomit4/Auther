@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
 
+const deleteProfileAskRoute = import.meta.env
+    .VITE_DELETE_PROFILE_ASK_ROUTE as string
+
 const passwordInput: Ref<string> = ref('')
 const errMessage: Ref<string> = ref('')
 const resSuccessful: Ref<string> = ref('')
@@ -10,7 +13,17 @@ defineProps({
 })
 
 const handleSubmit = async (passwordInput: string): Promise<void> => {
-    console.log('handleSubmit with passwordInput :=>', passwordInput)
+    const data = {
+        inputPassword: passwordInput,
+    }
+    const res = await fetch(deleteProfileAskRoute, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(data),
+    })
+    const jsonRes = await res.json()
+    console.log('jsonRes :=>', jsonRes)
 }
 </script>
 
