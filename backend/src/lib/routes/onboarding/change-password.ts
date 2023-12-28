@@ -128,6 +128,8 @@ export default (
                 const emailSent = await sendEmail(
                     rawEmailFromRedis as string,
                     `change-password/${hashedEmail}` as string,
+                    process.env
+                        .BREVO_CHANGE_PASSWORD_TEMPLATE_ID as unknown as number,
                 )
                 if (!emailSent.wasSuccessfull) {
                     fastify.log.error(

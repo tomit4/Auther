@@ -35,7 +35,7 @@ const apiInstance = new Brevo.TransactionalEmailsApi();
 const apiKey = apiInstance.authentications.apiKey;
 apiKey.apiKey = process.env.BREVO_KEY;
 const sendSmtpEmail = new Brevo.SendSmtpEmail();
-exports.default = async (email, endpoint) => {
+exports.default = async (email, endpoint, templateId) => {
     sendSmtpEmail.sender = {
         name: 'My Test Company',
         email: 'mytestemail@email.com',
@@ -46,7 +46,7 @@ exports.default = async (email, endpoint) => {
             email: email,
         },
     ];
-    sendSmtpEmail.templateId = Number(process.env.BREVO_TEMPLATE_ID);
+    sendSmtpEmail.templateId = Number(templateId);
     sendSmtpEmail.params = {
         // NOTE: verify must also change based off of sign up, change password, or delete
         link: `${process.env.BREVO_LINK}/${endpoint}`,

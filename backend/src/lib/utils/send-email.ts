@@ -18,7 +18,11 @@ const apiKey: Brevo.ApiKeyAuth = apiInstance.authentications.apiKey
 apiKey.apiKey = process.env.BREVO_KEY as string
 const sendSmtpEmail = new Brevo.SendSmtpEmail()
 
-export default async (email: string, endpoint: string): Promise<SendEmail> => {
+export default async (
+    email: string,
+    endpoint: string,
+    templateId: number,
+): Promise<SendEmail> => {
     sendSmtpEmail.sender = {
         name: 'My Test Company',
         email: 'mytestemail@email.com',
@@ -29,7 +33,7 @@ export default async (email: string, endpoint: string): Promise<SendEmail> => {
             email: email,
         },
     ]
-    sendSmtpEmail.templateId = Number(process.env.BREVO_TEMPLATE_ID)
+    sendSmtpEmail.templateId = Number(templateId)
     sendSmtpEmail.params = {
         // NOTE: verify must also change based off of sign up, change password, or delete
         link: `${process.env.BREVO_LINK}/${endpoint}`,

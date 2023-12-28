@@ -62,7 +62,7 @@ exports.default = (fastify, options, done) => {
                     .first();
                 const userAlreadyInCache = (await redis.get(`${hashedEmail}-email`)) ||
                     (await redis.get(`${hashedEmail}-password`));
-                const emailSent = await (0, send_email_1.default)(email, `verify/${hashedEmail}`);
+                const emailSent = await (0, send_email_1.default)(email, `verify/${hashedEmail}`, process.env.BREVO_SIGNUP_TEMPLATE_ID);
                 if (!zParsedEmail.success) {
                     const { error } = zParsedEmail;
                     throw new Error(error.issues[0].message);

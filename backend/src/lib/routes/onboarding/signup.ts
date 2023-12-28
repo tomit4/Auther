@@ -91,6 +91,7 @@ export default (
                 const emailSent = await sendEmail(
                     email as string,
                     `verify/${hashedEmail}` as string,
+                    process.env.BREVO_SIGNUP_TEMPLATE_ID as unknown as number,
                 )
                 if (!zParsedEmail.success) {
                     const { error } = zParsedEmail
