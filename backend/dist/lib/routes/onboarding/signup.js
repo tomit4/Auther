@@ -57,6 +57,8 @@ exports.default = (fastify, options, done) => {
             try {
                 const zParsedEmail = emailSchema.safeParse(email);
                 const zParsedPassword = passwordSchema.safeParse(password);
+                // TODO: If the user deleted their profile and they sign up again,
+                // we should simply change is_deleted to false again...
                 const userAlreadyInDb = await knex('users')
                     .where('email', email)
                     .andWhere('is_deleted', false)
