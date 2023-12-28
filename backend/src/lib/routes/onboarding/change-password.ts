@@ -101,14 +101,13 @@ export default (
                     error: 'No refresh token provided by client, redirecting to home.',
                 })
             }
-            // TODO: Also check redis store for key set up upon send of
-            // change-password email (see change-password-ask.ts)
-            const rawEmailFromRedis = await redis.get(`${hashedEmail}-email`)
-            if (!rawEmailFromRedis) {
-                return reply.code(401).send({
-                    ok: false,
-                    error: 'No refresh token in cache, redirecting to home.',
-                })
+            const redisCacheExpired = !(await redis.get(
+                `${hashedEmail}-change-password-ask`,
+            ))
+            if (redisCacheExpired) {
+                throw new Error(
+                    'Sorry, but you took too long to answer your email, please log in and try again.',
+                )
             }
             const userPasswordByEmail = await knex('users')
                 .select('password')

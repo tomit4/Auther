@@ -108,9 +108,7 @@ exports.default = (fastify, options, done) => {
                     throw new Error('An error occurred while sending email, please contact support.');
                 }
             }
-            // TODO: Just like in sign-up, set up a temporary redis key
-            // for 5 minutes that keeps track of whether the email was
-            // answered or not
+            await redis.set(`${hashedEmail}-change-password-ask`, hashedEmail, 'EX', 60);
             return reply
                 .code(200)
                 .setCookie('appname-hash', hashedEmail, {
