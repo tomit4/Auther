@@ -13,6 +13,7 @@ const delay = (ms: number): Promise<void> => {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
+// TODO: place in utility class/file
 const grabStoredCookie = (cookieKey: string): string => {
     const cookies = document.cookie.split('; ').reduce((prev, current) => {
         const [key, ...value] = current.split('=')
@@ -26,7 +27,7 @@ const grabStoredCookie = (cookieKey: string): string => {
 
 onMounted(async () => {
     const cookie = grabStoredCookie('appname-hash')
-    if (cookie === route.params.hash) {
+    if (cookie && cookie === route.params.hash) {
         const data = {
             hashedEmail: cookie,
         }

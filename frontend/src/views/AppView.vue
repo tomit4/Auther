@@ -3,10 +3,12 @@ import ChangePassForm from '../components/ChangePassForm.vue'
 import { ref, type Ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
-const showDash: Ref<boolean> = ref(true)
-const showChangePassForm: Ref<boolean> = ref(false)
+
 const logoutRoute = import.meta.env.VITE_LOGOUT_ROUTE
 const grabUserIdRoute = import.meta.env.VITE_USERID_ROUTE
+
+const showDash: Ref<boolean> = ref(true)
+const showChangePassForm: Ref<boolean> = ref(false)
 const emailFromCache: Ref<string> = ref('')
 
 const handleLogOut = async (): Promise<void> => {

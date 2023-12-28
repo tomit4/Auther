@@ -108,8 +108,13 @@ exports.default = (fastify, options, done) => {
                     throw new Error('An error occurred while sending email, please contact support.');
                 }
             }
-            // TODO: set hashedEmail-changing-password value in redis with TTL of 5 minutes
-            return reply.code(200).send({
+            return reply
+                .code(200)
+                .setCookie('appname-hash', hashedEmail, {
+                path: '/verify-change-pass',
+                maxAge: 60 * 60,
+            })
+                .send({
                 ok: true,
                 message: 'Your password is authenticated, please answer your email to continue change of password',
             });

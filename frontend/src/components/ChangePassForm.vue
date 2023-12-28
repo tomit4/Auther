@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
-const passwordInput: Ref<string> = ref('')
+
 const changePasswordRoute = import.meta.env.VITE_CHANGE_PASSWORD_ROUTE as string
 
+const passwordInput: Ref<string> = ref('')
 const errMessage: Ref<string> = ref('')
 const resSuccessful: Ref<string> = ref('')
 
