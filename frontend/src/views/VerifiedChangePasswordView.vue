@@ -125,6 +125,7 @@ onMounted(async () => {
                 Submit
             </button>
         </span>
+        <button className="btn" @click="router.push('/app')">Go Back</button>
         <span v-if="errMessage">
             <p>{{ errMessage }}</p>
         </span>

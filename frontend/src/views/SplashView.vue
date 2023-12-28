@@ -1,12 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 const router = useRouter()
-const handleSignUp = (): void => {
-    router.push('/signup')
-}
-const handleLogin = (): void => {
-    router.push('/login')
-}
 </script>
 
 <template>
@@ -14,9 +8,8 @@ const handleLogin = (): void => {
         <h1>Splash</h1>
         <br />
         <div className="onboard">
-            <!-- TODO: Change to router links -->
             <button
-                @click="handleSignUp()"
+                @click="router.push('/signup')"
                 type="submit"
                 value="Submit"
                 className="btn signup-btn"
@@ -25,7 +18,7 @@ const handleLogin = (): void => {
             </button>
             <br />
             <button
-                @click="handleLogin()"
+                @click="router.push('/login')"
                 type="submit"
                 value="Submit"
                 className="btn login-btn"

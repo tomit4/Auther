@@ -51,6 +51,9 @@ export default (
                 reply.clearCookie('appname-refresh-token', {
                     path: '/onboarding',
                 })
+                reply.clearCookie('appname-hash', {
+                    path: '/verify-change-pass',
+                })
                 const refreshTokenIsValid = jwt.verify(
                     refreshToken,
                 ) as VerifyPayloadType
