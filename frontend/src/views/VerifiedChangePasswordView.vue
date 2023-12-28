@@ -29,6 +29,12 @@ const grabStoredCookie = (cookieKey: string): string => {
 }
 
 const handleSubmit = async (passwordInput: string): Promise<void> => {
+    /* TODO: POST new password to /change-password route,
+     * which will grab the email from the refresh token/redis cache
+     * as well as the cookie hash here, they must all match,
+     * (credentials, include), rate limit, etc.
+     * It will then bcrypt the new password and replace it in the db by hashedEmail.
+     */
     console.log('handleSubmit hit with passwordInput being :=>', passwordInput)
 }
 
