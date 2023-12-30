@@ -109,6 +109,7 @@ onMounted(async () => {
                 placeholder="Password1234!"
                 v-model="passwordInput"
                 @keyup.enter="handleSubmit(passwordInput as string)"
+                v-focus
                 required
             />
             <!-- TODO: Integrate zod here to validate if is email and if password passes 

@@ -110,6 +110,9 @@ onBeforeRouteLeave(() => {
             >
                 Submit
             </button>
+            <router-link className="forgot-password-link" to="/forgot-password"
+                >Forgot My Password</router-link
+            >
         </span>
         <span v-if="errMessage">
             <p>{{ errMessage }}</p>
@@ -147,5 +150,8 @@ onBeforeRouteLeave(() => {
     font-size: 80%;
     border: 2px solid black;
     border-radius: 5px;
+}
+a {
+    color: black;
 }
 </style>

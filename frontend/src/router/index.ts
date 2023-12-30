@@ -6,6 +6,7 @@ const invalidTokenCode = import.meta.env.VITE_INVALID_TOKEN_CODE
 
 import AppView from '../views/AppView.vue'
 import LoginView from '../views/LoginView.vue'
+import ForgotPasswordView from '../views/ForgotPasswordView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 import SignUpView from '../views/SignUpView.vue'
 import SplashView from '../views/SplashView.vue'
@@ -29,6 +30,11 @@ const routes = [
         path: '/login',
         component: LoginView,
         name: 'LoginView',
+    },
+    {
+        path: '/forgot-password',
+        component: ForgotPasswordView,
+        name: 'ForgotPasswordView',
     },
     {
         path: '/auth',
