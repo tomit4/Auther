@@ -5,6 +5,7 @@ const route = useRoute()
 const router = useRouter()
 
 const forgotPasswordCheckRoute = import.meta.env.VITE_FORGOT_PASS_CHECK_ROUTE
+const forgotPasswordChangeRoute = import.meta.env.VITE_FORGOT_PASS_CHANGE_ROUTE
 
 const emailFromCache: Ref<string> = ref('')
 const passwordInput: Ref<string> = ref('')
@@ -25,8 +26,9 @@ const handleSubmit = async (passwordInput: string): Promise<void> => {
     try {
         const data = {
             newPassword: passwordInput,
+            hash: route.params.hash,
         }
-        const res = await fetch(forgotPasswordCheckRoute, {
+        const res = await fetch(forgotPasswordChangeRoute, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -59,7 +61,6 @@ onMounted(async () => {
             credentials: 'include',
             body: JSON.stringify(data),
         })
-        console.log('res :=>', res)
         const jsonRes = await res.json()
         if (!res.ok || !jsonRes.ok) {
             errMessage.value =
@@ -67,7 +68,7 @@ onMounted(async () => {
                     ? 'You took too long to answer the forgot password email, please try again'
                     : jsonRes.message
             delay(1000)
-            router.push('/login')
+            router.push('/forgot-password')
         } else {
             emailFromCache.value = jsonRes.email
         }
