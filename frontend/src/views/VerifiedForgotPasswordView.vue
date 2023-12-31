@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const router = useRouter()
 
-const forgotPasswordChangeRoute = import.meta.env.VITE_FORGOT_PASS_CHANGE_ROUTE
+const forgotPasswordCheckRoute = import.meta.env.VITE_FORGOT_PASS_CHECK_ROUTE
 
 const emailFromCache: Ref<string> = ref('')
 const passwordInput: Ref<string> = ref('')
@@ -26,7 +26,7 @@ const handleSubmit = async (passwordInput: string): Promise<void> => {
         const data = {
             newPassword: passwordInput,
         }
-        const res = await fetch(forgotPasswordChangeRoute, {
+        const res = await fetch(forgotPasswordCheckRoute, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -46,12 +46,34 @@ const handleSubmit = async (passwordInput: string): Promise<void> => {
 }
 
 onMounted(async () => {
-    // TODO: grab raw email and assign to emailFromCache using a route similar to /grab-user-creds
-    // TODO: send route.params as data along with credentials:includes to check against each other
-    // IF: no match, throw error, redirect login
-    // IF: match, continue
-    // IF: cookie data `${hashedEmail}-forgot-pass-ask` not in redis cache, throw error, redirect login
-    // ELSE: do nothing (all checks passed)
+    try {
+        if (!route.params.hash) {
+            throw Error('No hash provided')
+        }
+        const data = {
+            hash: route.params.hash,
+        }
+        const res = await fetch(forgotPasswordCheckRoute, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(data),
+        })
+        console.log('res :=>', res)
+        const jsonRes = await res.json()
+        if (!res.ok || !jsonRes.ok) {
+            errMessage.value =
+                res.status === 401
+                    ? 'You took too long to answer the forgot password email, please try again'
+                    : jsonRes.message
+            delay(1000)
+            router.push('/login')
+        } else {
+            emailFromCache.value = jsonRes.email
+        }
+    } catch (err) {
+        console.error('ERROR :=>', err)
+    }
 })
 </script>
 

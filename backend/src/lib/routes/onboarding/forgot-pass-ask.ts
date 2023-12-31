@@ -58,7 +58,7 @@ export default (
             // ): Promise<SignUpRes> => {
         ) => {
             const { email } = request.body
-            const { redis, knex } = fastify
+            const { redis, jwt, knex } = fastify
             const hashedEmail = hasher(email)
             const emailSchema = z.string().email()
             try {
@@ -102,17 +102,23 @@ export default (
             } catch (err) {
                 if (err instanceof Error) {
                     fastify.log.error('ERROR :=>', err.message)
+                    // TODO: You recently learned that this won't hit, so don't return here,
+                    // instead simply return reply at the end and conditionally determine if
+                    // it is status 200 or not  (see fastify-pass-check for better example)
                     return reply.code(500).send({
                         ok: false,
                         message: err.message,
                     })
                 }
             }
+            const sessionToken = jwt.sign(
+                { hashedEmail: hashedEmail },
+                { expiresIn: process.env.JWT_SESSION_EXP },
+            )
             await redis.set(`${hashedEmail}-forgot-pass-ask`, email, 'EX', 60)
             return reply
                 .code(200)
-                .setCookie('appname-forgot-pass-ask', hashedEmail, {
-                    path: '/verify-forgot-pass',
+                .setCookie('appname-forgot-pass-ask-token', sessionToken, {
                     secure: true,
                     httpOnly: true,
                     sameSite: true,

@@ -96,7 +96,7 @@ router.beforeEach(async (to, from): Promise<string | undefined> => {
             const refreshCheck = await fetch(refreshRoute, {
                 method: 'GET',
                 credentials: 'include',
-                headers: { ContentType: 'application/json' },
+                headers: { 'Content-Type': 'application/json' },
             })
             if (refreshCheck.status === 200) {
                 const jsonRes = await refreshCheck.json()
@@ -149,7 +149,7 @@ router.beforeEach(async (to, from): Promise<string | undefined> => {
         // NOTE: Protecting this route specifically,
         // the email has to be answered,
         // (i.e. the email address has to be in the redis cache)
-    } else if (to.meta.requiresEmailVerification) {
+        // } else if (to.meta.requiresEmailVerification) {
     } else if (
         !to.meta.requiresAuth &&
         to.path === '/auth' &&
