@@ -84,7 +84,6 @@ exports.default = (fastify, options, done) => {
                 .code(200)
                 .setCookie('appname-forgot-pass-ask', hashedEmail, {
                 path: '/verify-forgot-pass',
-                maxAge: 60 * 60,
                 secure: true,
                 httpOnly: true,
                 sameSite: true,
