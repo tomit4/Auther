@@ -70,7 +70,7 @@ export default (
                     .andWhere('is_deleted', false)
                     .first()
                 const userAlreadyInCache = await redis.get(
-                    `${hashedEmail}-forgot-password-ask`,
+                    `${hashedEmail}-forgot-pass-ask`,
                 )
                 const emailSent = await sendEmail(
                     email as string,
@@ -108,17 +108,15 @@ export default (
                     })
                 }
             }
-            await redis.set(
-                `${hashedEmail}-forgot-password-ask`,
-                hashedEmail,
-                'EX',
-                60,
-            )
+            await redis.set(`${hashedEmail}-forgot-pass-ask`, email, 'EX', 60)
             return reply
                 .code(200)
-                .setCookie('appname-hash', hashedEmail, {
+                .setCookie('appname-forgot-pass-ask', hashedEmail, {
                     path: '/verify-forgot-pass',
                     maxAge: 60 * 60,
+                    secure: true,
+                    httpOnly: true,
+                    sameSite: true,
                 })
                 .send({
                     ok: true,

@@ -54,7 +54,7 @@ exports.default = (fastify, options, done) => {
                     .where('email', hashedEmail)
                     .andWhere('is_deleted', false)
                     .first();
-                const userAlreadyInCache = await redis.get(`${hashedEmail}-forgot-password-ask`);
+                const userAlreadyInCache = await redis.get(`${hashedEmail}-forgot-pass-ask`);
                 const emailSent = await (0, send_email_1.default)(email, `verify-forgot-pass/${hashedEmail}`, process.env
                     .BREVO_FORGOT_PASSWORD_TEMPLATE_ID);
                 if (!zParsedEmail.success) {
@@ -79,12 +79,15 @@ exports.default = (fastify, options, done) => {
                     });
                 }
             }
-            await redis.set(`${hashedEmail}-forgot-password-ask`, hashedEmail, 'EX', 60);
+            await redis.set(`${hashedEmail}-forgot-pass-ask`, email, 'EX', 60);
             return reply
                 .code(200)
-                .setCookie('appname-hash', hashedEmail, {
+                .setCookie('appname-forgot-pass-ask', hashedEmail, {
                 path: '/verify-forgot-pass',
                 maxAge: 60 * 60,
+                secure: true,
+                httpOnly: true,
+                sameSite: true,
             })
                 .send({
                 ok: true,
