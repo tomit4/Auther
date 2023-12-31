@@ -114,7 +114,7 @@ onBeforeRouteLeave(() => {
                 >Forgot My Password</router-link
             >
         </span>
-        <span v-if="errMessage">
+        <span v-if="errMessage.length">
             <p>{{ errMessage }}</p>
         </span>
         <span v-else-if="resSuccessful.length">

@@ -1,18 +1,40 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
 const emailInput: Ref<string> = ref('')
-// const errMessage: Ref<string> = ref('')
-// const resSuccessful: Ref<string> = ref('')
+const errMessage: Ref<string> = ref('')
+const resSuccessful: Ref<string> = ref('')
 
+const forgotPassAskRoute = import.meta.env.VITE_FORGOT_PASS_ASK_ROUTE as string
 // TODO: place in utility class/file
-/*
 const delay = (ms: number): Promise<void> => {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
-*/
 const handleSubmit = async (emailInput: string): Promise<void> => {
     console.log('emailInput :=>', emailInput)
+    const data = {
+        email: emailInput,
+    }
+    const res = await fetch(forgotPassAskRoute, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(data),
+    })
+    const jsonRes = await res.json()
+    if (!res.ok) {
+        errMessage.value = jsonRes.message
+            ? jsonRes.message
+            : 'Unknown error occurred'
+        throw Error(`An error occurred: ${JSON.stringify(jsonRes)}`)
+    } else {
+        resSuccessful.value = jsonRes.message
+        // TODO: set up watcher to display count down before redirect
+        await delay(1000)
+        router.push('/login')
+    }
 }
 </script>
 
@@ -50,15 +72,13 @@ const handleSubmit = async (emailInput: string): Promise<void> => {
                 Submit
             </button>
         </span>
-        <!--
-        <span v-if="errMessage">
+        <span v-if="errMessage.length">
             <p>{{ errMessage }}</p>
         </span>
         <span v-else-if="resSuccessful.length">
             <p>{{ resSuccessful }}</p>
         </span>
         <span v-else />
-        -->
     </div>
 </template>
 
