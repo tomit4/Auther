@@ -14,7 +14,7 @@ const change_password_ask_1 = __importDefault(require("./onboarding/change-passw
 const change_password_1 = __importDefault(require("./onboarding/change-password"));
 const delete_profile_ask_1 = __importDefault(require("./onboarding/delete-profile-ask"));
 const delete_profile_1 = __importDefault(require("./onboarding/delete-profile"));
-const forgot_pass_1 = __importDefault(require("./onboarding/forgot-pass"));
+const forgot_pass_ask_1 = __importDefault(require("./onboarding/forgot-pass-ask"));
 exports.default = async (fastify) => {
     await fastify.register(signup_1.default, { prefix: '/onboarding' });
     await fastify.register(verify_1.default, { prefix: '/onboarding' });
@@ -27,5 +27,5 @@ exports.default = async (fastify) => {
     await fastify.register(change_password_1.default, { prefix: '/onboarding' });
     await fastify.register(delete_profile_ask_1.default, { prefix: '/onboarding' });
     await fastify.register(delete_profile_1.default, { prefix: '/onboarding' });
-    await fastify.register(forgot_pass_1.default, { prefix: '/onboarding' });
+    await fastify.register(forgot_pass_ask_1.default, { prefix: '/onboarding' });
 };
