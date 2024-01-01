@@ -67,7 +67,7 @@ exports.default = (fastify, options, done) => {
                 }
                 if (userAlreadyInDb === null || userAlreadyInDb === void 0 ? void 0 : userAlreadyInDb.is_deleted)
                     userService.updateAlreadyDeletedUser(hashedEmail, hashedPassword);
-                await userService.setUserCredentialsInCache(hashedEmail, email, hashedPassword);
+                await userService.setUserEmailAndPasswordInCache(hashedEmail, email, hashedPassword);
                 reply
                     .code(200)
                     .setCookie('appname-hash', hashedEmail, {

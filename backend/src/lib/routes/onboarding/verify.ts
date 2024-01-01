@@ -47,18 +47,14 @@ export default (
             reply: FastifyReply,
         ): Promise<VerifyRes> => {
             const { hashedEmail } = request.body
-            const { redis, knex, jwt } = fastify
+            const { userService } = fastify
             try {
                 const redisCacheExpired =
-                    (await redis.ttl(`${hashedEmail}-email`)) < 0 ||
-                    (await redis.ttl(`${hashedEmail}-password`)) < 0
-                const emailFromRedis = await redis.get(`${hashedEmail}-email`)
-                const hashedPasswordFromRedis = await redis.get(
-                    `${hashedEmail}-password`,
-                )
-                const userAlreadyInDb = await knex('users')
-                    .where('email', hashedEmail)
-                    .first()
+                    await userService.isUserInCacheExpired(hashedEmail)
+                const { emailFromRedis, hashedPasswordFromRedis } =
+                    await userService.grabUserCredentialsFromCache(hashedEmail)
+                const userAlreadyInDb =
+                    await userService.grabUserByEmail(hashedEmail)
                 if (redisCacheExpired)
                     throw new Error(
                         'Sorry, but you took too long to answer your email, please sign up again.',
@@ -72,24 +68,20 @@ export default (
                         'You have already signed up, please log in.',
                     )
                 if (userAlreadyInDb?.is_deleted) {
-                    await knex('users').where('email', hashedEmail).update({
-                        password: hashedPasswordFromRedis,
-                        is_deleted: false,
-                    })
+                    await userService.updateAlreadyDeletedUser(
+                        hashedEmail,
+                        hashedPasswordFromRedis,
+                    )
                 } else {
-                    await knex
-                        .insert({
-                            email: hashedEmail,
-                            password: hashedPasswordFromRedis,
-                            is_deleted: false,
-                        })
-                        .into('users')
+                    await userService.insertUserIntoDb(
+                        hashedEmail,
+                        hashedPasswordFromRedis,
+                    )
                 }
-                const email = (await redis.get(
-                    `${hashedEmail}-email`,
-                )) as string
-                await redis.set(`${hashedEmail}-email`, email, 'EX', 180)
-                await redis.del(`${hashedEmail}-password`)
+                await userService.setUserEmailInCacheAndDeletePassword(
+                    hashedEmail,
+                    emailFromRedis,
+                )
             } catch (err) {
                 if (err instanceof Error) {
                     fastify.log.error('ERROR :=>', err.message)
@@ -99,21 +91,15 @@ export default (
                     })
                 }
             }
-            const sessionToken = jwt.sign(
-                { email: hashedEmail },
-                { expiresIn: process.env.JWT_SESSION_EXP as string },
+            const sessionToken = await userService.signToken(
+                hashedEmail,
+                process.env.JWT_SESSION_EXP as string,
             )
-            const refreshToken = jwt.sign(
-                { email: hashedEmail },
-                { expiresIn: process.env.JWT_REFRESH_EXP as string },
+            const refreshToken = await userService.signToken(
+                hashedEmail,
+                process.env.JWT_REFRESH_EXP as string,
             )
-            // TODO: reset expiration to a .env variable
-            await redis.set(
-                `${hashedEmail}-refresh-token`,
-                refreshToken as string,
-                'EX',
-                180,
-            )
+            await userService.setRefreshTokenInCache(hashedEmail, refreshToken)
             return reply
                 .code(200)
                 .clearCookie('appname-hash', { path: '/verify' })

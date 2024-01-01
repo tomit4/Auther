@@ -110,7 +110,7 @@ export default (
                         hashedEmail,
                         hashedPassword,
                     )
-                await userService.setUserCredentialsInCache(
+                await userService.setUserEmailAndPasswordInCache(
                     hashedEmail,
                     email,
                     hashedPassword,
