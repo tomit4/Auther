@@ -27,12 +27,31 @@ class UserService {
         return await bcrypt.hash(password)
     }
 
+    async comparePasswordToHash(
+        loginPassword: string,
+        password: string,
+    ): Promise<boolean> {
+        const { bcrypt } = this
+        return await bcrypt
+            .compare(loginPassword, password)
+            .then(match => match)
+            .catch(err => err)
+    }
+
     // TODO: write return type
     async grabUserByEmail(hashedEmail: string) {
         const { knex } = this
-        return await knex('users').where('email', hashedEmail).first()
+        await knex('users').where('email', hashedEmail).first()
     }
-
+    async grabUserPasswordByEmail(hashedEmail: string): Promise<string> {
+        const { knex } = this
+        const { password } = await knex('users')
+            .select('password')
+            .where('email', hashedEmail)
+            .andWhere('is_deleted', false)
+            .first()
+        return password
+    }
     async insertUserIntoDb(
         hashedEmail: string,
         hashedPasswordFromRedis: string,
@@ -45,6 +64,18 @@ class UserService {
                 is_deleted: false,
             })
             .into('users')
+    }
+
+    // TODO: write return type
+    async updateAlreadyDeletedUser(
+        hashedEmail: string,
+        hashedPassword: string,
+    ) {
+        const { knex } = this
+        await knex('users').where('email', hashedEmail).update({
+            password: hashedPassword,
+            is_deleted: false,
+        })
     }
 
     // TODO: Consider isUserInCache and isUserInCacheExpired as same
@@ -85,16 +116,12 @@ class UserService {
         return await redis.get(`${hashedEmail}-refresh-token`)
     }
 
-    // TODO: write return type
-    async updateAlreadyDeletedUser(
+    async setUserEmailInCache(
         hashedEmail: string,
-        hashedPassword: string,
-    ) {
-        const { knex } = this
-        await knex('users').where('email', hashedEmail).update({
-            password: hashedPassword,
-            is_deleted: false,
-        })
+        email: string,
+    ): Promise<void> {
+        const { redis } = this
+        await redis.set(`${hashedEmail}-email`, email, 'EX', 180)
     }
 
     // TODO: reset expiration to a .env variable
