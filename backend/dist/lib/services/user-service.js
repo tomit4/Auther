@@ -51,6 +51,10 @@ class UserService {
             is_deleted: false,
         });
     }
+    async grabUserEmailInCache(hashedEmail) {
+        const { redis } = this;
+        return await redis.get(`${hashedEmail}-email`);
+    }
     // TODO: Consider isUserInCache and isUserInCacheExpired as same
     async isUserInCache(hashedEmail) {
         const { redis } = this;

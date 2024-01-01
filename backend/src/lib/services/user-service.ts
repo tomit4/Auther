@@ -78,6 +78,11 @@ class UserService {
         })
     }
 
+    async grabUserEmailInCache(hashedEmail: string): Promise<string | null> {
+        const { redis } = this
+        return await redis.get(`${hashedEmail}-email`)
+    }
+
     // TODO: Consider isUserInCache and isUserInCacheExpired as same
     async isUserInCache(hashedEmail: string): Promise<string | null> {
         const { redis } = this

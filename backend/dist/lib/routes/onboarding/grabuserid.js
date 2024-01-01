@@ -21,29 +21,39 @@ exports.default = (fastify, options, done) => {
             },
         },
         handler: async (request, reply) => {
-            const { redis, jwt } = fastify;
+            const { userService } = fastify;
             /* NOTE: no need to check refresh token here,
              * request is coming from frontend protected route */
-            const refreshToken = request.cookies['appname-refresh-token'];
-            let hashedEmail;
-            const refreshTokenIsValid = jwt.verify(refreshToken);
-            if (typeof refreshTokenIsValid === 'object' &&
-                'email' in refreshTokenIsValid) {
-                hashedEmail = refreshTokenIsValid.email;
-                const rawEmailFromRedis = await redis.get(`${hashedEmail}-email`);
-                if (!rawEmailFromRedis) {
-                    fastify.log.error(`No raw email found in cache: ${rawEmailFromRedis}`);
+            try {
+                const refreshToken = request.cookies['appname-refresh-token'];
+                if (!refreshToken) {
+                    throw new Error('No refresh token sent from client, redirecting home...');
                 }
-                return reply.code(200).send({
-                    ok: true,
-                    msg: 'Successfully returned raw email from cache',
-                    email: rawEmailFromRedis,
-                });
+                let hashedEmail;
+                const refreshTokenIsValid = await userService.verifyToken(refreshToken);
+                if (typeof refreshTokenIsValid === 'object' &&
+                    'email' in refreshTokenIsValid) {
+                    hashedEmail = refreshTokenIsValid.email;
+                    const rawEmailFromRedis = await userService.grabUserEmailInCache(hashedEmail);
+                    if (!rawEmailFromRedis) {
+                        throw new Error(`No raw email found in cache for : ${hashedEmail}`);
+                    }
+                    reply.code(200).send({
+                        ok: true,
+                        msg: 'Successfully returned raw email from cache',
+                        email: rawEmailFromRedis,
+                    });
+                }
             }
-            return reply.code(401).send({
-                ok: false,
-                error: 'No refresh token in cache, redirecting to home.',
-            });
+            catch (err) {
+                if (err instanceof Error) {
+                    reply.code(401).send({
+                        ok: false,
+                        error: err.message,
+                    });
+                }
+            }
+            return reply;
         },
     });
     done();

@@ -35,14 +35,14 @@ const toggleDeleteProfileForm = (): void => {
 }
 
 onMounted(async (): Promise<void> => {
-    const res = await fetch(grabUserIdRoute, {
-        method: 'GET',
-        credentials: 'include',
-    })
-    if (res.status === 200) {
+    try {
+        const res = await fetch(grabUserIdRoute, {
+            method: 'GET',
+            credentials: 'include',
+        })
         const jsonRes = await res.json()
         emailFromCache.value = jsonRes.email
-    } else {
+    } catch (err) {
         localStorage.removeItem('appname-session-token')
         router.push('/login')
     }
