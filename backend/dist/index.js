@@ -18,6 +18,7 @@ const start = async () => {
     try {
         await (0, plugins_1.default)(fastify);
         await (0, routes_1.default)(fastify);
+        await fastify.ready();
         return await fastify.listen({
             port: process.env.PORT,
             host: process.env.HOST,

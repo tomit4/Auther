@@ -15,6 +15,7 @@ const start = async (): Promise<string> => {
     try {
         await registerPlugins(fastify)
         await registerRoutes(fastify)
+        await fastify.ready()
         return await fastify.listen({
             port: process.env.PORT as unknown as number,
             host: process.env.HOST as string,
