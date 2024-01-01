@@ -29,13 +29,10 @@ const authPlugin = async (fastify, options, next) => {
         if (!fastify.authenticate) {
             fastify.decorate('authenticate', async (request, reply) => {
                 try {
-                    await request.jwtVerify();
+                    return await request.jwtVerify();
                 }
                 catch (err) {
-                    if (err instanceof Error)
-                        return reply
-                            .code(401)
-                            .send({ ok: false, message: err.message });
+                    return reply.send(err);
                 }
             });
         }

@@ -10,12 +10,12 @@ exports.default = (fastify, options, done) => {
             response: {
                 200: zod_1.z.object({
                     ok: zod_1.z.boolean(),
-                    msg: zod_1.z.string(),
+                    message: zod_1.z.string(),
                     sessionToken: zod_1.z.string(),
                 }),
                 401: zod_1.z.object({
                     ok: zod_1.z.boolean(),
-                    error: zod_1.z.string(),
+                    message: zod_1.z.string(),
                 }),
             },
         },
@@ -23,35 +23,28 @@ exports.default = (fastify, options, done) => {
             const { userService } = fastify;
             const refreshToken = request.cookies['appname-refresh-token'];
             try {
-                if (refreshToken) {
-                    const refreshTokenIsValid = userService.verifyToken(refreshToken);
-                    if (typeof refreshTokenIsValid === 'object' &&
-                        'email' in refreshTokenIsValid) {
-                        const hashedEmail = refreshTokenIsValid.email;
-                        const refreshTokenFromRedis = await userService.grabRefreshTokenFromCache(hashedEmail);
-                        if (!refreshTokenFromRedis) {
-                            throw new Error('No refresh token in cache, redirecting to home.');
-                        }
-                        const sessionToken = userService.signToken(hashedEmail, process.env.JWT_SESSION_EXP);
-                        await userService.removeRefreshTokenFromCache(hashedEmail);
-                        reply.code(200).send({
-                            ok: true,
-                            msg: 'Successfully refreshed session.',
-                            sessionToken: sessionToken,
-                        });
-                    }
-                }
-                else {
-                    throw new Error('Invalid refresh token, redirecting home...');
-                }
+                if (!refreshToken)
+                    throw new Error('No refresh token sent from client, redirecting home...');
+                const refreshTokenIsValid = userService.verifyToken(refreshToken);
+                if (typeof refreshTokenIsValid !== 'object' ||
+                    !('email' in refreshTokenIsValid))
+                    throw new Error('Invalid refresh token.');
+                const hashedEmail = refreshTokenIsValid.email;
+                const refreshTokenFromRedis = await userService.grabRefreshTokenFromCache(hashedEmail);
+                if (!refreshTokenFromRedis)
+                    throw new Error('Invalid refresh token.');
+                const sessionToken = userService.signToken(hashedEmail, process.env.JWT_SESSION_EXP);
+                reply.code(200).send({
+                    ok: true,
+                    message: 'Successfully refreshed session.',
+                    sessionToken: sessionToken,
+                });
             }
             catch (err) {
-                if (err instanceof Error) {
-                    reply.code(401).send({
-                        ok: false,
-                        error: err.message,
-                    });
-                }
+                reply.code(401).send({
+                    ok: false,
+                    message: 'Invalid refresh token.',
+                });
             }
             return reply;
         },

@@ -168,12 +168,12 @@ class UserService {
         await redis.del(`${hashedEmail}-refresh-token`)
     }
 
-    async signToken(hashedEmail: string, expiration: string): Promise<string> {
+    signToken(hashedEmail: string, expiration: string): string {
         const { jwt } = this
         return jwt.sign({ email: hashedEmail }, { expiresIn: expiration })
     }
 
-    async verifyToken(token: string): Promise<VerifyPayloadType | undefined> {
+    verifyToken(token: string): VerifyPayloadType | undefined {
         const { jwt } = this
         try {
             return jwt.verify(token)
@@ -181,7 +181,6 @@ class UserService {
             if (err instanceof Error) {
                 throw new Error(err.message)
             }
-            return
         }
     }
 }

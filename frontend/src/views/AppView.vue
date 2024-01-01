@@ -40,9 +40,15 @@ onMounted(async (): Promise<void> => {
             method: 'GET',
             credentials: 'include',
         })
+        if (!res.ok) {
+            throw new Error('ERROR while grabbing user id')
+        }
         const jsonRes = await res.json()
         emailFromCache.value = jsonRes.email
     } catch (err) {
+        if (err instanceof Error) {
+            console.error(err.message)
+        }
         localStorage.removeItem('appname-session-token')
         router.push('/login')
     }

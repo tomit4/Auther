@@ -102,11 +102,11 @@ class UserService {
         const { redis } = this;
         await redis.del(`${hashedEmail}-refresh-token`);
     }
-    async signToken(hashedEmail, expiration) {
+    signToken(hashedEmail, expiration) {
         const { jwt } = this;
         return jwt.sign({ email: hashedEmail }, { expiresIn: expiration });
     }
-    async verifyToken(token) {
+    verifyToken(token) {
         const { jwt } = this;
         try {
             return jwt.verify(token);
@@ -115,7 +115,6 @@ class UserService {
             if (err instanceof Error) {
                 throw new Error(err.message);
             }
-            return;
         }
     }
 }

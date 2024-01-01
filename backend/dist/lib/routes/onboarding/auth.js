@@ -7,7 +7,7 @@ exports.default = (fastify, options, done) => {
         url: '/auth',
         onRequest: fastify.authenticate,
         handler: async (request, reply) => {
-            return reply;
+            return fastify.authenticate(request, reply);
         },
     });
     done();
