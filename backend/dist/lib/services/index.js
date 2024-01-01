@@ -8,7 +8,7 @@ const user_service_1 = __importDefault(require("./user-service"));
 const userServicePlugin = (fastify, options, next) => {
     try {
         if (!fastify.userService) {
-            const newUserService = new user_service_1.default();
+            const newUserService = new user_service_1.default(fastify);
             fastify.decorate('userService', newUserService);
         }
         next();

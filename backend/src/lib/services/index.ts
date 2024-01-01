@@ -19,7 +19,7 @@ const userServicePlugin = (
 ) => {
     try {
         if (!fastify.userService) {
-            const newUserService = new UserService()
+            const newUserService = new UserService(fastify)
             fastify.decorate('userService', newUserService)
         }
         next()
