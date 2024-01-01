@@ -93,6 +93,7 @@ router.beforeEach(async (to, from): Promise<string | undefined> => {
                 method: 'GET',
                 headers: { Authorization: `Bearer ${sessionToken}` },
             })
+            console.log('res :=>', res)
             if (res?.status === 401) {
                 const refreshCheck = await fetch(refreshRoute, {
                     method: 'GET',
@@ -159,7 +160,6 @@ router.beforeEach(async (to, from): Promise<string | undefined> => {
         }
     } catch (err) {
         console.error('ERROR :=>', err)
-        return '/'
     }
 })
 

@@ -16,7 +16,9 @@ export default (
         method: 'GET',
         url: '/auth',
         onRequest: fastify.authenticate,
-        handler: async () => {},
+        handler: async (request: FastifyRequest, reply: FastifyReply) => {
+            return reply
+        },
     })
     done()
 }
