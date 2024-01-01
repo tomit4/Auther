@@ -82,37 +82,41 @@ export default (
                     hashedEmail,
                     emailFromRedis,
                 )
+                const sessionToken = await userService.signToken(
+                    hashedEmail,
+                    process.env.JWT_SESSION_EXP as string,
+                )
+                const refreshToken = await userService.signToken(
+                    hashedEmail,
+                    process.env.JWT_REFRESH_EXP as string,
+                )
+                await userService.setRefreshTokenInCache(
+                    hashedEmail,
+                    refreshToken,
+                )
+                reply
+                    .code(200)
+                    .clearCookie('appname-hash', { path: '/verify' })
+                    .setCookie('appname-refresh-token', refreshToken, {
+                        secure: true,
+                        httpOnly: true,
+                        sameSite: true,
+                    })
+                    .send({
+                        ok: true,
+                        msg: 'Your email has been verified, redirecting you to the app...',
+                        sessionToken: sessionToken,
+                    })
             } catch (err) {
                 if (err instanceof Error) {
                     fastify.log.error('ERROR :=>', err.message)
-                    return reply.code(500).send({
+                    reply.code(500).send({
                         ok: false,
                         error: err.message,
                     })
                 }
             }
-            const sessionToken = await userService.signToken(
-                hashedEmail,
-                process.env.JWT_SESSION_EXP as string,
-            )
-            const refreshToken = await userService.signToken(
-                hashedEmail,
-                process.env.JWT_REFRESH_EXP as string,
-            )
-            await userService.setRefreshTokenInCache(hashedEmail, refreshToken)
             return reply
-                .code(200)
-                .clearCookie('appname-hash', { path: '/verify' })
-                .setCookie('appname-refresh-token', refreshToken, {
-                    secure: true,
-                    httpOnly: true,
-                    sameSite: true,
-                })
-                .send({
-                    ok: true,
-                    msg: 'Your email has been verified, redirecting you to the app...',
-                    sessionToken: sessionToken,
-                })
         },
     })
     done()
