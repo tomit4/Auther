@@ -60,11 +60,9 @@ export default (
             reply: FastifyReply,
         ): Promise<SignUpRes> => {
             const { email, password } = request.body
-            const { redis, knex, bcrypt, userService } = fastify
-            // NOTE: Just a simple test for our eventual refactor
-            userService.test()
+            const { userService } = fastify
             const hashedEmail = hasher(email)
-            const hashedPassword = await bcrypt.hash(password)
+            const hashedPassword = await userService.hashPassword(password)
             // TODO: replicate zod checks on front end
             const emailSchema = z.string().email()
             const passwordSchema = z.string().regex(passwordSchemaRegex, {
@@ -73,12 +71,10 @@ export default (
             try {
                 const zParsedEmail = emailSchema.safeParse(email)
                 const zParsedPassword = passwordSchema.safeParse(password)
-                const userAlreadyInDb = await knex('users')
-                    .where('email', hashedEmail)
-                    .first()
+                const userAlreadyInDb =
+                    await userService.grabUserByEmail(hashedEmail)
                 const userAlreadyInCache =
-                    (await redis.get(`${hashedEmail}-email`)) ||
-                    (await redis.get(`${hashedEmail}-password`))
+                    await userService.isUserInCache(hashedEmail)
                 const emailSent = await sendEmail(
                     email as string,
                     `verify/${hashedEmail}` as string,
@@ -109,19 +105,15 @@ export default (
                         'An error occurred while sending email, please contact support.',
                     )
                 }
-                if (userAlreadyInDb?.is_deleted) {
-                    await knex('users').where('email', hashedEmail).update({
-                        password: hashedPassword,
-                        is_deleted: false,
-                    })
-                }
-                // TODO: reset expiration to a .env variable
-                await redis.set(`${hashedEmail}-email`, email, 'EX', 60)
-                await redis.set(
-                    `${hashedEmail}-password`,
+                if (userAlreadyInDb?.is_deleted)
+                    userService.updateAlreadyDeletedUser(
+                        hashedEmail,
+                        hashedPassword,
+                    )
+                await userService.setUserCredentialsInCache(
+                    hashedEmail,
+                    email,
                     hashedPassword,
-                    'EX',
-                    60,
                 )
                 reply
                     .code(200)

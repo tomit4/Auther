@@ -35,11 +35,9 @@ exports.default = (fastify, options, done) => {
         },
         handler: async (request, reply) => {
             const { email, password } = request.body;
-            const { redis, knex, bcrypt, userService } = fastify;
-            // NOTE: Just a simple test for our eventual refactor
-            userService.test();
+            const { userService } = fastify;
             const hashedEmail = (0, hasher_1.default)(email);
-            const hashedPassword = await bcrypt.hash(password);
+            const hashedPassword = await userService.hashPassword(password);
             // TODO: replicate zod checks on front end
             const emailSchema = zod_1.z.string().email();
             const passwordSchema = zod_1.z.string().regex(password_1.passwordSchemaRegex, {
@@ -48,11 +46,8 @@ exports.default = (fastify, options, done) => {
             try {
                 const zParsedEmail = emailSchema.safeParse(email);
                 const zParsedPassword = passwordSchema.safeParse(password);
-                const userAlreadyInDb = await knex('users')
-                    .where('email', hashedEmail)
-                    .first();
-                const userAlreadyInCache = (await redis.get(`${hashedEmail}-email`)) ||
-                    (await redis.get(`${hashedEmail}-password`));
+                const userAlreadyInDb = await userService.grabUserByEmail(hashedEmail);
+                const userAlreadyInCache = await userService.isUserInCache(hashedEmail);
                 const emailSent = await (0, send_email_1.default)(email, `verify/${hashedEmail}`, process.env.BREVO_SIGNUP_TEMPLATE_ID);
                 if (!zParsedEmail.success) {
                     const { error } = zParsedEmail;
@@ -70,15 +65,9 @@ exports.default = (fastify, options, done) => {
                     fastify.log.error('Error occurred while sending email, are your Brevo credentials up to date? :=>', emailSent.error);
                     throw new Error('An error occurred while sending email, please contact support.');
                 }
-                if (userAlreadyInDb === null || userAlreadyInDb === void 0 ? void 0 : userAlreadyInDb.is_deleted) {
-                    await knex('users').where('email', hashedEmail).update({
-                        password: hashedPassword,
-                        is_deleted: false,
-                    });
-                }
-                // TODO: reset expiration to a .env variable
-                await redis.set(`${hashedEmail}-email`, email, 'EX', 60);
-                await redis.set(`${hashedEmail}-password`, hashedPassword, 'EX', 60);
+                if (userAlreadyInDb === null || userAlreadyInDb === void 0 ? void 0 : userAlreadyInDb.is_deleted)
+                    userService.updateAlreadyDeletedUser(hashedEmail, hashedPassword);
+                await userService.setUserCredentialsInCache(hashedEmail, email, hashedPassword);
                 reply
                     .code(200)
                     .setCookie('appname-hash', hashedEmail, {

@@ -6,10 +6,31 @@ class UserService {
         this.redis = fastify.redis;
         this.bcrypt = fastify.bcrypt;
     }
-    async test() {
+    async hashPassword(password) {
+        const { bcrypt } = this;
+        return await bcrypt.hash(password);
+    }
+    async grabUserByEmail(hashedEmail) {
         const { knex } = this;
-        console.log('this.fastify.knex(users) :=>', await knex('users'));
-        console.log('this is just a test of the userService :=>');
+        return await knex('users').where('email', hashedEmail).first();
+    }
+    async isUserInCache(hashedEmail) {
+        const { redis } = this;
+        return ((await redis.get(`${hashedEmail}-email`)) ||
+            (await redis.get(`${hashedEmail}-password`)));
+    }
+    async updateAlreadyDeletedUser(hashedEmail, hashedPassword) {
+        const { knex } = this;
+        await knex('users').where('email', hashedEmail).update({
+            password: hashedPassword,
+            is_deleted: false,
+        });
+    }
+    // TODO: reset expiration to a .env variable
+    async setUserCredentialsInCache(hashedEmail, email, hashedPassword) {
+        const { redis } = this;
+        await redis.set(`${hashedEmail}-email`, email, 'EX', 60);
+        await redis.set(`${hashedEmail}-password`, hashedPassword, 'EX', 60);
     }
 }
 exports.default = UserService;
