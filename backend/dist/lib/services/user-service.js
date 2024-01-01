@@ -22,7 +22,7 @@ class UserService {
     // TODO: write return type
     async grabUserByEmail(hashedEmail) {
         const { knex } = this;
-        await knex('users').where('email', hashedEmail).first();
+        return await knex('users').where('email', hashedEmail).first();
     }
     async grabUserPasswordByEmail(hashedEmail) {
         const { knex } = this;
