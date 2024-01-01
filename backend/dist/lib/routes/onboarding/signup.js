@@ -35,7 +35,9 @@ exports.default = (fastify, options, done) => {
         },
         handler: async (request, reply) => {
             const { email, password } = request.body;
-            const { redis, knex, bcrypt } = fastify;
+            const { redis, knex, bcrypt, userService } = fastify;
+            // NOTE: Just a simple test for our eventual refactor
+            userService.test();
             const hashedEmail = (0, hasher_1.default)(email);
             const hashedPassword = await bcrypt.hash(password);
             // TODO: replicate zod checks on front end

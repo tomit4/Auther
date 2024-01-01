@@ -2,6 +2,7 @@ import 'dotenv/config'
 import Fastify, { type FastifyInstance } from 'fastify'
 import registerRoutes from './lib/routes'
 import registerPlugins from './lib/plugins'
+import registerServices from './lib/services'
 
 const fastify: FastifyInstance = Fastify({
     logger: {
@@ -14,6 +15,7 @@ const fastify: FastifyInstance = Fastify({
 const start = async (): Promise<string> => {
     try {
         await registerPlugins(fastify)
+        await registerServices(fastify)
         await registerRoutes(fastify)
         await fastify.ready()
         return await fastify.listen({

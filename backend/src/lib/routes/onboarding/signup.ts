@@ -60,7 +60,9 @@ export default (
             reply: FastifyReply,
         ): Promise<SignUpRes> => {
             const { email, password } = request.body
-            const { redis, knex, bcrypt } = fastify
+            const { redis, knex, bcrypt, userService } = fastify
+            // NOTE: Just a simple test for our eventual refactor
+            userService.test()
             const hashedEmail = hasher(email)
             const hashedPassword = await bcrypt.hash(password)
             // TODO: replicate zod checks on front end
