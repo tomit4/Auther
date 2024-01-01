@@ -8,6 +8,10 @@ import type {
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import type { VerifyPayloadType } from '@fastify/jwt'
 import { z } from 'zod'
+import {
+    passwordSchemaRegex,
+    passwordSchemaErrMsg,
+} from '../../schemas/password'
 
 type BodyReq = {
     newPassword: string
@@ -65,21 +69,6 @@ export default (
         ) => {
             const { redis, knex, bcrypt, jwt } = fastify
             const { newPassword } = request.body
-            const passwordSchemaRegex = new RegExp(
-                [
-                    /^(?=.*[a-z])/, // At least one lowercase letter
-                    /(?=.*[A-Z])/, // At least one uppercase letter
-                    /(?=.*\d)/, // At least one digit
-                    /(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/, // At least one special character
-                    /[A-Za-z\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{10,}$/, // At least 10 characters long
-                ]
-                    .map(r => r.source)
-                    .join(''),
-            )
-            const passwordSchemaErrMsg =
-                'Password must be at least 10 characters in length and contain at \
-                least one lowercase letter, one uppercase letter, one digit, and one \
-                special character'
             const passwordSchema = z.string().regex(passwordSchemaRegex, {
                 message: passwordSchemaErrMsg,
             })

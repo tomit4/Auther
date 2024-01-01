@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const zod_1 = require("zod");
+const password_1 = require("../../schemas/password");
 const send_email_1 = __importDefault(require("../../utils/send-email"));
 /*
 type AuthRes = {
@@ -49,20 +50,8 @@ exports.default = (fastify, options, done) => {
         handler: async (request, reply) => {
             const { redis, knex, bcrypt, jwt } = fastify;
             const { inputPassword } = request.body;
-            const passwordSchemaRegex = new RegExp([
-                /^(?=.*[a-z])/, // At least one lowercase letter
-                /(?=.*[A-Z])/, // At least one uppercase letter
-                /(?=.*\d)/, // At least one digit
-                /(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/, // At least one special character
-                /[A-Za-z\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{10,}$/, // At least 10 characters long
-            ]
-                .map(r => r.source)
-                .join(''));
-            const passwordSchemaErrMsg = 'Password must be at least 10 characters in length and contain at \
-                least one lowercase letter, one uppercase letter, one digit, and one \
-                special character';
-            const passwordSchema = zod_1.z.string().regex(passwordSchemaRegex, {
-                message: passwordSchemaErrMsg,
+            const passwordSchema = zod_1.z.string().regex(password_1.passwordSchemaRegex, {
+                message: password_1.passwordSchemaErrMsg,
             });
             const zParsedPassword = passwordSchema.safeParse(inputPassword);
             if (!zParsedPassword.success) {

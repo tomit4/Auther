@@ -146,10 +146,6 @@ router.beforeEach(async (to, from): Promise<string | undefined> => {
             console.error('ERROR while logging out :=>', jsonLogOutRes)
         }
         return '/login'
-        // NOTE: Protecting this route specifically,
-        // the email has to be answered,
-        // (i.e. the email address has to be in the redis cache)
-        // } else if (to.meta.requiresEmailVerification) {
     } else if (
         !to.meta.requiresAuth &&
         to.path === '/auth' &&

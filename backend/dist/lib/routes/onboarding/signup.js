@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const zod_1 = require("zod");
+const password_1 = require("../../schemas/password");
 const send_email_1 = __importDefault(require("../../utils/send-email"));
 const hasher_1 = __importDefault(require("../../utils/hasher"));
 exports.default = (fastify, options, done) => {
@@ -39,26 +40,12 @@ exports.default = (fastify, options, done) => {
             const hashedPassword = await bcrypt.hash(password);
             // TODO: replicate zod checks on front end
             const emailSchema = zod_1.z.string().email();
-            const passwordSchemaRegex = new RegExp([
-                /^(?=.*[a-z])/, // At least one lowercase letter
-                /(?=.*[A-Z])/, // At least one uppercase letter
-                /(?=.*\d)/, // At least one digit
-                /(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/, // At least one special character
-                /[A-Za-z\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{10,}$/, // At least 10 characters long
-            ]
-                .map(r => r.source)
-                .join(''));
-            const passwordSchemaErrMsg = 'Password must be at least 10 characters in length and contain at \
-                least one lowercase letter, one uppercase letter, one digit, and one \
-                special character';
-            const passwordSchema = zod_1.z.string().regex(passwordSchemaRegex, {
-                message: passwordSchemaErrMsg,
+            const passwordSchema = zod_1.z.string().regex(password_1.passwordSchemaRegex, {
+                message: password_1.passwordSchemaErrMsg,
             });
             try {
                 const zParsedEmail = emailSchema.safeParse(email);
                 const zParsedPassword = passwordSchema.safeParse(password);
-                // TODO: If the user deleted their profile and they sign up again,
-                // we should simply change is_deleted to false again...
                 const userAlreadyInDb = await knex('users')
                     .where('email', hashedEmail)
                     .first();
@@ -75,41 +62,42 @@ exports.default = (fastify, options, done) => {
                 }
                 if (userAlreadyInDb && !userAlreadyInDb.is_deleted)
                     throw new Error('You have already signed up, please log in.');
-                if (userAlreadyInDb === null || userAlreadyInDb === void 0 ? void 0 : userAlreadyInDb.is_deleted) {
-                    await knex('users').where('email', hashedEmail).update({
-                        password: hashedPassword,
-                        is_deleted: false,
-                    });
-                }
                 if (userAlreadyInCache)
                     throw new Error('You have already submitted your email, please check your inbox.');
                 if (!emailSent.wasSuccessfull) {
                     fastify.log.error('Error occurred while sending email, are your Brevo credentials up to date? :=>', emailSent.error);
                     throw new Error('An error occurred while sending email, please contact support.');
                 }
+                if (userAlreadyInDb === null || userAlreadyInDb === void 0 ? void 0 : userAlreadyInDb.is_deleted) {
+                    await knex('users').where('email', hashedEmail).update({
+                        password: hashedPassword,
+                        is_deleted: false,
+                    });
+                }
+                // TODO: reset expiration to a .env variable
+                await redis.set(`${hashedEmail}-email`, email, 'EX', 60);
+                await redis.set(`${hashedEmail}-password`, hashedPassword, 'EX', 60);
+                reply
+                    .code(200)
+                    .setCookie('appname-hash', hashedEmail, {
+                    path: '/verify',
+                    maxAge: 60 * 60,
+                })
+                    .send({
+                    ok: true,
+                    message: `Your Email Was Successfully Sent to ${email}!`,
+                });
             }
             catch (err) {
                 if (err instanceof Error) {
                     fastify.log.error('ERROR :=>', err.message);
-                    return reply.code(500).send({
+                    reply.code(500).send({
                         ok: false,
                         message: err.message,
                     });
                 }
             }
-            // TODO: reset expiration to a .env variable
-            await redis.set(`${hashedEmail}-email`, email, 'EX', 60);
-            await redis.set(`${hashedEmail}-password`, hashedPassword, 'EX', 60);
-            return reply
-                .code(200)
-                .setCookie('appname-hash', hashedEmail, {
-                path: '/verify',
-                maxAge: 60 * 60,
-            })
-                .send({
-                ok: true,
-                message: `Your Email Was Successfully Sent to ${email}!`,
-            });
+            return reply;
         },
     });
     done();

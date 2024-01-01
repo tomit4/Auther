@@ -7,6 +7,10 @@ import type {
 } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
+import {
+    passwordSchemaRegex,
+    passwordSchemaErrMsg,
+} from '../../schemas/password'
 import sendEmail from '../../utils/send-email'
 import hasher from '../../utils/hasher'
 
@@ -61,29 +65,12 @@ export default (
             const hashedPassword = await bcrypt.hash(password)
             // TODO: replicate zod checks on front end
             const emailSchema = z.string().email()
-            const passwordSchemaRegex = new RegExp(
-                [
-                    /^(?=.*[a-z])/, // At least one lowercase letter
-                    /(?=.*[A-Z])/, // At least one uppercase letter
-                    /(?=.*\d)/, // At least one digit
-                    /(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/, // At least one special character
-                    /[A-Za-z\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{10,}$/, // At least 10 characters long
-                ]
-                    .map(r => r.source)
-                    .join(''),
-            )
-            const passwordSchemaErrMsg =
-                'Password must be at least 10 characters in length and contain at \
-                least one lowercase letter, one uppercase letter, one digit, and one \
-                special character'
             const passwordSchema = z.string().regex(passwordSchemaRegex, {
                 message: passwordSchemaErrMsg,
             })
             try {
                 const zParsedEmail = emailSchema.safeParse(email)
                 const zParsedPassword = passwordSchema.safeParse(password)
-                // TODO: If the user deleted their profile and they sign up again,
-                // we should simply change is_deleted to false again...
                 const userAlreadyInDb = await knex('users')
                     .where('email', hashedEmail)
                     .first()
@@ -107,12 +94,6 @@ export default (
                     throw new Error(
                         'You have already signed up, please log in.',
                     )
-                if (userAlreadyInDb?.is_deleted) {
-                    await knex('users').where('email', hashedEmail).update({
-                        password: hashedPassword,
-                        is_deleted: false,
-                    })
-                }
                 if (userAlreadyInCache)
                     throw new Error(
                         'You have already submitted your email, please check your inbox.',
@@ -126,28 +107,40 @@ export default (
                         'An error occurred while sending email, please contact support.',
                     )
                 }
+                if (userAlreadyInDb?.is_deleted) {
+                    await knex('users').where('email', hashedEmail).update({
+                        password: hashedPassword,
+                        is_deleted: false,
+                    })
+                }
+                // TODO: reset expiration to a .env variable
+                await redis.set(`${hashedEmail}-email`, email, 'EX', 60)
+                await redis.set(
+                    `${hashedEmail}-password`,
+                    hashedPassword,
+                    'EX',
+                    60,
+                )
+                reply
+                    .code(200)
+                    .setCookie('appname-hash', hashedEmail, {
+                        path: '/verify',
+                        maxAge: 60 * 60,
+                    })
+                    .send({
+                        ok: true,
+                        message: `Your Email Was Successfully Sent to ${email}!`,
+                    })
             } catch (err) {
                 if (err instanceof Error) {
                     fastify.log.error('ERROR :=>', err.message)
-                    return reply.code(500).send({
+                    reply.code(500).send({
                         ok: false,
                         message: err.message,
                     })
                 }
             }
-            // TODO: reset expiration to a .env variable
-            await redis.set(`${hashedEmail}-email`, email, 'EX', 60)
-            await redis.set(`${hashedEmail}-password`, hashedPassword, 'EX', 60)
             return reply
-                .code(200)
-                .setCookie('appname-hash', hashedEmail, {
-                    path: '/verify',
-                    maxAge: 60 * 60,
-                })
-                .send({
-                    ok: true,
-                    message: `Your Email Was Successfully Sent to ${email}!`,
-                })
         },
     })
     done()

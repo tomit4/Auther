@@ -7,6 +7,10 @@ import type {
 } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
+import {
+    passwordSchemaRegex,
+    passwordSchemaErrMsg,
+} from '../../schemas/password'
 import hasher from '../../utils/hasher'
 
 type BodyReq = {
@@ -64,21 +68,6 @@ export default (
             const { email, loginPassword } = request.body
             const hashedEmail = hasher(email)
             const emailSchema = z.string().email()
-            const passwordSchemaRegex = new RegExp(
-                [
-                    /^(?=.*[a-z])/, // At least one lowercase letter
-                    /(?=.*[A-Z])/, // At least one uppercase letter
-                    /(?=.*\d)/, // At least one digit
-                    /(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/, // At least one special character
-                    /[A-Za-z\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{10,}$/, // At least 10 characters long
-                ]
-                    .map(r => r.source)
-                    .join(''),
-            )
-            const passwordSchemaErrMsg =
-                'Password must be at least 10 characters in length and contain at \
-                least one lowercase letter, one uppercase letter, one digit, and one \
-                special character'
             const passwordSchema = z.string().regex(passwordSchemaRegex, {
                 message: passwordSchemaErrMsg,
             })
