@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
+import { delay } from '../utils/utils.ts'
 
 const router = useRouter()
 const emailInput: Ref<string> = ref('')
@@ -9,10 +10,6 @@ const errMessage: Ref<string> = ref('')
 const resSuccessful: Ref<string> = ref('')
 
 const emailRoute = import.meta.env.VITE_EMAIL_ROUTE as string
-// TODO: place in a utility class/file
-const delay = (ms: number): Promise<void> => {
-    return new Promise(resolve => setTimeout(resolve, ms))
-}
 
 const handleSubmit = async (
     emailInput: string,

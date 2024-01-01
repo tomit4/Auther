@@ -1,29 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted, type Ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { delay, grabStoredCookie } from '../utils/utils.ts'
 const route = useRoute()
 const router = useRouter()
 const errMessage: Ref<string> = ref('')
 const resSuccessful: Ref<string> = ref('')
 
 const verifyRoute = import.meta.env.VITE_VERIFY_ROUTE as string
-
-// TODO: place in utility class/file
-const delay = (ms: number): Promise<void> => {
-    return new Promise(resolve => setTimeout(resolve, ms))
-}
-
-// TODO: place in utility class/file
-const grabStoredCookie = (cookieKey: string): string | undefined => {
-    const cookies = document.cookie.split('; ').reduce((prev, current) => {
-        const [key, ...value] = current.split('=')
-        // TODO: consider refactoring this using a Map
-        prev[key] = value.join('=')
-        return prev
-    }, {})
-    const cookieVal = cookieKey in cookies ? cookies[cookieKey] : undefined
-    return cookieVal
-}
 
 onMounted(async () => {
     const cookie = grabStoredCookie('appname-hash')

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { delay } from '../utils/utils.ts'
 const router = useRouter()
 
 const deleteProfileAskRoute = import.meta.env
@@ -13,11 +14,6 @@ const resSuccessful: Ref<string> = ref('')
 defineProps({
     emailFromCache: String,
 })
-
-// TODO: place in utility class/file
-const delay = (ms: number): Promise<void> => {
-    return new Promise(resolve => setTimeout(resolve, ms))
-}
 
 const handleSubmit = async (passwordInput: string): Promise<void> => {
     const data = {

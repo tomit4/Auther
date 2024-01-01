@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, type Ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { delay } from '../utils/utils.ts'
 const route = useRoute()
 const router = useRouter()
 
@@ -12,16 +13,6 @@ const passwordInput: Ref<string> = ref('')
 const errMessage: Ref<string> = ref('')
 const resSuccessful: Ref<string> = ref('')
 
-// TODO: place in utility class/file
-const delay = (ms: number): Promise<void> => {
-    return new Promise(resolve => setTimeout(resolve, ms))
-}
-
-// NOTE: At this point, checks have passed in router/index.ts checks
-// TODO: Submit Password to backend along with hashedEmail from secure cookie
-// TODO: Change Password by hashedEmail and is_deleted = false
-// TODO: If all successful, display message letting user know of success,
-// and then delay/redirect to /login
 const handleSubmit = async (passwordInput: string): Promise<void> => {
     try {
         const data = {

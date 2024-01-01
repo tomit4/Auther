@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, type Ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { delay, grabStoredCookie } from '../utils/utils.ts'
 const route = useRoute()
 const router = useRouter()
 
@@ -11,23 +12,6 @@ const invalidTokenCode = import.meta.env.VITE_INVALID_TOKEN_CODE
 
 const emailFromCache: Ref<string> = ref('')
 const errMessage: Ref<string> = ref('')
-
-// TODO: place in utility class/file
-const delay = (ms: number): Promise<void> => {
-    return new Promise(resolve => setTimeout(resolve, ms))
-}
-
-// TODO: place in utility class/file
-const grabStoredCookie = (cookieKey: string): string | undefined => {
-    const cookies = document.cookie.split('; ').reduce((prev, current) => {
-        const [key, ...value] = current.split('=')
-        // TODO: consider refactoring this using a Map
-        prev[key] = value.join('=')
-        return prev
-    }, {})
-    const cookieVal = cookieKey in cookies ? cookies[cookieKey] : undefined
-    return cookieVal
-}
 
 onMounted(async () => {
     const cookie = grabStoredCookie('appname-hash')
