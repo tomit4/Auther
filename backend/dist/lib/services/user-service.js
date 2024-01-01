@@ -46,6 +46,10 @@ class UserService {
         credentials.hashedPasswordFromRedis = await redis.get(`${hashedEmail}-password`);
         return credentials;
     }
+    async grabRefreshTokenFromCache(hashedEmail) {
+        const { redis } = this;
+        return await redis.get(`${hashedEmail}-refresh-token`);
+    }
     // TODO: write return type
     async updateAlreadyDeletedUser(hashedEmail, hashedPassword) {
         const { knex } = this;
@@ -70,9 +74,17 @@ class UserService {
         const { redis } = this;
         await redis.set(`${hashedEmail}-refresh-token`, refreshToken, 'EX', 180);
     }
+    async removeRefreshTokenFromCache(hashedEmail) {
+        const { redis } = this;
+        await redis.del(`${hashedEmail}-refresh-token`);
+    }
     async signToken(hashedEmail, expiration) {
         const { jwt } = this;
         return jwt.sign({ email: hashedEmail }, { expiresIn: expiration });
+    }
+    async verifyToken(token) {
+        const { jwt } = this;
+        return jwt.verify(token);
     }
 }
 exports.default = UserService;

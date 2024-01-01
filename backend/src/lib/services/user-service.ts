@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify'
 import type { Knex } from 'knex'
-import type { JWT } from '@fastify/jwt'
+import type { JWT, VerifyPayloadType } from '@fastify/jwt'
 import type { FastifyRedis } from '@fastify/redis'
 
 type FastifyBcryptPluginType = {
@@ -78,6 +78,13 @@ class UserService {
         return credentials
     }
 
+    async grabRefreshTokenFromCache(
+        hashedEmail: string,
+    ): Promise<string | null> {
+        const { redis } = this
+        return await redis.get(`${hashedEmail}-refresh-token`)
+    }
+
     // TODO: write return type
     async updateAlreadyDeletedUser(
         hashedEmail: string,
@@ -124,9 +131,19 @@ class UserService {
         )
     }
 
+    async removeRefreshTokenFromCache(hashedEmail: string): Promise<void> {
+        const { redis } = this
+        await redis.del(`${hashedEmail}-refresh-token`)
+    }
+
     async signToken(hashedEmail: string, expiration: string): Promise<string> {
         const { jwt } = this
         return jwt.sign({ email: hashedEmail }, { expiresIn: expiration })
+    }
+
+    async verifyToken(token: string): Promise<VerifyPayloadType> {
+        const { jwt } = this
+        return jwt.verify(token)
     }
 }
 

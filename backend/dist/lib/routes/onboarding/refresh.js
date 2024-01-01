@@ -20,34 +20,40 @@ exports.default = (fastify, options, done) => {
             },
         },
         handler: async (request, reply) => {
-            const { redis, jwt } = fastify;
+            const { userService } = fastify;
             const refreshToken = request.cookies['appname-refresh-token'];
-            let hashedEmail;
-            if (refreshToken) {
-                const refreshTokenIsValid = jwt.verify(refreshToken);
-                if (typeof refreshTokenIsValid === 'object' &&
-                    'email' in refreshTokenIsValid) {
-                    hashedEmail = refreshTokenIsValid.email;
-                    const refreshTokenFromRedis = await redis.get(`${hashedEmail}-refresh-token`);
-                    if (!refreshTokenFromRedis) {
-                        return reply.code(401).send({
-                            ok: false,
-                            error: 'No refresh token in cache, redirecting to home.',
+            try {
+                if (refreshToken) {
+                    const refreshTokenIsValid = userService.verifyToken(refreshToken);
+                    if (typeof refreshTokenIsValid === 'object' &&
+                        'email' in refreshTokenIsValid) {
+                        const hashedEmail = refreshTokenIsValid.email;
+                        const refreshTokenFromRedis = await userService.grabRefreshTokenFromCache(hashedEmail);
+                        if (!refreshTokenFromRedis) {
+                            throw new Error('No refresh token in cache, redirecting to home.');
+                        }
+                        const sessionToken = userService.signToken(hashedEmail, process.env.JWT_SESSION_EXP);
+                        await userService.removeRefreshTokenFromCache(hashedEmail);
+                        reply.code(200).send({
+                            ok: true,
+                            msg: 'Successfully refreshed session.',
+                            sessionToken: sessionToken,
                         });
                     }
-                    const sessionToken = jwt.sign({ email: hashedEmail }, { expiresIn: process.env.JWT_SESSION_EXP });
-                    return reply.code(200).send({
-                        ok: true,
-                        msg: 'Successfully refreshed session.',
-                        sessionToken: sessionToken,
+                }
+                else {
+                    throw new Error('Invalid refresh token, redirecting home...');
+                }
+            }
+            catch (err) {
+                if (err instanceof Error) {
+                    reply.code(401).send({
+                        ok: false,
+                        error: err.message,
                     });
                 }
             }
-            await redis.del(`${hashedEmail}-refresh-token`);
-            return reply.code(401).send({
-                ok: false,
-                error: 'Invalid refresh token. Redirecting to home...',
-            });
+            return reply;
         },
     });
     done();
