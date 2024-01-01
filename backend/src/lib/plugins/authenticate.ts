@@ -30,10 +30,6 @@ const authPlugin: FastifyPluginCallback = async (
                 async (request: FastifyRequest, reply: FastifyReply) => {
                     try {
                         await request.jwtVerify()
-                        return reply.code(200).send({
-                            ok: true,
-                            message: 'Authenticated',
-                        })
                     } catch (err) {
                         if (err instanceof Error)
                             return reply

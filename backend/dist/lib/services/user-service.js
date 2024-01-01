@@ -104,7 +104,15 @@ class UserService {
     }
     async verifyToken(token) {
         const { jwt } = this;
-        return jwt.verify(token);
+        try {
+            return jwt.verify(token);
+        }
+        catch (err) {
+            if (err instanceof Error) {
+                throw new Error(err.message);
+            }
+            return;
+        }
     }
 }
 exports.default = UserService;

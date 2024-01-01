@@ -168,9 +168,16 @@ class UserService {
         return jwt.sign({ email: hashedEmail }, { expiresIn: expiration })
     }
 
-    async verifyToken(token: string): Promise<VerifyPayloadType> {
+    async verifyToken(token: string): Promise<VerifyPayloadType | undefined> {
         const { jwt } = this
-        return jwt.verify(token)
+        try {
+            return jwt.verify(token)
+        } catch (err) {
+            if (err instanceof Error) {
+                throw new Error(err.message)
+            }
+            return
+        }
     }
 }
 

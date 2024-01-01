@@ -30,10 +30,6 @@ const authPlugin = async (fastify, options, next) => {
             fastify.decorate('authenticate', async (request, reply) => {
                 try {
                     await request.jwtVerify();
-                    return reply.code(200).send({
-                        ok: true,
-                        message: 'Authenticated',
-                    });
                 }
                 catch (err) {
                     if (err instanceof Error)
