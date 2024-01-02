@@ -53,10 +53,7 @@ class UserService {
 
     async grabUserByEmail(hashedEmail: string) {
         const { knex } = this
-        return await knex('users')
-            .where('email', hashedEmail)
-            .andWhere('is_deleted', false)
-            .first()
+        return await knex('users').where('email', hashedEmail).first()
     }
 
     async insertUserIntoDb(

@@ -82,11 +82,11 @@ export default (
                     hashedEmail,
                     emailFromRedis,
                 )
-                const sessionToken = await userService.signToken(
+                const sessionToken = userService.signToken(
                     hashedEmail,
                     process.env.JWT_SESSION_EXP as string,
                 )
-                const refreshToken = await userService.signToken(
+                const refreshToken = userService.signToken(
                     hashedEmail,
                     process.env.JWT_REFRESH_EXP as string,
                 )

@@ -88,7 +88,7 @@ export default (
                     const { error } = zParsedPassword
                     throw new Error(error.issues[0].message as string)
                 }
-                if (userAlreadyInDb)
+                if (userAlreadyInDb && !userAlreadyInDb.is_deleted)
                     throw new Error(
                         'You have already signed up, please log in.',
                     )
@@ -105,11 +105,6 @@ export default (
                         'An error occurred while sending email, please contact support.',
                     )
                 }
-                if (userAlreadyInDb?.is_deleted)
-                    userService.updateAlreadyDeletedUser(
-                        hashedEmail,
-                        hashedPassword,
-                    )
                 await userService.setUserEmailAndPasswordInCache(
                     hashedEmail,
                     email,

@@ -41,8 +41,8 @@ exports.default = (fastify, options, done) => {
                     await userService.insertUserIntoDb(hashedEmail, hashedPasswordFromRedis);
                 }
                 await userService.setUserEmailInCacheAndDeletePassword(hashedEmail, emailFromRedis);
-                const sessionToken = await userService.signToken(hashedEmail, process.env.JWT_SESSION_EXP);
-                const refreshToken = await userService.signToken(hashedEmail, process.env.JWT_REFRESH_EXP);
+                const sessionToken = userService.signToken(hashedEmail, process.env.JWT_SESSION_EXP);
+                const refreshToken = userService.signToken(hashedEmail, process.env.JWT_REFRESH_EXP);
                 await userService.setRefreshTokenInCache(hashedEmail, refreshToken);
                 reply
                     .code(200)
