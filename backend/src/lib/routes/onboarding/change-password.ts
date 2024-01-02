@@ -17,14 +17,11 @@ type BodyReq = {
     newPassword: string
 }
 
-/*
-type AuthRes = {
+type ChangePassRes = {
     ok: boolean
     message?: string
-    error?: string
-    sessionToken?: string
 }
-*/
+
 export default (
     fastify: FastifyInstance,
     options: FastifyPluginOptions,
@@ -39,98 +36,98 @@ export default (
                 timeWindow: 300000, // 5 minutes
             },
         },
-        /*
         schema: {
             body: z.object({
-                email: z.string(),
-                loginPassword: z.string(),
+                newPassword: z.string(),
             }),
             response: {
                 200: z.object({
                     ok: z.boolean(),
                     message: z.string(),
-                    sessionToken: z.string(),
                 }),
-                401: z.object({
-                    ok: z.boolean(),
-                    message: z.string(),
-                }),
-                500: z.object({
+                409: z.object({
                     ok: z.boolean(),
                     message: z.string(),
                 }),
             },
         },
-        */
         handler: async (
             request: FastifyRequest<{ Body: BodyReq }>,
             reply: FastifyReply,
-            // ): Promise<AuthRes> => {
-        ) => {
-            const { redis, knex, bcrypt, jwt } = fastify
+        ): Promise<ChangePassRes> => {
+            const { userService } = fastify
             const { newPassword } = request.body
+            const refreshToken = request.cookies[
+                'appname-refresh-token'
+            ] as string
             const passwordSchema = z.string().regex(passwordSchemaRegex, {
                 message: passwordSchemaErrMsg,
             })
             const zParsedPassword = passwordSchema.safeParse(newPassword)
-            if (!zParsedPassword.success) {
-                const { error } = zParsedPassword
-                throw new Error(error.issues[0].message as string)
-            }
-            const refreshToken = request.cookies[
-                'appname-refresh-token'
-            ] as string
-            const refreshTokenIsValid = jwt.verify(
-                refreshToken,
-            ) as VerifyPayloadType & { email: string }
-            const hashedEmail = refreshTokenIsValid.email as string
-            if (!hashedEmail) {
-                return reply.code(401).send({
-                    ok: false,
-                    error: 'No refresh token provided by client, redirecting to home.',
-                })
-            }
-            const redisCacheExpired =
-                (await redis.ttl(`${hashedEmail}-change-password-ask`)) < 0
-            if (redisCacheExpired) {
-                throw new Error(
-                    'Sorry, but you took too long to answer your email, please log in and try again.',
+            try {
+                if (!zParsedPassword.success) {
+                    const { error } = zParsedPassword
+                    throw new Error(error.issues[0].message as string)
+                }
+                const refreshTokenIsValid = userService.verifyToken(
+                    refreshToken,
+                ) as VerifyPayloadType & { email: string }
+                const hashedEmail = refreshTokenIsValid.email as string
+                const redisCacheExpired =
+                    await userService.checkIfCacheIsExpired(
+                        hashedEmail,
+                        'change-password',
+                    )
+                if (!hashedEmail || redisCacheExpired) reply.code(401)
+                if (!hashedEmail)
+                    throw new Error(
+                        'Sorry, but you took too long to answer your email, please log in and try again.',
+                    )
+                if (redisCacheExpired)
+                    throw new Error(
+                        'Sorry, but you took too long to answer your email, please log in and try again.',
+                    )
+                const userPasswordByEmail =
+                    await userService.grabUserByEmail(hashedEmail)
+                const { password } = userPasswordByEmail
+                const passwordHashesMatch =
+                    await userService.comparePasswordToHash(
+                        newPassword,
+                        password,
+                    )
+                // TODO: set up separate db table that keeps track of last 5 passwords
+                // for user and throws this 409 reply if new password is in table
+                // (i.e. newPassword cannot be the same as last 5 passwords)
+                if (passwordHashesMatch) {
+                    reply.code(409)
+                    throw new Error(
+                        'New password cannot be the same as old password.',
+                    )
+                }
+                const newHashedPassword =
+                    await userService.hashPassword(newPassword)
+                await userService.updatePassword(hashedEmail, newHashedPassword)
+                await userService.removeFromCache(
+                    hashedEmail,
+                    'change-password-ask',
                 )
+                reply
+                    .code(200)
+                    .clearCookie('appname-hash', {
+                        path: '/verify-change-pass',
+                    })
+                    .send({
+                        ok: true,
+                        message: 'You have successfully changed your password!',
+                    })
+            } catch (err) {
+                if (err instanceof Error)
+                    reply.send({
+                        ok: false,
+                        message: err.message,
+                    })
             }
-            const userPasswordByEmail = await knex('users')
-                .select('password')
-                .where('email', hashedEmail)
-                .andWhere('is_deleted', false)
-                .first()
-            const { password } = userPasswordByEmail
-            const passwordHashesMatch = await bcrypt
-                .compare(newPassword, password)
-                .then(match => match)
-                .catch(err => err)
-            // TODO: set up separate db table that keeps track of last 5 passwords
-            // for user and throws this 409 reply if new password is in table
-            // (i.e. newPassword cannot be the same as last 5 passwords)
-            if (passwordHashesMatch) {
-                return reply.code(409).send({
-                    ok: false,
-                    message: 'New password cannot be the same as old password.',
-                })
-            }
-            const newHashedPassword = await bcrypt.hash(newPassword)
-            await knex('users')
-                .where('email', hashedEmail)
-                .andWhere('is_deleted', false)
-                .update({
-                    password: newHashedPassword,
-                })
-            await redis.del(`${hashedEmail}-change-password-ask`)
             return reply
-                .code(200)
-                .clearCookie('appname-hash', { path: '/verify-change-pass' })
-                .send({
-                    ok: true,
-                    message: 'You have successfully changed your password!',
-                })
         },
     })
     done()

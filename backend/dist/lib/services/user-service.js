@@ -19,6 +19,15 @@ class UserService {
             .then(match => match)
             .catch(err => err);
     }
+    async updatePassword(hashedEmail, newHashedPassword) {
+        const { knex } = this;
+        await knex('users')
+            .where('email', hashedEmail)
+            .andWhere('is_deleted', false)
+            .update({
+            password: newHashedPassword,
+        });
+    }
     async grabUserByEmail(hashedEmail) {
         const { knex } = this;
         return await knex('users')
@@ -98,6 +107,10 @@ class UserService {
     async setInCacheWithExpiry(hashedEmail, key, expiration) {
         const { redis } = this;
         await redis.set(`${hashedEmail}-${key}`, hashedEmail, 'EX', expiration);
+    }
+    async checkIfCacheIsExpired(hashedEmail, key) {
+        const { redis } = this;
+        return (await redis.ttl(`${hashedEmail}-${key}`)) < 0;
     }
     signToken(hashedEmail, expiration) {
         const { jwt } = this;
