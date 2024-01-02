@@ -53,6 +53,11 @@ class UserService {
             is_deleted: false,
         });
     }
+    // TODO: consider replacing other cache checking methods with this
+    async isInCache(hashedEmail, key) {
+        const { redis } = this;
+        return await redis.get(`${hashedEmail}-${key}`);
+    }
     async grabUserEmailInCache(hashedEmail) {
         const { redis } = this;
         return await redis.get(`${hashedEmail}-email`);

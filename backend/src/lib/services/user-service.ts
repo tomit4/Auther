@@ -85,6 +85,12 @@ class UserService {
         })
     }
 
+    // TODO: consider replacing other cache checking methods with this
+    async isInCache(hashedEmail: string, key: string): Promise<string | null> {
+        const { redis } = this
+        return await redis.get(`${hashedEmail}-${key}`)
+    }
+
     async grabUserEmailInCache(hashedEmail: string): Promise<string | null> {
         const { redis } = this
         return await redis.get(`${hashedEmail}-email`)
