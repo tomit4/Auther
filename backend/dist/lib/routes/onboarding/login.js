@@ -38,7 +38,7 @@ exports.default = (fastify, options, done) => {
             },
         },
         handler: async (request, reply) => {
-            const { redis, knex, bcrypt, jwt } = fastify;
+            const { userService } = fastify;
             const { email, loginPassword } = request.body;
             const hashedEmail = (0, hasher_1.default)(email);
             const emailSchema = zod_1.z.string().email();
@@ -56,55 +56,41 @@ exports.default = (fastify, options, done) => {
                     const { error } = zParsedPassword;
                     throw new Error(error.issues[0].message);
                 }
-                const userByEmail = await knex('users')
-                    .select('password')
-                    .where('email', hashedEmail)
-                    .andWhere('is_deleted', false)
-                    .first();
-                if (!userByEmail) {
-                    return reply.code(401).send({
-                        ok: false,
-                        message: 'Incorrect email or password. Please try again.',
-                    });
-                }
+                const userByEmail = await userService.grabUserByEmail(hashedEmail);
                 const { password } = userByEmail;
-                const passwordHashesMatch = await bcrypt
-                    .compare(loginPassword, password)
-                    .then(match => match)
-                    .catch(err => err);
-                if (!passwordHashesMatch) {
-                    return reply.code(401).send({
-                        ok: false,
-                        message: 'Incorrect email or password. Please try again.',
-                    });
+                const passwordHashesMatch = await userService.comparePasswordToHash(loginPassword, password);
+                if (!userByEmail || !passwordHashesMatch) {
+                    reply.code(401);
+                    throw new Error('Incorrect email or password. Please try again.');
                 }
+                const sessionToken = userService.signToken(hashedEmail, process.env.JWT_SESSION_EXP);
+                const refreshToken = userService.signToken(hashedEmail, process.env.JWT_REFRESH_EXP);
+                // TODO: reset expiration to a .env variable
+                await userService.setRefreshTokenInCache(hashedEmail, refreshToken);
+                await userService.setUserEmailInCache(hashedEmail, email);
+                reply
+                    .code(200)
+                    .setCookie('appname-refresh-token', refreshToken, {
+                    secure: true,
+                    httpOnly: true,
+                    sameSite: true,
+                })
+                    .send({
+                    ok: true,
+                    message: 'You have been successfully authenticated! Redirecting you to the app...',
+                    sessionToken: sessionToken,
+                });
             }
             catch (err) {
                 if (err instanceof Error) {
                     fastify.log.error('ERROR :=>', err);
-                    return reply.code(500).send({
+                    reply.send({
                         ok: false,
                         message: err.message,
                     });
                 }
             }
-            const sessionToken = jwt.sign({ email: hashedEmail }, { expiresIn: process.env.JWT_SESSION_EXP });
-            const refreshToken = jwt.sign({ email: hashedEmail }, { expiresIn: process.env.JWT_REFRESH_EXP });
-            // TODO: reset expiration to a .env variable
-            await redis.set(`${hashedEmail}-refresh-token`, refreshToken, 'EX', 180);
-            await redis.set(`${hashedEmail}-email`, email, 'EX', 180);
-            return reply
-                .code(200)
-                .setCookie('appname-refresh-token', refreshToken, {
-                secure: true,
-                httpOnly: true,
-                sameSite: true,
-            })
-                .send({
-                ok: true,
-                message: 'You have been successfully authenticated! Redirecting you to the app...',
-                sessionToken: sessionToken,
-            });
+            return reply;
         },
     });
     done();

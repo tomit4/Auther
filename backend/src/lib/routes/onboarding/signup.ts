@@ -88,7 +88,7 @@ export default (
                     const { error } = zParsedPassword
                     throw new Error(error.issues[0].message as string)
                 }
-                if (userAlreadyInDb && !userAlreadyInDb.is_deleted)
+                if (userAlreadyInDb)
                     throw new Error(
                         'You have already signed up, please log in.',
                     )

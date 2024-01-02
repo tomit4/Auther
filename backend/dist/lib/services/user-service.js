@@ -22,16 +22,10 @@ class UserService {
     // TODO: write return type
     async grabUserByEmail(hashedEmail) {
         const { knex } = this;
-        return await knex('users').where('email', hashedEmail).first();
-    }
-    async grabUserPasswordByEmail(hashedEmail) {
-        const { knex } = this;
-        const { password } = await knex('users')
-            .select('password')
+        return await knex('users')
             .where('email', hashedEmail)
             .andWhere('is_deleted', false)
             .first();
-        return password;
     }
     async insertUserIntoDb(hashedEmail, hashedPasswordFromRedis) {
         const { knex } = this;

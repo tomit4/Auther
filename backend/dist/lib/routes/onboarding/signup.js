@@ -57,7 +57,7 @@ exports.default = (fastify, options, done) => {
                     const { error } = zParsedPassword;
                     throw new Error(error.issues[0].message);
                 }
-                if (userAlreadyInDb && !userAlreadyInDb.is_deleted)
+                if (userAlreadyInDb)
                     throw new Error('You have already signed up, please log in.');
                 if (userAlreadyInCache)
                     throw new Error('You have already submitted your email, please check your inbox.');
