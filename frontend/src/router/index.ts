@@ -84,52 +84,49 @@ const router = createRouter({
     routes,
 })
 
+const authorizeSession = async (sessionToken: string): Promise<Response> => {
+    return await fetch(authRoute, {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${sessionToken}` },
+    })
+}
+
+const attemptRefresh = async (): Promise<
+    Response & { statusCode?: number; sessionToken?: string; code?: number }
+> => {
+    const refreshCheck = await fetch(refreshRoute, {
+        method: 'GET',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+    })
+    return refreshCheck.json()
+}
+
+const attemptLogout = async (): Promise<Response & { code?: number }> => {
+    const logOutRes = await fetch(logoutRoute, {
+        method: 'GET',
+        credentials: 'include',
+    })
+    return logOutRes.json()
+}
+
 // TODO: Heavy refactor into smaller helper functions
 router.beforeEach(async (to, from): Promise<string | undefined> => {
     const sessionToken = localStorage.getItem('appname-session-token')
     try {
         if (to.meta.requiresAuth && sessionToken) {
-            const res = await fetch(authRoute, {
-                method: 'GET',
-                headers: { Authorization: `Bearer ${sessionToken}` },
-            })
-            if (res?.status === 401) {
-                const refreshCheck = await fetch(refreshRoute, {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: { 'Content-Type': 'application/json' },
-                })
-                if (refreshCheck.status === 200) {
-                    const jsonRes = await refreshCheck.json()
+            const res = await authorizeSession(sessionToken)
+            if (!res.ok) {
+                const jsonRes = await attemptRefresh()
+                if (jsonRes.ok) {
                     localStorage.setItem(
                         'appname-session-token',
-                        jsonRes.sessionToken,
+                        jsonRes.sessionToken as string,
                     )
                 } else {
-                    const jsonRefreshCheck = await refreshCheck.json()
-                    if (
-                        jsonRefreshCheck.statusCode === 500 &&
-                        jsonRefreshCheck.code !== invalidTokenCode
-                    ) {
-                        console.error(
-                            'ERROR while refreshing token :=>',
-                            jsonRefreshCheck,
-                        )
-                    }
-                    const logOutRes = await fetch(logoutRoute, {
-                        method: 'GET',
-                        credentials: 'include',
-                    })
-                    const jsonLogOutRes = await logOutRes.json()
-                    if (
-                        jsonLogOutRes.statusCode !== 200 &&
-                        jsonLogOutRes.code !== invalidTokenCode
-                    ) {
-                        console.error(
-                            'ERROR while logging out :=>',
-                            jsonLogOutRes,
-                        )
-                    }
+                    const logOutRes = await attemptLogout()
+                    if (!logOutRes.ok && logOutRes.code !== invalidTokenCode)
+                        console.error('ERROR while logging out :=>', logOutRes)
                     localStorage.removeItem('appname-session-token')
                     return '/login'
                 }
@@ -137,18 +134,9 @@ router.beforeEach(async (to, from): Promise<string | undefined> => {
         } else if (!to.meta.is404 && !to.meta.requiresAuth && sessionToken) {
             return '/app'
         } else if (to.meta.requiresAuth && !sessionToken) {
-            // NOTE: Repetitive, hence the need for refactor
-            const logOutRes = await fetch(logoutRoute, {
-                method: 'GET',
-                credentials: 'include',
-            })
-            const jsonLogOutRes = await logOutRes.json()
-            if (
-                jsonLogOutRes.statusCode !== 200 &&
-                jsonLogOutRes.code !== invalidTokenCode
-            ) {
-                console.error('ERROR while logging out :=>', jsonLogOutRes)
-            }
+            const logOutRes = await attemptLogout()
+            if (!logOutRes.ok)
+                console.error('ERROR while logging out :=>', logOutRes)
             return '/login'
         } else if (
             !to.meta.requiresAuth &&
