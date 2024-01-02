@@ -19,7 +19,6 @@ class UserService {
             .then(match => match)
             .catch(err => err);
     }
-    // TODO: write return type
     async grabUserByEmail(hashedEmail) {
         const { knex } = this;
         return await knex('users')

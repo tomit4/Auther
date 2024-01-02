@@ -8,14 +8,6 @@ type FastifyBcryptPluginType = {
     compare: (data: string, hash: string) => Promise<boolean>
 }
 
-type User = {
-    id: number
-    email: string
-    password: string
-    is_deleted: boolean
-    created_at: string
-}
-
 class UserService {
     knex: Knex
     redis: FastifyRedis
@@ -46,8 +38,7 @@ class UserService {
             .catch(err => err)
     }
 
-    // TODO: write return type
-    async grabUserByEmail(hashedEmail: string): Promise<User> {
+    async grabUserByEmail(hashedEmail: string) {
         const { knex } = this
         return await knex('users')
             .where('email', hashedEmail)
