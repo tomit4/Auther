@@ -92,9 +92,9 @@ class UserService {
         const { redis } = this;
         await redis.set(`${hashedEmail}-refresh-token`, refreshToken, 'EX', 180);
     }
-    async removeRefreshTokenFromCache(hashedEmail) {
+    async removeFromCache(hashedEmail, key) {
         const { redis } = this;
-        await redis.del(`${hashedEmail}-refresh-token`);
+        await redis.del(`${hashedEmail}-${key}`);
     }
     signToken(hashedEmail, expiration) {
         const { jwt } = this;

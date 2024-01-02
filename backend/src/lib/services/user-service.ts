@@ -166,9 +166,9 @@ class UserService {
         )
     }
 
-    async removeRefreshTokenFromCache(hashedEmail: string): Promise<void> {
+    async removeFromCache(hashedEmail: string, key: string): Promise<void> {
         const { redis } = this
-        await redis.del(`${hashedEmail}-refresh-token`)
+        await redis.del(`${hashedEmail}-${key}`)
     }
 
     signToken(hashedEmail: string, expiration: string): string {

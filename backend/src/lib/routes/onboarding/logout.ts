@@ -11,10 +11,6 @@ import { z } from 'zod'
 
 type LogOutRes = {
     ok: boolean
-    msg?: string
-    error?: string
-    statusCode?: number
-    code?: string
     message?: string
 }
 
@@ -31,12 +27,10 @@ export default (
             response: {
                 200: z.object({
                     ok: z.boolean(),
-                    msg: z.string(),
+                    message: z.string(),
                 }),
                 500: z.object({
-                    statusCode: z.number(),
-                    code: z.string(),
-                    error: z.string(),
+                    ok: z.boolean(),
                     message: z.string(),
                 }),
             },
@@ -45,9 +39,11 @@ export default (
             request: FastifyRequest,
             reply: FastifyReply,
         ): Promise<LogOutRes> => {
-            const { redis, jwt } = fastify
+            const { userService } = fastify
             const refreshToken = request.cookies['appname-refresh-token']
-            if (refreshToken) {
+            try {
+                if (!refreshToken)
+                    throw new Error('No refresh token sent from client')
                 reply.clearCookie('appname-refresh-token', {
                     path: '/onboarding',
                 })
@@ -57,22 +53,38 @@ export default (
                 reply.clearCookie('appname-hash', {
                     path: '/verify-delete-profile',
                 })
-                const refreshTokenIsValid = jwt.verify(
-                    refreshToken,
-                ) as VerifyPayloadType
-                if (
-                    typeof refreshTokenIsValid === 'object' &&
-                    'email' in refreshTokenIsValid
-                ) {
-                    const hashedEmail = refreshTokenIsValid.email
-                    await redis.del(`${hashedEmail}-refresh-token`)
-                    await redis.del(`${hashedEmail}-email`)
+                const refreshTokenIsValid =
+                    userService.verifyToken(refreshToken)
+                if (!refreshTokenIsValid) {
+                    reply.code(401)
+                    throw new Error('Invalid refresh token')
                 }
+                if (
+                    typeof refreshTokenIsValid !== 'object' ||
+                    !('email' in refreshTokenIsValid)
+                )
+                    throw new Error('Refresh Token has incorrect payload')
+                const hashedEmail = refreshTokenIsValid.email
+                await userService.removeFromCache(
+                    hashedEmail as string,
+                    'refresh-token',
+                )
+                await userService.removeFromCache(
+                    hashedEmail as string,
+                    'email',
+                )
+                reply.code(200).send({
+                    ok: true,
+                    message: 'logged out',
+                })
+            } catch (err) {
+                if (err instanceof Error)
+                    reply.send({
+                        ok: false,
+                        message: err.message,
+                    })
             }
-            return reply.code(200).send({
-                ok: true,
-                msg: 'logged out',
-            })
+            return reply
         },
     })
     done()

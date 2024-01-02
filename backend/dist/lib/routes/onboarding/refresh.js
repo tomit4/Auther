@@ -28,7 +28,7 @@ exports.default = (fastify, options, done) => {
                 const refreshTokenIsValid = userService.verifyToken(refreshToken);
                 if (typeof refreshTokenIsValid !== 'object' ||
                     !('email' in refreshTokenIsValid))
-                    throw new Error('Invalid refresh token.');
+                    throw new Error('Refresh Token has incorrect payload');
                 const hashedEmail = refreshTokenIsValid.email;
                 const refreshTokenFromRedis = await userService.grabRefreshTokenFromCache(hashedEmail);
                 if (!refreshTokenFromRedis)
