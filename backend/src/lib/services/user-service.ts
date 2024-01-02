@@ -162,6 +162,15 @@ class UserService {
         await redis.del(`${hashedEmail}-${key}`)
     }
 
+    async setInCacheWithExpiry(
+        hashedEmail: string,
+        key: string,
+        expiration: number,
+    ): Promise<void> {
+        const { redis } = this
+        await redis.set(`${hashedEmail}-${key}`, hashedEmail, 'EX', expiration)
+    }
+
     signToken(hashedEmail: string, expiration: string): string {
         const { jwt } = this
         return jwt.sign({ email: hashedEmail }, { expiresIn: expiration })

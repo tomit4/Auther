@@ -14,7 +14,7 @@ defineProps({
 
 const handleSubmit = async (passwordInput: string): Promise<void> => {
     const data = {
-        inputPassword: passwordInput,
+        loginPassword: passwordInput,
     }
     const res = await fetch(changePasswordAskRoute, {
         method: 'POST',
