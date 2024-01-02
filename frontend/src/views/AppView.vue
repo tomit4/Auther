@@ -7,21 +7,22 @@ const router = useRouter()
 
 const logoutRoute = import.meta.env.VITE_LOGOUT_ROUTE
 const grabUserIdRoute = import.meta.env.VITE_USERID_ROUTE
+const invalidTokenCode = import.meta.env.VITE_INVALID_TOKEN_CODE
 
 const showDash: Ref<boolean> = ref(true)
 const showChangePassForm: Ref<boolean> = ref(false)
 const showDeleteProfileForm: Ref<boolean> = ref(false)
 const emailFromCache: Ref<string> = ref('')
 
-const handleLogOut = async (): Promise<void> => {
-    const logOutRes = await fetch(logoutRoute, {
+const handleLogout = async (): Promise<void> => {
+    const logOutRes = (await fetch(logoutRoute, {
         method: 'GET',
         credentials: 'include',
-    })
-    if (logOutRes.status === 200) {
-        localStorage.removeItem('appname-session-token')
-        router.push('/login')
-    } else console.error('ERROR while logging out :=>', logOutRes)
+    })) as Response & { code?: number }
+    if (!logOutRes.ok && logOutRes.code !== invalidTokenCode)
+        console.error('ERROR while logging out :=>', logOutRes)
+    localStorage.removeItem('appname-session-token')
+    router.push('/login')
 }
 
 const toggleChangePasswordForm = (): void => {
@@ -56,20 +57,13 @@ onMounted(async (): Promise<void> => {
 </script>
 
 <template>
-    <!-- TODO: Hitting delete my profile button displays form/hides other buttons
-        form asks for email/password, sends transac email for confirmation, 
-        then upon confirmation, deletion of account is complete -->
-    <!-- NOTE: Deletion of account includes a new table field in the db 'is_deleted'
-        which is set to true upon deletion -->
-    <!-- NOTE: This will require readjustment of our db queries as they stand 
-        currently to check for this new 'is_deleted' field -->
     <div>
         <h1>App</h1>
         <div v-if="showDash" className="app-dash">
             <!-- TODO: Make this its own component passing props/emitting etc. -->
             <p>Welcome {{ emailFromCache }}!!</p>
             <button
-                @click="handleLogOut"
+                @click="handleLogout"
                 type="submit"
                 value="Submit"
                 className="btn logout-btn"

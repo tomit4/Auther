@@ -57,7 +57,6 @@ const routes = [
         path: '/verify-forgot-pass/:hash',
         component: VerifiedForgotPasswordView,
         name: 'VerifiedForgotPasswordView',
-        meta: { requiresEmailVerification: true },
     },
     {
         path: '/verify-delete-profile/:hash',
@@ -102,51 +101,44 @@ const attemptRefresh = async (): Promise<
     return refreshCheck.json()
 }
 
-const attemptLogout = async (): Promise<Response & { code?: number }> => {
-    const logOutRes = await fetch(logoutRoute, {
+const logout = async (): Promise<void> => {
+    const logOutRes = (await fetch(logoutRoute, {
         method: 'GET',
         credentials: 'include',
-    })
-    return logOutRes.json()
+    })) as Response & { code?: number }
+    if (!logOutRes.ok && logOutRes.code !== invalidTokenCode)
+        console.error('ERROR while logging out :=>', logOutRes)
+    localStorage.removeItem('appname-session-token')
 }
 
 // TODO: Heavy refactor into smaller helper functions
 router.beforeEach(async (to, from): Promise<string | undefined> => {
     const sessionToken = localStorage.getItem('appname-session-token')
-    try {
-        if (to.meta.requiresAuth && sessionToken) {
-            const res = await authorizeSession(sessionToken)
-            if (!res.ok) {
-                const jsonRes = await attemptRefresh()
-                if (jsonRes.ok) {
-                    localStorage.setItem(
-                        'appname-session-token',
-                        jsonRes.sessionToken as string,
-                    )
-                } else {
-                    const logOutRes = await attemptLogout()
-                    if (!logOutRes.ok && logOutRes.code !== invalidTokenCode)
-                        console.error('ERROR while logging out :=>', logOutRes)
-                    localStorage.removeItem('appname-session-token')
-                    return '/login'
-                }
+    if (to.meta.requiresAuth && sessionToken) {
+        const res = await authorizeSession(sessionToken)
+        if (!res.ok) {
+            const refreshRes = await attemptRefresh()
+            if (refreshRes.ok) {
+                localStorage.setItem(
+                    'appname-session-token',
+                    refreshRes.sessionToken as string,
+                )
+            } else {
+                await logout()
+                return '/login'
             }
-        } else if (!to.meta.is404 && !to.meta.requiresAuth && sessionToken) {
-            return '/app'
-        } else if (to.meta.requiresAuth && !sessionToken) {
-            const logOutRes = await attemptLogout()
-            if (!logOutRes.ok)
-                console.error('ERROR while logging out :=>', logOutRes)
-            return '/login'
-        } else if (
-            !to.meta.requiresAuth &&
-            to.path === '/auth' &&
-            from.path !== '/signup'
-        ) {
-            return '/'
         }
-    } catch (err) {
-        console.error('ERROR :=>', err)
+    } else if (!to.meta.is404 && !to.meta.requiresAuth && sessionToken) {
+        return '/app'
+    } else if (to.meta.requiresAuth && !sessionToken) {
+        await logout()
+        return '/login'
+    } else if (
+        !to.meta.requiresAuth &&
+        to.path === '/auth' &&
+        from.path !== '/signup'
+    ) {
+        return '/'
     }
 })
 
