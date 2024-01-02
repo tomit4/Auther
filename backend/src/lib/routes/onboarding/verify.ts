@@ -67,7 +67,7 @@ export default (
                     throw new Error(
                         'You have already signed up, please log in.',
                     )
-                if (userAlreadyInDb?.is_deleted) {
+                if (userAlreadyInDb.is_deleted) {
                     await userService.updateAlreadyDeletedUser(
                         hashedEmail,
                         hashedPasswordFromRedis,

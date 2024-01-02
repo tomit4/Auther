@@ -34,7 +34,7 @@ exports.default = (fastify, options, done) => {
                     throw new Error('No data found by that email address, please sign up again.');
                 if (userAlreadyInDb && !userAlreadyInDb.is_deleted)
                     throw new Error('You have already signed up, please log in.');
-                if (userAlreadyInDb === null || userAlreadyInDb === void 0 ? void 0 : userAlreadyInDb.is_deleted) {
+                if (userAlreadyInDb.is_deleted) {
                     await userService.updateAlreadyDeletedUser(hashedEmail, hashedPasswordFromRedis);
                 }
                 else {

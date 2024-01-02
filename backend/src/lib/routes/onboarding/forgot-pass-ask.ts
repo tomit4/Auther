@@ -13,13 +13,12 @@ import hasher from '../../utils/hasher'
 type BodyReq = {
     email: string
 }
-/*
-type SignUpRes = {
+
+type ForgotPassAskRes = {
     ok: boolean
     message?: string
-    error?: string
 }
-*/
+
 export default (
     fastify: FastifyInstance,
     options: FastifyPluginOptions,
@@ -34,55 +33,38 @@ export default (
                 timeWindow: 300000, // 5 minutes
             },
         },
-        /*
         schema: {
             body: z.object({
                 email: z.string(),
-                password: z.string(),
             }),
             response: {
                 200: z.object({
                     ok: z.boolean(),
                     message: z.string(),
                 }),
-                500: z.object({
-                    ok: z.boolean(),
-                    message: z.string(),
-                }),
             },
         },
-        */
         handler: async (
             request: FastifyRequest<{ Body: BodyReq }>,
             reply: FastifyReply,
-            // ): Promise<SignUpRes> => {
-        ) => {
+        ): Promise<ForgotPassAskRes> => {
             const { email } = request.body
-            const { redis, jwt, knex } = fastify
+            const { userService } = fastify
             const hashedEmail = hasher(email)
             const emailSchema = z.string().email()
+            const zParsedEmail = emailSchema.safeParse(email)
             try {
-                const zParsedEmail = emailSchema.safeParse(email)
-                // TODO: If the user deleted their profile and they sign up again,
-                // we should simply change is_deleted to false again...
-                const userAlreadyInDb = await knex('users')
-                    .where('email', hashedEmail)
-                    .andWhere('is_deleted', false)
-                    .first()
-                const userAlreadyInCache = await redis.get(
-                    `${hashedEmail}-forgot-pass-ask`,
-                )
-                const emailSent = await sendEmail(
-                    email as string,
-                    `verify-forgot-pass/${hashedEmail}` as string,
-                    process.env
-                        .BREVO_FORGOT_PASSWORD_TEMPLATE_ID as unknown as number,
+                const userAlreadyInDb =
+                    await userService.grabUserByEmail(hashedEmail)
+                const userAlreadyInCache = await userService.isInCache(
+                    hashedEmail,
+                    'forgot-pass-ask',
                 )
                 if (!zParsedEmail.success) {
                     const { error } = zParsedEmail
                     throw new Error(error.issues[0].message as string)
                 }
-                if (!userAlreadyInDb)
+                if (!userAlreadyInDb || userAlreadyInDb.is_deleted)
                     throw new Error(
                         'There is no record of that email address, please sign up.',
                     )
@@ -90,6 +72,12 @@ export default (
                     throw new Error(
                         'You have already submitted your email, please check your inbox.',
                     )
+                const emailSent = await sendEmail(
+                    email as string,
+                    `verify-forgot-pass/${hashedEmail}` as string,
+                    process.env
+                        .BREVO_FORGOT_PASSWORD_TEMPLATE_ID as unknown as number,
+                )
                 if (!emailSent.wasSuccessfull) {
                     fastify.log.error(
                         'Error occurred while sending email, are your Brevo credentials up to date? :=>',
@@ -99,34 +87,35 @@ export default (
                         'An error occurred while sending email, please contact support.',
                     )
                 }
+                const sessionToken = userService.signToken(
+                    hashedEmail,
+                    process.env.JWT_SESSION_EXP as string,
+                )
+                await userService.setInCacheWithExpiry(
+                    hashedEmail,
+                    'forgot-pass-ask',
+                    60,
+                )
+                reply
+                    .code(200)
+                    .setCookie('appname-forgot-pass-ask-token', sessionToken, {
+                        secure: true,
+                        httpOnly: true,
+                        sameSite: true,
+                    })
+                    .send({
+                        ok: true,
+                        message: `Your forgot password request was successfully sent to ${email}!`,
+                    })
             } catch (err) {
                 if (err instanceof Error) {
-                    fastify.log.error('ERROR :=>', err.message)
-                    // TODO: You recently learned that this won't hit, so don't return here,
-                    // instead simply return reply at the end and conditionally determine if
-                    // it is status 200 or not  (see fastify-pass-check for better example)
-                    return reply.code(500).send({
+                    reply.send({
                         ok: false,
                         message: err.message,
                     })
                 }
             }
-            const sessionToken = jwt.sign(
-                { hashedEmail: hashedEmail },
-                { expiresIn: process.env.JWT_SESSION_EXP },
-            )
-            await redis.set(`${hashedEmail}-forgot-pass-ask`, email, 'EX', 60)
             return reply
-                .code(200)
-                .setCookie('appname-forgot-pass-ask-token', sessionToken, {
-                    secure: true,
-                    httpOnly: true,
-                    sameSite: true,
-                })
-                .send({
-                    ok: true,
-                    message: `Your forgot password request was successfully sent to ${email}!`,
-                })
         },
     })
     done()
