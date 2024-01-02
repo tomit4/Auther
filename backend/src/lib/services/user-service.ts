@@ -85,6 +85,13 @@ class UserService {
         })
     }
 
+    async markUserAsDeleted(hashedEmail: string): Promise<void> {
+        const { knex } = this
+        await knex('users').where('email', hashedEmail).update({
+            is_deleted: true,
+        })
+    }
+
     // TODO: consider replacing other cache checking methods with this
     async isInCache(hashedEmail: string, key: string): Promise<string | null> {
         const { redis } = this
