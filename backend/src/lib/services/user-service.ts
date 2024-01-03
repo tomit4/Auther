@@ -188,10 +188,11 @@ class UserService {
     async setInCacheWithExpiry(
         hashedEmail: string,
         key: string,
+        value: string,
         expiration: number,
     ): Promise<void> {
         const { redis } = this
-        await redis.set(`${hashedEmail}-${key}`, hashedEmail, 'EX', expiration)
+        await redis.set(`${hashedEmail}-${key}`, value, 'EX', expiration)
     }
 
     async checkIfCacheIsExpired(

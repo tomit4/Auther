@@ -112,9 +112,9 @@ class UserService {
         const { redis } = this;
         await redis.del(`${hashedEmail}-${key}`);
     }
-    async setInCacheWithExpiry(hashedEmail, key, expiration) {
+    async setInCacheWithExpiry(hashedEmail, key, value, expiration) {
         const { redis } = this;
-        await redis.set(`${hashedEmail}-${key}`, hashedEmail, 'EX', expiration);
+        await redis.set(`${hashedEmail}-${key}`, value, 'EX', expiration);
     }
     async checkIfCacheIsExpired(hashedEmail, key) {
         const { redis } = this;

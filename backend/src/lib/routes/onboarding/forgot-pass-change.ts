@@ -68,7 +68,7 @@ export default (
             reply: FastifyReply,
             // ): Promise<AuthRes> => {
         ) => {
-            const { redis, knex, bcrypt, jwt } = fastify
+            const { redis, knex, bcrypt, jwt, userService } = fastify
             const { newPassword, hash } = request.body
             const passwordSchema = z.string().regex(passwordSchemaRegex, {
                 message: passwordSchemaErrMsg,
@@ -83,16 +83,16 @@ export default (
                 request.cookies['appname-forgot-pass-ask-token']
             const sessionTokenIsValid = jwt.verify(
                 sessionToken as string,
-            ) as VerifyPayloadType & { hashedEmail: string }
-            const { hashedEmail } = sessionTokenIsValid
-            if (hash !== hashedEmail) {
+            ) as VerifyPayloadType & { email: string }
+            const { email } = sessionTokenIsValid
+            if (hash !== email) {
                 reply.code(400)
                 throw new Error(
                     'Provided Hashes do not match, please try again',
                 )
             }
-            const email = await redis.get(`${hashedEmail}-forgot-pass-ask`)
-            if (!email) {
+            const emailFromCache = await redis.get(`${email}-forgot-pass-ask`)
+            if (!emailFromCache) {
                 reply.code(401)
                 throw new Error(
                     'You took too long to answer the forgot password email, please try again',
@@ -100,7 +100,7 @@ export default (
             }
             const userPasswordByEmail = await knex('users')
                 .select('password')
-                .where('email', hashedEmail)
+                .where('email', email)
                 .andWhere('is_deleted', false)
                 .first()
             const { password } = userPasswordByEmail
@@ -123,12 +123,12 @@ export default (
             }
             const newHashedPassword = await bcrypt.hash(newPassword)
             await knex('users')
-                .where('email', hashedEmail)
+                .where('email', email)
                 .andWhere('is_deleted', false)
                 .update({
                     password: newHashedPassword,
                 })
-            await redis.del(`${hashedEmail}-forgot-pass-ask`)
+            await redis.del(`${email}-forgot-pass-ask`)
             return reply
                 .code(200)
                 .clearCookie('appname-forgot-pass-ask', { path: '/onboarding' })

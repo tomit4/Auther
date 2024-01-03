@@ -11,7 +11,6 @@ const resSuccessful: Ref<string> = ref('')
 const forgotPassAskRoute = import.meta.env.VITE_FORGOT_PASS_ASK_ROUTE as string
 
 const handleSubmit = async (emailInput: string): Promise<void> => {
-    console.log('emailInput :=>', emailInput)
     const data = {
         email: emailInput,
     }

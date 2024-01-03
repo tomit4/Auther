@@ -57,17 +57,18 @@ export default (
                     request.cookies['appname-forgot-pass-ask-token']
                 const sessionTokenIsValid = jwt.verify(
                     sessionToken as string,
-                ) as VerifyPayloadType & { hashedEmail: string }
-                console.log('sessionTokenIsValid :=>', sessionTokenIsValid)
-                const { hashedEmail } = sessionTokenIsValid
-                if (hash !== hashedEmail) {
+                ) as VerifyPayloadType & { email: string }
+                const { email } = sessionTokenIsValid
+                if (hash !== email) {
                     reply.code(400)
                     throw new Error(
                         'Provided Hashes do not match, please try again',
                     )
                 }
-                const email = await redis.get(`${hashedEmail}-forgot-pass-ask`)
-                if (!email) {
+                const emailFromCache = await redis.get(
+                    `${email}-forgot-pass-ask`,
+                )
+                if (!emailFromCache) {
                     reply.code(401)
                     throw new Error(
                         'You took too long to answer the forgot password email, please try again',
@@ -75,7 +76,7 @@ export default (
                 }
                 reply.code(200).send({
                     ok: true,
-                    email: email,
+                    email: emailFromCache,
                     message:
                         'Hashed Email Verified and Validated, now you can change your password',
                 })

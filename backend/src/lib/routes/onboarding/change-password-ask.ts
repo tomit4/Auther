@@ -112,6 +112,7 @@ export default (
                 await userService.setInCacheWithExpiry(
                     hashedEmail,
                     'change-password-ask',
+                    rawEmailFromRedis,
                     60,
                 )
                 reply

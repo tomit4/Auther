@@ -51,7 +51,7 @@ exports.default = (fastify, options, done) => {
                     throw new Error('An error occurred while sending email, please contact support.');
                 }
                 const sessionToken = userService.signToken(hashedEmail, process.env.JWT_SESSION_EXP);
-                await userService.setInCacheWithExpiry(hashedEmail, 'forgot-pass-ask', 60);
+                await userService.setInCacheWithExpiry(hashedEmail, 'forgot-pass-ask', email, 60);
                 reply
                     .code(200)
                     .setCookie('appname-forgot-pass-ask-token', sessionToken, {

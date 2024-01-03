@@ -114,6 +114,7 @@ export default (
                 await userService.setInCacheWithExpiry(
                     hashedEmail,
                     'delete-profile-ask',
+                    rawEmailFromRedis,
                     60,
                 )
                 reply

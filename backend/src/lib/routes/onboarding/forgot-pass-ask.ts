@@ -94,6 +94,7 @@ export default (
                 await userService.setInCacheWithExpiry(
                     hashedEmail,
                     'forgot-pass-ask',
+                    email,
                     60,
                 )
                 reply

@@ -64,7 +64,7 @@ exports.default = (fastify, options, done) => {
                     fastify.log.error('Error occurred while sending email, are your Brevo credentials up to date? :=>', emailSent.error);
                     throw new Error('An error occurred while sending email, please contact support.');
                 }
-                await userService.setInCacheWithExpiry(hashedEmail, 'delete-profile-ask', 60);
+                await userService.setInCacheWithExpiry(hashedEmail, 'delete-profile-ask', rawEmailFromRedis, 60);
                 reply
                     .code(200)
                     .setCookie('appname-hash', hashedEmail, {
