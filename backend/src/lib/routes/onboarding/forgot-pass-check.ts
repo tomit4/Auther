@@ -7,18 +7,18 @@ import type {
     HookHandlerDoneFunction,
 } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
-// import { z } from 'zod'
+import { z } from 'zod'
 
 type BodyReq = {
     hash: string
 }
-/*
-type SignUpRes = {
+
+type ForgotPassCheckRes = {
     ok: boolean
     message?: string
     error?: string
 }
-*/
+
 export default (
     fastify: FastifyInstance,
     options: FastifyPluginOptions,
@@ -27,35 +27,36 @@ export default (
     fastify.withTypeProvider<ZodTypeProvider>().route({
         method: 'POST',
         url: '/forgot-password-check',
-        /*
         schema: {
             body: z.object({
-                email: z.string(),
-                password: z.string(),
+                hash: z.string(),
             }),
             response: {
                 200: z.object({
                     ok: z.boolean(),
+                    email: z.string(),
                     message: z.string(),
                 }),
-                500: z.object({
+                400: z.object({
+                    ok: z.boolean(),
+                    message: z.string(),
+                }),
+                401: z.object({
                     ok: z.boolean(),
                     message: z.string(),
                 }),
             },
         },
-        */
         handler: async (
             request: FastifyRequest<{ Body: BodyReq }>,
             reply: FastifyReply,
-            // ): Promise<SignUpRes> => {
-        ) => {
+        ): Promise<ForgotPassCheckRes> => {
+            const { hash } = request.body
+            const { userService } = fastify
+            const sessionToken =
+                request.cookies['appname-forgot-pass-ask-token']
             try {
-                const { hash } = request.body
-                const { redis, jwt } = fastify
-                const sessionToken =
-                    request.cookies['appname-forgot-pass-ask-token']
-                const sessionTokenIsValid = jwt.verify(
+                const sessionTokenIsValid = userService.verifyToken(
                     sessionToken as string,
                 ) as VerifyPayloadType & { email: string }
                 const { email } = sessionTokenIsValid
@@ -65,8 +66,9 @@ export default (
                         'Provided Hashes do not match, please try again',
                     )
                 }
-                const emailFromCache = await redis.get(
-                    `${email}-forgot-pass-ask`,
+                const emailFromCache = await userService.grabFromCache(
+                    email,
+                    'forgot-pass-ask',
                 )
                 if (!emailFromCache) {
                     reply.code(401)

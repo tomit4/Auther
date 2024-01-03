@@ -55,6 +55,14 @@ class UserService {
         const { knex } = this
         return await knex('users').where('email', hashedEmail).first()
     }
+    // NOTE: Obviously this is repetitve and a poor implementation, refactor later...
+    async grabUserByEmailAndIsNotDeleted(hashedEmail: string) {
+        const { knex } = this
+        return await knex('users')
+            .where('email', hashedEmail)
+            .andWhere('is_deleted', false)
+            .first()
+    }
 
     async insertUserIntoDb(
         hashedEmail: string,
@@ -129,6 +137,14 @@ class UserService {
             `${hashedEmail}-password`,
         )
         return credentials
+    }
+
+    async grabFromCache(
+        hashedEmail: string,
+        key: string,
+    ): Promise<string | null> {
+        const { redis } = this
+        return await redis.get(`${hashedEmail}-${key}`)
     }
 
     async grabRefreshTokenFromCache(

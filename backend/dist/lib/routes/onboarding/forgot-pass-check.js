@@ -1,46 +1,42 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-/*
-type SignUpRes = {
-    ok: boolean
-    message?: string
-    error?: string
-}
-*/
+const zod_1 = require("zod");
 exports.default = (fastify, options, done) => {
     fastify.withTypeProvider().route({
         method: 'POST',
         url: '/forgot-password-check',
-        /*
         schema: {
-            body: z.object({
-                email: z.string(),
-                password: z.string(),
+            body: zod_1.z.object({
+                hash: zod_1.z.string(),
             }),
             response: {
-                200: z.object({
-                    ok: z.boolean(),
-                    message: z.string(),
+                200: zod_1.z.object({
+                    ok: zod_1.z.boolean(),
+                    email: zod_1.z.string(),
+                    message: zod_1.z.string(),
                 }),
-                500: z.object({
-                    ok: z.boolean(),
-                    message: z.string(),
+                400: zod_1.z.object({
+                    ok: zod_1.z.boolean(),
+                    message: zod_1.z.string(),
+                }),
+                401: zod_1.z.object({
+                    ok: zod_1.z.boolean(),
+                    message: zod_1.z.string(),
                 }),
             },
         },
-        */
         handler: async (request, reply) => {
+            const { hash } = request.body;
+            const { userService } = fastify;
+            const sessionToken = request.cookies['appname-forgot-pass-ask-token'];
             try {
-                const { hash } = request.body;
-                const { redis, jwt } = fastify;
-                const sessionToken = request.cookies['appname-forgot-pass-ask-token'];
-                const sessionTokenIsValid = jwt.verify(sessionToken);
+                const sessionTokenIsValid = userService.verifyToken(sessionToken);
                 const { email } = sessionTokenIsValid;
                 if (hash !== email) {
                     reply.code(400);
                     throw new Error('Provided Hashes do not match, please try again');
                 }
-                const emailFromCache = await redis.get(`${email}-forgot-pass-ask`);
+                const emailFromCache = await userService.grabFromCache(email, 'forgot-pass-ask');
                 if (!emailFromCache) {
                     reply.code(401);
                     throw new Error('You took too long to answer the forgot password email, please try again');
