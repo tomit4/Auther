@@ -143,15 +143,52 @@ to document this simple project as it might prove useful to myself (and possibly
 others) in the future when starting out on a basic project that utilizes
 these tools.
 
+### UPDATE AS OF 01/03/2024
+
+Since setting up this repository as a simple demonstration of how to set up
+vite/nginx/vue-router within docker, I have since used it to scaffold a project
+that demonstrates the very basics of Login/Authentication. As of the writing of
+this section, this now includes Sign Up, Login, Logout, Change Password, Delete
+Profile, and Forgot Password features. It's a little rough around the edges, but
+it is a good starting point for a beginner like myself.
+
+The backend is more or less done (although a second refactor would be helpful as
+there is still some repeated code and poor naming conventions,
+especially in the forgot password routes).
+
+The frontend needs to incorporate zod verification to further protect the
+backend routes.
+
+Additionally, AppView still has a TODO that specifies making a
+section of its View its own component.
+
+This entire project requires its directory structure to be further organized,
+as it only encapsulates the Authentication part of the application, and will
+get messy should an actual application be utilized behind the Login Page (which
+is the plan).
+
+Once these refactors are done, we'll need to write unit tests on the backend
+using Ava, and some sort of E2E testing utilizing Vitest (and possibly other
+libraries I am as of this writing only vaguely familiar with).
+
+After that, setting up a series of Virtualized Docker Environments within a
+Docker Network will be necessary to set this up as a POC on Linode (utilize one
+of your free Domains, set it up with HTTPS/SSL/LetsEncrypt/Certbot/NGINX).
+
+Finally, once this POC of just basic login is done, utilize it in one of your
+main portfolio pieces. Ensure that all accounts are wiped clean on a cronjob as
+the likelihood of this being an insecure form of authentication is high and is
+only for learning purporses (make this clear to the user in an About section).
+
 **TODOS**
 
 - [x] Convert project over to typescript as practice
 - [x] Investigate caching (i.e.redis)
-- [ ] Set up knex/postgresql following [this tutorial](https://www.basedash.com/blog/how-to-configure-knex-js-with-typescript)
-- [ ] Incorporate postgresql with knex query builder for very basic db integration,
+- [x] Set up knex/postgresql following [this tutorial](https://www.basedash.com/blog/how-to-configure-knex-js-with-typescript)
+- [x] Incorporate postgresql with knex query builder for very basic db integration,
       allow for secure storage of hashed email addresses and associated usernames,
       dates of sign up, etc.
-- [ ] Expand example to include jsonwebtoken/login demonstration
+- [x] Expand example to include jsonwebtoken/login demonstration
 - [ ] Dockerize the backend fastify/redis/knex/postgresql as one docker
       container (not going to be easy)
 
