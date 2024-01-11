@@ -48,7 +48,7 @@ exports.default = (fastify, options, done) => {
                 const hashedEmail = refreshTokenIsValid.email;
                 const rawEmailFromRedis = await userService.grabUserEmailInCache(hashedEmail);
                 const userPasswordByEmail = await userService.grabUserByEmail(hashedEmail);
-                const { password } = userPasswordByEmail;
+                const { password } = userPasswordByEmail !== null && userPasswordByEmail !== void 0 ? userPasswordByEmail : {};
                 const passwordHashesMatch = await userService.comparePasswordToHash(loginPassword, password);
                 if (!hashedEmail || !rawEmailFromRedis || !passwordHashesMatch)
                     reply.code(401);

@@ -23,6 +23,14 @@ type ForgotPassChangeRes = {
     message?: string
 }
 
+type User = {
+    id: number
+    email: string
+    password: string
+    is_deleted: boolean
+    created_at: Date
+}
+
 export default (
     fastify: FastifyInstance,
     options: FastifyPluginOptions,
@@ -94,13 +102,13 @@ export default (
                         'You took too long to answer the forgot password email, please try again',
                     )
                 }
-                const userPasswordByEmail =
+                const userPasswordByEmail: User | null =
                     await userService.grabUserByEmail(email)
-                const { password } = userPasswordByEmail
+                const { password } = userPasswordByEmail ?? {}
                 const passwordHashesMatch =
                     await userService.comparePasswordToHash(
                         newPassword,
-                        password,
+                        password as string,
                     )
                 // TODO: set up separate db table that keeps track of last 5 passwords
                 // for user and throws this 409 reply if new password is in table

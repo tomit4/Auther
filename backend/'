@@ -75,7 +75,7 @@ class UserService {
             })
     }
 
-    async grabUserByEmail(hashedEmail: string): Promise<User | null> {
+    async grabUserByEmail(hashedEmail: string): Promise<User> {
         const { knex } = this
         const alreadyDeletedUser = await knex('users')
             .where('email', hashedEmail)

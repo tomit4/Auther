@@ -22,6 +22,14 @@ type ChangePassRes = {
     message?: string
 }
 
+type User = {
+    id: number
+    email: string
+    password: string
+    is_deleted: boolean
+    created_at: Date
+}
+
 export default (
     fastify: FastifyInstance,
     options: FastifyPluginOptions,
@@ -84,13 +92,13 @@ export default (
                         'Sorry, but you took too long to answer your email, please log in and try again.',
                     )
                 }
-                const userPasswordByEmail =
+                const userPasswordByEmail: User | null =
                     await userService.grabUserByEmail(hashedEmail)
-                const { password } = userPasswordByEmail
+                const { password } = userPasswordByEmail ?? {}
                 const passwordHashesMatch =
                     await userService.comparePasswordToHash(
                         newPassword,
-                        password,
+                        password as string,
                     )
                 /* TODO (v2): set up separate db table that keeps track of last 5 passwords
                  * for user and throws this 409 reply if new password is in table

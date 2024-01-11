@@ -57,7 +57,7 @@ exports.default = (fastify, options, done) => {
                     throw new Error('You took too long to answer the forgot password email, please try again');
                 }
                 const userPasswordByEmail = await userService.grabUserByEmail(email);
-                const { password } = userPasswordByEmail;
+                const { password } = userPasswordByEmail !== null && userPasswordByEmail !== void 0 ? userPasswordByEmail : {};
                 const passwordHashesMatch = await userService.comparePasswordToHash(newPassword, password);
                 // TODO: set up separate db table that keeps track of last 5 passwords
                 // for user and throws this 409 reply if new password is in table

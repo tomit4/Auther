@@ -23,6 +23,14 @@ type ChangePassAskRes = {
     message?: string
 }
 
+type User = {
+    id: number
+    email: string
+    password: string
+    is_deleted: boolean
+    created_at: Date
+}
+
 export default (
     fastify: FastifyInstance,
     options: FastifyPluginOptions,
@@ -82,13 +90,13 @@ export default (
                         'No refresh token found, redirecting to home.',
                     )
                 }
-                const userByEmail =
+                const userByEmail: User | null =
                     await userService.grabUserByEmail(hashedEmail)
-                const { password } = userByEmail
+                const { password } = userByEmail ?? {}
                 const passwordHashesMatch =
                     await userService.comparePasswordToHash(
                         loginPassword,
-                        password,
+                        password as string,
                     )
                 if (!passwordHashesMatch) {
                     reply.code(401)

@@ -1,5 +1,9 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const fastify_plugin_1 = __importDefault(require("fastify-plugin"));
 class UserService {
     constructor(fastify) {
         this.knex = fastify.knex;
@@ -133,4 +137,20 @@ class UserService {
         }
     }
 }
-exports.default = UserService;
+const userServicePlugin = (fastify, options, next) => {
+    try {
+        if (!fastify.userService) {
+            const newUserService = new UserService(fastify);
+            fastify.decorate('userService', newUserService);
+        }
+        next();
+    }
+    catch (err) {
+        if (err instanceof Error)
+            next(err);
+    }
+};
+const userService = (0, fastify_plugin_1.default)(userServicePlugin, {
+    name: 'fastify-user-service-plugin',
+});
+exports.default = userService;

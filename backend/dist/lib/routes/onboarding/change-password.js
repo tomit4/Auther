@@ -48,7 +48,7 @@ exports.default = (fastify, options, done) => {
                     throw new Error('Sorry, but you took too long to answer your email, please log in and try again.');
                 }
                 const userPasswordByEmail = await userService.grabUserByEmail(hashedEmail);
-                const { password } = userPasswordByEmail;
+                const { password } = userPasswordByEmail !== null && userPasswordByEmail !== void 0 ? userPasswordByEmail : {};
                 const passwordHashesMatch = await userService.comparePasswordToHash(newPassword, password);
                 /* TODO (v2): set up separate db table that keeps track of last 5 passwords
                  * for user and throws this 409 reply if new password is in table

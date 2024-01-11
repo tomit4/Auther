@@ -52,7 +52,7 @@ exports.default = (fastify, options, done) => {
                     throw new Error('No refresh token found, redirecting to home.');
                 }
                 const userByEmail = await userService.grabUserByEmail(hashedEmail);
-                const { password } = userByEmail;
+                const { password } = userByEmail !== null && userByEmail !== void 0 ? userByEmail : {};
                 const passwordHashesMatch = await userService.comparePasswordToHash(loginPassword, password);
                 if (!passwordHashesMatch) {
                     reply.code(401);

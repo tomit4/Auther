@@ -23,6 +23,14 @@ type DeleteProfileAskRes = {
     message?: string
 }
 
+type User = {
+    id: number
+    email: string
+    password: string
+    is_deleted: boolean
+    created_at: Date
+}
+
 export default (
     fastify: FastifyInstance,
     options: FastifyPluginOptions,
@@ -76,13 +84,13 @@ export default (
                 const hashedEmail = refreshTokenIsValid.email as string
                 const rawEmailFromRedis =
                     await userService.grabUserEmailInCache(hashedEmail)
-                const userPasswordByEmail =
+                const userPasswordByEmail: User | null =
                     await userService.grabUserByEmail(hashedEmail)
-                const { password } = userPasswordByEmail
+                const { password } = userPasswordByEmail ?? {}
                 const passwordHashesMatch =
                     await userService.comparePasswordToHash(
                         loginPassword,
-                        password,
+                        password as string,
                     )
                 if (!hashedEmail || !rawEmailFromRedis || !passwordHashesMatch)
                     reply.code(401)
