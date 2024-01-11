@@ -57,7 +57,6 @@ onBeforeRouteLeave(() => {
 </script>
 
 <template>
-    <!-- TODO: Implement 'Forgot My Password' -->
     <div>
         <h1>Login</h1>
         <br />
@@ -94,11 +93,6 @@ onBeforeRouteLeave(() => {
                 "
                 required
             />
-            <!-- TODO: Integrate zod here to validate if is email and if password passes 
-                specific params (i.e. length, special characters, numbers, 
-                capitalized letters, etc.) (see backend for reference) -->
-            <!-- TODO: Setup a vue watcher to tell if email/password are valid 
-                and notify user if they are/aren't -->
             <button
                 @click="
                     handleSubmit(emailInput as string, passwordInput as string)

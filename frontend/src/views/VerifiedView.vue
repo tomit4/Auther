@@ -28,18 +28,15 @@ onMounted(async () => {
                 error: jsonRes.error ? jsonRes.error : 'Unknown error occurred',
             }
             errMessage.value = errMsg.error
-            // TODO: set up watcher to display count down before redirect
             await delay(1000)
             router.push('/')
         } else {
             resSuccessful.value = jsonRes.msg
             localStorage.setItem('appname-session-token', jsonRes.sessionToken)
-            // TODO: set up watcher to display count down before redirect
             await delay(1000)
             router.push('/app')
         }
     } else {
-        // TODO: set refs to display error message before redirect
         errMessage.value =
             'Invalid hash provided, please try and sign up again.'
         await delay(1000)

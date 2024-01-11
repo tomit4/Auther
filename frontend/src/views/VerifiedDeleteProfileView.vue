@@ -64,8 +64,6 @@ onMounted(async () => {
 </script>
 
 <template>
-    <!-- TODO: Figure out why this template doesn't render, 
-        it just redirects, probably due to router guards... see just above -->
     <div>
         <h1>App</h1>
         <p>
