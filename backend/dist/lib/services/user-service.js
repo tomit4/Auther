@@ -65,6 +65,7 @@ class UserService {
         });
     }
     // TODO: consider replacing other cache checking methods with this
+    // NOTE: same is grabFromCache, don't be so repetitive
     async isInCache(hashedEmail, key) {
         const { redis } = this;
         return await redis.get(`${hashedEmail}-${key}`);
@@ -79,6 +80,7 @@ class UserService {
         return ((await redis.get(`${hashedEmail}-email`)) ||
             (await redis.get(`${hashedEmail}-password`)));
     }
+    // NOTE: very similar to checkIfCacheIsExpired, see if you can consolidate
     async isUserInCacheExpired(hashedEmail) {
         const { redis } = this;
         return ((await redis.ttl(`${hashedEmail}-email`)) < 0 ||
@@ -95,6 +97,7 @@ class UserService {
         const { redis } = this;
         return await redis.get(`${hashedEmail}-${key}`);
     }
+    // NOTE: Can be replaced with grabFromCache
     async grabRefreshTokenFromCache(hashedEmail) {
         const { redis } = this;
         return await redis.get(`${hashedEmail}-refresh-token`);
