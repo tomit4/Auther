@@ -189,8 +189,13 @@ only for learning purporses (make this clear to the user in an About section).
       allow for secure storage of hashed email addresses and associated usernames,
       dates of sign up, etc.
 - [x] Expand example to include jsonwebtoken/login demonstration
-- [ ] Dockerize the backend fastify/redis/knex/postgresql as one docker
-      container (not going to be easy)
+- [x] Heavily refactor both back end and front end so there isn't so much
+      repeated logic
+- [ ] Integrate Ava Unit Testing with nyc output on backend
+- [ ] Learn/utilize playwright for E2E Testing
+- [ ] Address any remaining TODO notes within the code base
+- [ ] Dockerize each service separately and investigate docker networking so
+      that each container can "talk" to each other via externalized ports
 
 **SIGNUP LOGIC**
 
