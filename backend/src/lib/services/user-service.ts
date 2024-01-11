@@ -8,6 +8,14 @@ type FastifyBcryptPluginType = {
     compare: (data: string, hash: string) => Promise<boolean>
 }
 
+type User = {
+    id: number
+    email: string
+    password: string
+    is_deleted: boolean
+    created_at: Date
+}
+
 type UserCredentials = {
     emailFromRedis?: string | null
     hashedPasswordFromRedis?: string | null
@@ -56,9 +64,9 @@ class UserService {
             })
     }
 
-    async grabUserByEmail(hashedEmail: string) {
+    async grabUserByEmail(hashedEmail: string): Promise<User | null> {
         const { knex } = this
-        const alreadDeletedUser = await knex('users')
+        const alreadyDeletedUser = await knex('users')
             .where('email', hashedEmail)
             .andWhere('is_deleted', true)
             .first()
@@ -66,7 +74,7 @@ class UserService {
             .where('email', hashedEmail)
             .andWhere('is_deleted', false)
             .first()
-        return alreadDeletedUser || existingUser
+        return alreadyDeletedUser ?? existingUser
     }
 
     async insertUserIntoDb(

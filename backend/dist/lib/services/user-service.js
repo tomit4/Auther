@@ -30,7 +30,7 @@ class UserService {
     }
     async grabUserByEmail(hashedEmail) {
         const { knex } = this;
-        const alreadDeletedUser = await knex('users')
+        const alreadyDeletedUser = await knex('users')
             .where('email', hashedEmail)
             .andWhere('is_deleted', true)
             .first();
@@ -38,7 +38,7 @@ class UserService {
             .where('email', hashedEmail)
             .andWhere('is_deleted', false)
             .first();
-        return alreadDeletedUser || existingUser;
+        return alreadyDeletedUser !== null && alreadyDeletedUser !== void 0 ? alreadyDeletedUser : existingUser;
     }
     async insertUserIntoDb(hashedEmail, hashedPasswordFromRedis) {
         const { knex } = this;
