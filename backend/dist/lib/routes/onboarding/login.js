@@ -57,14 +57,15 @@ exports.default = (fastify, options, done) => {
                     throw new Error(error.issues[0].message);
                 }
                 const userByEmail = await userService.grabUserByEmail(hashedEmail);
-                if (!userByEmail) {
+                const { password } = userByEmail !== null && userByEmail !== void 0 ? userByEmail : {};
+                const passwordHashesMatch = password !== undefined &&
+                    (await userService.comparePasswordToHash(loginPassword, password));
+                if (!userByEmail || !passwordHashesMatch)
                     reply.code(401);
+                if (!userByEmail) {
                     throw new Error('No record of that email found. Please try again.');
                 }
-                const { password } = userByEmail;
-                const passwordHashesMatch = await userService.comparePasswordToHash(loginPassword, password);
                 if (!passwordHashesMatch) {
-                    reply.code(401);
                     throw new Error('Incorrect password. Please try again.');
                 }
                 const sessionToken = userService.signToken(hashedEmail, process.env.JWT_SESSION_EXP);

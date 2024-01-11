@@ -106,10 +106,11 @@ export default (
                     await userService.grabUserByEmail(email)
                 const { password } = userPasswordByEmail ?? {}
                 const passwordHashesMatch =
-                    await userService.comparePasswordToHash(
+                    password !== undefined &&
+                    (await userService.comparePasswordToHash(
                         newPassword,
-                        password as string,
-                    )
+                        password,
+                    ))
                 // TODO: set up separate db table that keeps track of last 5 passwords
                 // for user and throws this 409 reply if new password is in table
                 // (i.e. newPassword cannot be the same as last 5 passwords)

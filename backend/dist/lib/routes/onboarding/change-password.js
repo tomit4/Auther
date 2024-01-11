@@ -49,7 +49,8 @@ exports.default = (fastify, options, done) => {
                 }
                 const userPasswordByEmail = await userService.grabUserByEmail(hashedEmail);
                 const { password } = userPasswordByEmail !== null && userPasswordByEmail !== void 0 ? userPasswordByEmail : {};
-                const passwordHashesMatch = await userService.comparePasswordToHash(newPassword, password);
+                const passwordHashesMatch = password !== undefined &&
+                    (await userService.comparePasswordToHash(newPassword, password));
                 /* TODO (v2): set up separate db table that keeps track of last 5 passwords
                  * for user and throws this 409 reply if new password is in table
                  * (i.e. newPassword cannot be the same as last 5 passwords) */

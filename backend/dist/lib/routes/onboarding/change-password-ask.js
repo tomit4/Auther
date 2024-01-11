@@ -53,7 +53,8 @@ exports.default = (fastify, options, done) => {
                 }
                 const userByEmail = await userService.grabUserByEmail(hashedEmail);
                 const { password } = userByEmail !== null && userByEmail !== void 0 ? userByEmail : {};
-                const passwordHashesMatch = await userService.comparePasswordToHash(loginPassword, password);
+                const passwordHashesMatch = password !== undefined &&
+                    (await userService.comparePasswordToHash(loginPassword, password));
                 if (!passwordHashesMatch) {
                     reply.code(401);
                     throw new Error('Incorrect password. Please try again.');

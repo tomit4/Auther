@@ -25,6 +25,14 @@ type AuthRes = {
     sessionToken?: string
 }
 
+type User = {
+    id: number
+    email: string
+    password: string
+    is_deleted: boolean
+    created_at: Date
+}
+
 export default (
     fastify: FastifyInstance,
     options: FastifyPluginOptions,
@@ -82,22 +90,22 @@ export default (
                     const { error } = zParsedPassword
                     throw new Error(error.issues[0].message as string)
                 }
-                const userByEmail =
+                const userByEmail: User | null =
                     await userService.grabUserByEmail(hashedEmail)
+                const { password } = userByEmail ?? {}
+                const passwordHashesMatch =
+                    password !== undefined &&
+                    (await userService.comparePasswordToHash(
+                        loginPassword,
+                        password,
+                    ))
+                if (!userByEmail || !passwordHashesMatch) reply.code(401)
                 if (!userByEmail) {
-                    reply.code(401)
                     throw new Error(
                         'No record of that email found. Please try again.',
                     )
                 }
-                const { password } = userByEmail
-                const passwordHashesMatch =
-                    await userService.comparePasswordToHash(
-                        loginPassword,
-                        password,
-                    )
                 if (!passwordHashesMatch) {
-                    reply.code(401)
                     throw new Error('Incorrect password. Please try again.')
                 }
                 const sessionToken = userService.signToken(

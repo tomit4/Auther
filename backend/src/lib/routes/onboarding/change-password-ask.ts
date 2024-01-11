@@ -94,10 +94,11 @@ export default (
                     await userService.grabUserByEmail(hashedEmail)
                 const { password } = userByEmail ?? {}
                 const passwordHashesMatch =
-                    await userService.comparePasswordToHash(
+                    password !== undefined &&
+                    (await userService.comparePasswordToHash(
                         loginPassword,
-                        password as string,
-                    )
+                        password,
+                    ))
                 if (!passwordHashesMatch) {
                     reply.code(401)
                     throw new Error('Incorrect password. Please try again.')

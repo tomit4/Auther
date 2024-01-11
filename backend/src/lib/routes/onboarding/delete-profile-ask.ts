@@ -88,10 +88,11 @@ export default (
                     await userService.grabUserByEmail(hashedEmail)
                 const { password } = userPasswordByEmail ?? {}
                 const passwordHashesMatch =
-                    await userService.comparePasswordToHash(
+                    password !== undefined &&
+                    (await userService.comparePasswordToHash(
                         loginPassword,
-                        password as string,
-                    )
+                        password,
+                    ))
                 if (!hashedEmail || !rawEmailFromRedis || !passwordHashesMatch)
                     reply.code(401)
                 if (!hashedEmail)
