@@ -8,6 +8,11 @@ type FastifyBcryptPluginType = {
     compare: (data: string, hash: string) => Promise<boolean>
 }
 
+type UserCredentials = {
+    emailFromRedis?: string | null
+    hashedPasswordFromRedis?: string | null
+}
+
 class UserService {
     knex: Knex
     redis: FastifyRedis
@@ -125,13 +130,11 @@ class UserService {
         )
     }
 
-    // TODO: write return type
-    async grabUserCredentialsFromCache(hashedEmail: string) {
+    async grabUserCredentialsFromCache(
+        hashedEmail: string,
+    ): Promise<UserCredentials> {
         const { redis } = this
-        const credentials: {
-            emailFromRedis?: string | null
-            hashedPasswordFromRedis?: string | null
-        } = {}
+        const credentials: UserCredentials = {}
         credentials.emailFromRedis = await redis.get(`${hashedEmail}-email`)
         credentials.hashedPasswordFromRedis = await redis.get(
             `${hashedEmail}-password`,

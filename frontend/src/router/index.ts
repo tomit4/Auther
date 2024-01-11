@@ -1,8 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-const authRoute = import.meta.env.VITE_AUTH_ROUTE
-const refreshRoute = import.meta.env.VITE_REFRESH_ROUTE
-const logoutRoute = import.meta.env.VITE_LOGOUT_ROUTE
-const invalidTokenCode = import.meta.env.VITE_INVALID_TOKEN_CODE
+import { authorizeSession, attemptRefresh, logout } from '../utils/auth-utils'
 
 import AppView from '../views/AppView.vue'
 import LoginView from '../views/LoginView.vue'
@@ -83,35 +80,6 @@ const router = createRouter({
     routes,
 })
 
-const authorizeSession = async (sessionToken: string): Promise<Response> => {
-    return await fetch(authRoute, {
-        method: 'GET',
-        headers: { Authorization: `Bearer ${sessionToken}` },
-    })
-}
-
-const attemptRefresh = async (): Promise<
-    Response & { statusCode?: number; sessionToken?: string; code?: number }
-> => {
-    const refreshCheck = await fetch(refreshRoute, {
-        method: 'GET',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-    })
-    return refreshCheck.json()
-}
-
-const logout = async (): Promise<void> => {
-    const logOutRes = (await fetch(logoutRoute, {
-        method: 'GET',
-        credentials: 'include',
-    })) as Response & { code?: number }
-    if (!logOutRes.ok && logOutRes.code !== invalidTokenCode)
-        console.error('ERROR while logging out :=>', logOutRes)
-    localStorage.removeItem('appname-session-token')
-}
-
-// TODO: Heavy refactor into smaller helper functions
 router.beforeEach(async (to, from): Promise<string | undefined> => {
     const sessionToken = localStorage.getItem('appname-session-token')
     if (to.meta.requiresAuth && sessionToken) {

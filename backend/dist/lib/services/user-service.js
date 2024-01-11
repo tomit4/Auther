@@ -84,7 +84,6 @@ class UserService {
         return ((await redis.ttl(`${hashedEmail}-email`)) < 0 ||
             (await redis.ttl(`${hashedEmail}-password`)) < 0);
     }
-    // TODO: write return type
     async grabUserCredentialsFromCache(hashedEmail) {
         const { redis } = this;
         const credentials = {};
