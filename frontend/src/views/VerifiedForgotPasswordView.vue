@@ -2,9 +2,10 @@
 import { ref, type Ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { delay } from '../utils/utils.ts'
+import { validatePasswordInput } from '../utils/schema-validators'
+
 const route = useRoute()
 const router = useRouter()
-
 const forgotPasswordCheckRoute = import.meta.env.VITE_FORGOT_PASS_CHECK_ROUTE
 const forgotPasswordChangeRoute = import.meta.env.VITE_FORGOT_PASS_CHANGE_ROUTE
 
@@ -15,6 +16,9 @@ const resSuccessful: Ref<string> = ref('')
 
 const handleSubmit = async (passwordInput: string): Promise<void> => {
     try {
+        errMessage.value = ''
+        resSuccessful.value = ''
+        validatePasswordInput(passwordInput)
         const data = {
             newPassword: passwordInput,
             hash: route.params.hash,
@@ -28,13 +32,17 @@ const handleSubmit = async (passwordInput: string): Promise<void> => {
         const jsonRes = await res.json()
         if (!res.ok) {
             errMessage.value = jsonRes.message
+                ? jsonRes.message
+                : 'Unknown error occurred'
+            throw Error(jsonRes.message)
         } else {
             resSuccessful.value = jsonRes.message
             await delay(1000)
             router.push('/login')
         }
     } catch (err) {
-        console.error('ERROR :=>', err)
+        if (err instanceof Error) errMessage.value = err.message
+        console.error(err)
     }
 }
 
@@ -89,11 +97,6 @@ onMounted(async () => {
                 v-focus
                 required
             />
-            <!-- TODO: Integrate zod here to validate if is email and if password passes 
-                specific params (i.e. length, special characters, numbers, 
-                capitalized letters, etc.) (see backend for reference) -->
-            <!-- TODO: Setup a vue watcher to tell if email/password are valid 
-                and notify user if they are/aren't -->
             <button
                 @click="handleSubmit(passwordInput as string)"
                 type="submit"

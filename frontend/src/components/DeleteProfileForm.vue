@@ -2,38 +2,50 @@
 import { ref, type Ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { delay } from '../utils/utils.ts'
+import { validatePasswordInput } from '../utils/schema-validators'
+
 const router = useRouter()
-
-const deleteProfileAskRoute = import.meta.env
-    .VITE_DELETE_PROFILE_ASK_ROUTE as string
-
 const passwordInput: Ref<string> = ref('')
 const errMessage: Ref<string> = ref('')
 const resSuccessful: Ref<string> = ref('')
+
+const deleteProfileAskRoute = import.meta.env
+    .VITE_DELETE_PROFILE_ASK_ROUTE as string
 
 defineProps({
     emailFromCache: String,
 })
 
 const handleSubmit = async (passwordInput: string): Promise<void> => {
-    const data = {
-        loginPassword: passwordInput,
+    try {
+        errMessage.value = ''
+        resSuccessful.value = ''
+        validatePasswordInput(passwordInput)
+        const data = {
+            loginPassword: passwordInput,
+        }
+        const res = await fetch(deleteProfileAskRoute, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(data),
+        })
+        const jsonRes = await res.json()
+        if (!res.ok) {
+            errMessage.value = jsonRes.message
+                ? jsonRes.message
+                : 'Unknown error occurred'
+            localStorage.removeItem('appname-session-token')
+            throw Error(jsonRes.message)
+        } else {
+            resSuccessful.value = jsonRes.message
+        }
+        await delay(1000)
+        router.push('/app')
+    } catch (err) {
+        if (err instanceof Error) errMessage.value = err.message
+        console.error(err)
     }
-    const res = await fetch(deleteProfileAskRoute, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(data),
-    })
-    const jsonRes = await res.json()
-    if (!res.ok) {
-        errMessage.value = jsonRes.message
-        localStorage.removeItem('appname-session-token')
-    } else {
-        resSuccessful.value = jsonRes.message
-    }
-    await delay(1000)
-    router.push('/app')
 }
 </script>
 
@@ -56,11 +68,6 @@ const handleSubmit = async (passwordInput: string): Promise<void> => {
                 @keyup.enter="handleSubmit(passwordInput as string)"
                 required
             />
-            <!-- TODO: Integrate zod here to validate if is email and if password passes 
-                specific params (i.e. length, special characters, numbers, 
-                capitalized letters, etc.) (see backend for reference) -->
-            <!-- TODO: Setup a vue watcher to tell if email/password are valid 
-                and notify user if they are/aren't -->
             <button
                 @click="handleSubmit(passwordInput as string)"
                 type="submit"

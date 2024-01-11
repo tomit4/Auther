@@ -2,8 +2,9 @@
 import { ref, type Ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { delay } from '../utils/utils.ts'
-const router = useRouter()
+import { validateEmailInput } from '../utils/schema-validators'
 
+const router = useRouter()
 const emailInput: Ref<string> = ref('')
 const errMessage: Ref<string> = ref('')
 const resSuccessful: Ref<string> = ref('')
@@ -11,26 +12,33 @@ const resSuccessful: Ref<string> = ref('')
 const forgotPassAskRoute = import.meta.env.VITE_FORGOT_PASS_ASK_ROUTE as string
 
 const handleSubmit = async (emailInput: string): Promise<void> => {
-    const data = {
-        email: emailInput,
-    }
-    const res = await fetch(forgotPassAskRoute, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(data),
-    })
-    const jsonRes = await res.json()
-    if (!res.ok) {
-        errMessage.value = jsonRes.message
-            ? jsonRes.message
-            : 'Unknown error occurred'
-        throw Error(`An error occurred: ${JSON.stringify(jsonRes)}`)
-    } else {
-        resSuccessful.value = jsonRes.message
-        // TODO: set up watcher to display count down before redirect
-        await delay(1000)
-        router.push('/login')
+    try {
+        errMessage.value = ''
+        resSuccessful.value = ''
+        validateEmailInput(emailInput)
+        const data = {
+            email: emailInput,
+        }
+        const res = await fetch(forgotPassAskRoute, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(data),
+        })
+        const jsonRes = await res.json()
+        if (!res.ok) {
+            errMessage.value = jsonRes.message
+                ? jsonRes.message
+                : 'Unknown error occurred'
+            throw Error(jsonRes.message)
+        } else {
+            resSuccessful.value = jsonRes.message
+            await delay(1000)
+            router.push('/login')
+        }
+    } catch (err) {
+        if (err instanceof Error) errMessage.value = err.message
+        console.error(err)
     }
 }
 </script>
@@ -55,11 +63,6 @@ const handleSubmit = async (emailInput: string): Promise<void> => {
                 v-focus
                 required
             />
-            <!-- TODO: Integrate zod here to validate if is email and if password passes 
-                specific params (i.e. length, special characters, numbers, 
-                capitalized letters, etc.) (see backend for reference) -->
-            <!-- TODO: Setup a vue watcher to tell if email/password are valid 
-                and notify user if they are/aren't -->
             <button
                 @click="handleSubmit(emailInput as string)"
                 type="submit"

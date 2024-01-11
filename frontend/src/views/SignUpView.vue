@@ -2,7 +2,7 @@
 import { ref, type Ref } from 'vue'
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { delay } from '../utils/utils.ts'
-import { validateInputSchemas } from '../utils/schema-validators'
+import { validateInputs } from '../utils/schema-validators'
 
 const router = useRouter()
 const emailInput: Ref<string> = ref('')
@@ -19,7 +19,7 @@ const handleSubmit = async (
     try {
         errMessage.value = ''
         resSuccessful.value = ''
-        validateInputSchemas(emailInput, passwordInput)
+        validateInputs(emailInput, passwordInput)
         const data = {
             email: emailInput,
             password: passwordInput,

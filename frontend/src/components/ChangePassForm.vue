@@ -1,32 +1,49 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { delay } from '../utils/utils.ts'
+import { validatePasswordInput } from '../utils/schema-validators'
 
-const changePasswordAskRoute = import.meta.env
-    .VITE_CHANGE_PASSWORD_ASK_ROUTE as string
-
+const router = useRouter()
 const passwordInput: Ref<string> = ref('')
 const errMessage: Ref<string> = ref('')
 const resSuccessful: Ref<string> = ref('')
+
+const changePasswordAskRoute = import.meta.env
+    .VITE_CHANGE_PASSWORD_ASK_ROUTE as string
 
 defineProps({
     emailFromCache: String,
 })
 
 const handleSubmit = async (passwordInput: string): Promise<void> => {
-    const data = {
-        loginPassword: passwordInput,
-    }
-    const res = await fetch(changePasswordAskRoute, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(data),
-    })
-    const jsonRes = await res.json()
-    if (res.ok) {
-        resSuccessful.value = jsonRes.message
-    } else {
-        errMessage.value = jsonRes.message
+    try {
+        errMessage.value = ''
+        resSuccessful.value = ''
+        validatePasswordInput(passwordInput)
+        const data = {
+            loginPassword: passwordInput,
+        }
+        const res = await fetch(changePasswordAskRoute, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(data),
+        })
+        const jsonRes = await res.json()
+        if (!res.ok) {
+            errMessage.value = jsonRes.message
+                ? jsonRes.message
+                : 'Unknown error occurred'
+            throw Error(jsonRes.message)
+        } else {
+            resSuccessful.value = jsonRes.message
+            await delay(1000)
+            router.push('/login')
+        }
+    } catch (err) {
+        if (err instanceof Error) errMessage.value = err.message
+        console.error(err)
     }
 }
 // TODO: Change password field to be empty after submit
@@ -51,11 +68,6 @@ const handleSubmit = async (passwordInput: string): Promise<void> => {
                 @keyup.enter="handleSubmit(passwordInput as string)"
                 required
             />
-            <!-- TODO: Integrate zod here to validate if is email and if password passes 
-                specific params (i.e. length, special characters, numbers, 
-                capitalized letters, etc.) (see backend for reference) -->
-            <!-- TODO: Setup a vue watcher to tell if email/password are valid 
-                and notify user if they are/aren't -->
             <button
                 @click="handleSubmit(passwordInput as string)"
                 type="submit"

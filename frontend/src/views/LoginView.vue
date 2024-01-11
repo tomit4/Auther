@@ -2,6 +2,7 @@
 import { ref, type Ref } from 'vue'
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { delay } from '../utils/utils.ts'
+import { validateInputs } from '../utils/schema-validators'
 
 const router = useRouter()
 const emailInput: Ref<string> = ref('')
@@ -18,6 +19,7 @@ const handleSubmit = async (
     try {
         errMessage.value = ''
         resSuccessful.value = ''
+        validateInputs(emailInput, passwordInput)
         const data = {
             email: emailInput,
             loginPassword: passwordInput,
@@ -33,7 +35,7 @@ const handleSubmit = async (
             errMessage.value = jsonRes.message
                 ? jsonRes.message
                 : 'Unknown error occurred'
-            throw Error(`An error occurred: ${JSON.stringify(jsonRes)}`)
+            throw new Error(jsonRes.message)
         } else {
             resSuccessful.value = jsonRes.message
             localStorage.setItem('appname-session-token', jsonRes.sessionToken)
@@ -42,6 +44,7 @@ const handleSubmit = async (
             router.push('/app')
         }
     } catch (err) {
+        if (err instanceof Error) errMessage.value = err.message
         console.error(err)
     }
 }
