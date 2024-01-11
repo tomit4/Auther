@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, type Ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
 import { delay, grabStoredCookie } from '../utils/utils.ts'
 import { validatePasswordInput } from '../utils/schema-validators'
 
@@ -81,6 +81,12 @@ onMounted(async () => {
         localStorage.removeItem('appname-session-token')
         router.push('/login')
     }
+})
+
+onBeforeRouteLeave(() => {
+    passwordInput.value = ''
+    errMessage.value = ''
+    resSuccessful.value = ''
 })
 </script>
 

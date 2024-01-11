@@ -39,7 +39,6 @@ const handleSubmit = async (
         } else {
             resSuccessful.value = jsonRes.message
             localStorage.setItem('appname-session-token', jsonRes.sessionToken)
-            // TODO: set up watcher to display count down before redirect
             await delay(1000)
             router.push('/app')
         }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { delay } from '../utils/utils.ts'
 import { validateEmailInput } from '../utils/schema-validators'
 
@@ -41,6 +41,12 @@ const handleSubmit = async (emailInput: string): Promise<void> => {
         console.error(err)
     }
 }
+
+onBeforeRouteLeave(() => {
+    emailInput.value = ''
+    errMessage.value = ''
+    resSuccessful.value = ''
+})
 </script>
 
 <template>

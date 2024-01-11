@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, type Ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
 import { delay } from '../utils/utils.ts'
 import { validatePasswordInput } from '../utils/schema-validators'
 
@@ -74,6 +74,12 @@ onMounted(async () => {
     } catch (err) {
         console.error('ERROR :=>', err)
     }
+})
+
+onBeforeRouteLeave(() => {
+    passwordInput.value = ''
+    errMessage.value = ''
+    resSuccessful.value = ''
 })
 </script>
 

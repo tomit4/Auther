@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { delay } from '../utils/utils.ts'
 import { validatePasswordInput } from '../utils/schema-validators'
 
@@ -46,7 +46,12 @@ const handleSubmit = async (passwordInput: string): Promise<void> => {
         console.error(err)
     }
 }
-// TODO: Change password field to be empty after submit
+
+onBeforeRouteLeave(() => {
+    passwordInput.value = ''
+    errMessage.value = ''
+    resSuccessful.value = ''
+})
 </script>
 
 <template>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppDash from '../components/AppDash.vue'
 import ChangePassForm from '../components/ChangePassForm.vue'
 import DeleteProfileForm from '../components/DeleteProfileForm.vue'
 import { ref, type Ref, onMounted } from 'vue'
@@ -58,37 +59,13 @@ onMounted(async (): Promise<void> => {
 
 <template>
     <div>
-        <h1>App</h1>
-        <div v-if="showDash" className="app-dash">
-            <!-- TODO: Make this its own component passing props/emitting etc. -->
-            <p>Welcome {{ emailFromCache }}!!</p>
-            <button
-                @click="handleLogout"
-                type="submit"
-                value="Submit"
-                className="btn logout-btn"
-            >
-                Log Out
-            </button>
-            <br />
-            <button
-                @click="toggleChangePasswordForm"
-                type="submit"
-                value="Submit"
-                className="btn change-password-btn"
-            >
-                Change Password
-            </button>
-            <br />
-            <button
-                @click="toggleDeleteProfileForm"
-                type="submit"
-                value="Submit"
-                className="btn delete-profile-btn"
-            >
-                Delete My Profile
-            </button>
-        </div>
+        <AppDash
+            v-if="showDash"
+            :email-from-cache="emailFromCache"
+            @handle-logout="handleLogout"
+            @toggle-change-password-form="toggleChangePasswordForm"
+            @toggle-delete-profile-form="toggleDeleteProfileForm"
+        />
         <div>
             <ChangePassForm
                 v-if="showChangePassForm"
@@ -106,25 +83,4 @@ onMounted(async (): Promise<void> => {
     </div>
 </template>
 
-<style scoped>
-h1 {
-    margin-top: 2.5em;
-    font-size: 160%;
-}
-.app-dash {
-    margin-top: 1em;
-}
-.btn {
-    cursor: pointer;
-    padding: 0.5em;
-    font-weight: 700;
-    font-size: 100%;
-    border: 2px solid black;
-    border-radius: 5px;
-    margin: 0.5em auto;
-}
-.change-password-btn,
-.delete-profile-btn {
-    width: 9.5em;
-}
-</style>
+<style scoped></style>
