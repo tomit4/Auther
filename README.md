@@ -192,7 +192,10 @@ only for learning purporses (make this clear to the user in an About section).
 - [x] Heavily refactor both back end and front end so there isn't so much
       repeated logic
 - [ ] Integrate Ava Unit Testing with nyc output on backend
-- [ ] Learn/utilize playwright for E2E Testing
+- [ ] Utilize Vitest for E2E testing. Consider starting with [this basic
+      tutorial](https://blog.logrocket.com/guide-vitest-automated-testing-vue-components/) and also read [the official docs](https://vitest.dev/guide/)
+- [ ] After looking over Vitest, consider whether this is robust enough, or to
+      use a more commonly used E2E testing library like [Playwright](https://playwright.dev/)
 - [ ] Address any remaining TODO notes within the code base
 - [ ] Dockerize each service separately and investigate docker networking so
       that each container can "talk" to each other via externalized ports
