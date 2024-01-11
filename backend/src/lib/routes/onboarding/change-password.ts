@@ -76,17 +76,14 @@ export default (
                 const redisCacheExpired =
                     await userService.checkIfCacheIsExpired(
                         hashedEmail,
-                        'change-password',
+                        'change-password-ask',
                     )
-                if (!hashedEmail || redisCacheExpired) reply.code(401)
-                if (!hashedEmail)
+                if (!hashedEmail || redisCacheExpired) {
+                    reply.code(401)
                     throw new Error(
                         'Sorry, but you took too long to answer your email, please log in and try again.',
                     )
-                if (redisCacheExpired)
-                    throw new Error(
-                        'Sorry, but you took too long to answer your email, please log in and try again.',
-                    )
+                }
                 const userPasswordByEmail =
                     await userService.grabUserByEmail(hashedEmail)
                 const { password } = userPasswordByEmail
@@ -95,9 +92,9 @@ export default (
                         newPassword,
                         password,
                     )
-                // TODO: set up separate db table that keeps track of last 5 passwords
-                // for user and throws this 409 reply if new password is in table
-                // (i.e. newPassword cannot be the same as last 5 passwords)
+                /* TODO (v2): set up separate db table that keeps track of last 5 passwords
+                 * for user and throws this 409 reply if new password is in table
+                 * (i.e. newPassword cannot be the same as last 5 passwords) */
                 if (passwordHashesMatch) {
                     reply.code(409)
                     throw new Error(

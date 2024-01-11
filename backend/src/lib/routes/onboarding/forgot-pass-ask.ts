@@ -56,7 +56,7 @@ export default (
             try {
                 const userAlreadyInDb =
                     await userService.grabUserByEmail(hashedEmail)
-                const userAlreadyInCache = await userService.isInCache(
+                const userAlreadyInCache = await userService.grabFromCache(
                     hashedEmail,
                     'forgot-pass-ask',
                 )

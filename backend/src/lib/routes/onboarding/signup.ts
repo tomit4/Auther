@@ -74,7 +74,7 @@ export default (
                 const userAlreadyInDb =
                     await userService.grabUserByEmail(hashedEmail)
                 const userAlreadyInCache =
-                    await userService.isUserInCache(hashedEmail)
+                    await userService.isUserInCacheExpired(hashedEmail)
                 const emailSent = await sendEmail(
                     email as string,
                     `verify/${hashedEmail}` as string,
@@ -92,7 +92,7 @@ export default (
                     throw new Error(
                         'You have already signed up, please log in.',
                     )
-                if (userAlreadyInCache)
+                if (!userAlreadyInCache)
                     throw new Error(
                         'You have already submitted your email, please check your inbox.',
                     )

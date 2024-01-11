@@ -47,7 +47,7 @@ exports.default = (fastify, options, done) => {
                 const zParsedEmail = emailSchema.safeParse(email);
                 const zParsedPassword = passwordSchema.safeParse(password);
                 const userAlreadyInDb = await userService.grabUserByEmail(hashedEmail);
-                const userAlreadyInCache = await userService.isUserInCache(hashedEmail);
+                const userAlreadyInCache = await userService.isUserInCacheExpired(hashedEmail);
                 const emailSent = await (0, send_email_1.default)(email, `verify/${hashedEmail}`, process.env.BREVO_SIGNUP_TEMPLATE_ID);
                 if (!zParsedEmail.success) {
                     const { error } = zParsedEmail;
@@ -59,7 +59,7 @@ exports.default = (fastify, options, done) => {
                 }
                 if (userAlreadyInDb && !userAlreadyInDb.is_deleted)
                     throw new Error('You have already signed up, please log in.');
-                if (userAlreadyInCache)
+                if (!userAlreadyInCache)
                     throw new Error('You have already submitted your email, please check your inbox.');
                 if (!emailSent.wasSuccessfull) {
                     fastify.log.error('Error occurred while sending email, are your Brevo credentials up to date? :=>', emailSent.error);

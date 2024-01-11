@@ -58,15 +58,15 @@ class UserService {
 
     async grabUserByEmail(hashedEmail: string) {
         const { knex } = this
-        return await knex('users').where('email', hashedEmail).first()
-    }
-    // NOTE: Obviously this is repetitve and a poor implementation, refactor later...
-    async grabUserByEmailAndIsNotDeleted(hashedEmail: string) {
-        const { knex } = this
-        return await knex('users')
+        const alreadDeletedUser = await knex('users')
+            .where('email', hashedEmail)
+            .andWhere('is_deleted', true)
+            .first()
+        const existingUser = await knex('users')
             .where('email', hashedEmail)
             .andWhere('is_deleted', false)
             .first()
+        return alreadDeletedUser || existingUser
     }
 
     async insertUserIntoDb(
@@ -83,11 +83,10 @@ class UserService {
             .into('users')
     }
 
-    // TODO: write return type
     async updateAlreadyDeletedUser(
         hashedEmail: string,
         hashedPassword: string,
-    ) {
+    ): Promise<void> {
         const { knex } = this
         await knex('users').where('email', hashedEmail).update({
             password: hashedPassword,
@@ -102,27 +101,13 @@ class UserService {
         })
     }
 
-    // TODO: consider replacing other cache checking methods with this
-    // NOTE: same is grabFromCache, don't be so repetitive
-    async isInCache(hashedEmail: string, key: string): Promise<string | null> {
-        const { redis } = this
-        return await redis.get(`${hashedEmail}-${key}`)
-    }
-
     async grabUserEmailInCache(hashedEmail: string): Promise<string | null> {
         const { redis } = this
         return await redis.get(`${hashedEmail}-email`)
     }
 
-    // TODO: Consider isUserInCache and isUserInCacheExpired as same
-    async isUserInCache(hashedEmail: string): Promise<string | null> {
-        const { redis } = this
-        return (
-            (await redis.get(`${hashedEmail}-email`)) ||
-            (await redis.get(`${hashedEmail}-password`))
-        )
-    }
-    // NOTE: very similar to checkIfCacheIsExpired, see if you can consolidate
+    // NOTE: very similar to checkIfCacheIsExpired, see if you can consolidate,
+    // but due to better readability where used, this is left as is
     async isUserInCacheExpired(hashedEmail: string): Promise<boolean> {
         const { redis } = this
         return (
@@ -149,13 +134,6 @@ class UserService {
     ): Promise<string | null> {
         const { redis } = this
         return await redis.get(`${hashedEmail}-${key}`)
-    }
-    // NOTE: Can be replaced with grabFromCache
-    async grabRefreshTokenFromCache(
-        hashedEmail: string,
-    ): Promise<string | null> {
-        const { redis } = this
-        return await redis.get(`${hashedEmail}-refresh-token`)
     }
 
     async setUserEmailInCache(

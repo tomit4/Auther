@@ -55,10 +55,10 @@ export default (
                 )
                     throw new Error('Refresh Token has incorrect payload')
                 const hashedEmail = refreshTokenIsValid.email
-                const refreshTokenFromRedis =
-                    await userService.grabRefreshTokenFromCache(
-                        hashedEmail as string,
-                    )
+                const refreshTokenFromRedis = await userService.grabFromCache(
+                    hashedEmail as string,
+                    'refresh-token',
+                )
                 if (!refreshTokenFromRedis)
                     throw new Error('Invalid refresh token.')
                 const sessionToken = userService.signToken(

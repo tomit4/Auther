@@ -84,17 +84,21 @@ export default (
                 }
                 const userByEmail =
                     await userService.grabUserByEmail(hashedEmail)
+                if (!userByEmail) {
+                    reply.code(401)
+                    throw new Error(
+                        'No record of that email found. Please try again.',
+                    )
+                }
                 const { password } = userByEmail
                 const passwordHashesMatch =
                     await userService.comparePasswordToHash(
                         loginPassword,
                         password,
                     )
-                if (!userByEmail || !passwordHashesMatch) {
+                if (!passwordHashesMatch) {
                     reply.code(401)
-                    throw new Error(
-                        'Incorrect email or password. Please try again.',
-                    )
+                    throw new Error('Incorrect password. Please try again.')
                 }
                 const sessionToken = userService.signToken(
                     hashedEmail,

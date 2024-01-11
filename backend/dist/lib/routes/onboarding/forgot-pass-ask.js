@@ -35,7 +35,7 @@ exports.default = (fastify, options, done) => {
             const zParsedEmail = emailSchema.safeParse(email);
             try {
                 const userAlreadyInDb = await userService.grabUserByEmail(hashedEmail);
-                const userAlreadyInCache = await userService.isInCache(hashedEmail, 'forgot-pass-ask');
+                const userAlreadyInCache = await userService.grabFromCache(hashedEmail, 'forgot-pass-ask');
                 if (!zParsedEmail.success) {
                     const { error } = zParsedEmail;
                     throw new Error(error.issues[0].message);

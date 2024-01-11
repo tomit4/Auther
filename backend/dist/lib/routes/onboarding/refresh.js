@@ -30,7 +30,7 @@ exports.default = (fastify, options, done) => {
                     !('email' in refreshTokenIsValid))
                     throw new Error('Refresh Token has incorrect payload');
                 const hashedEmail = refreshTokenIsValid.email;
-                const refreshTokenFromRedis = await userService.grabRefreshTokenFromCache(hashedEmail);
+                const refreshTokenFromRedis = await userService.grabFromCache(hashedEmail, 'refresh-token');
                 if (!refreshTokenFromRedis)
                     throw new Error('Invalid refresh token.');
                 const sessionToken = userService.signToken(hashedEmail, process.env.JWT_SESSION_EXP);

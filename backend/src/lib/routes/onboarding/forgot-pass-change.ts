@@ -95,7 +95,7 @@ export default (
                     )
                 }
                 const userPasswordByEmail =
-                    await userService.grabUserByEmailAndIsNotDeleted(email)
+                    await userService.grabUserByEmail(email)
                 const { password } = userPasswordByEmail
                 const passwordHashesMatch =
                     await userService.comparePasswordToHash(
