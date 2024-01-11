@@ -101,7 +101,7 @@ export default (
                         newPassword,
                         password,
                     ))
-                // TODO: set up separate db table that keeps track of last 5 passwords
+                // TODO (v2): set up separate db table that keeps track of last 5 passwords
                 // for user and throws this 409 reply if new password is in table
                 // (i.e. newPassword cannot be the same as last 5 passwords)
                 if (passwordHashesMatch) {

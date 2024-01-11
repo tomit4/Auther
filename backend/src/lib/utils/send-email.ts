@@ -7,7 +7,6 @@ type SendEmail = {
     error?: object
 }
 
-// TODO: Consider wrapping this as a fastify service plugin/class
 // Configuration for Brevo
 const apiInstance = new Brevo.TransactionalEmailsApi()
 // ISSUE: https://github.com/getbrevo/brevo-node/issues/1
