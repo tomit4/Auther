@@ -3,13 +3,12 @@ import { ref, type Ref, onMounted } from 'vue'
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
 import { delay, grabStoredCookie } from '../utils/utils.ts'
 import { validatePasswordInput } from '../utils/schema-validators'
+import { logout } from '../utils/auth-utils'
 
 const route = useRoute()
 const router = useRouter()
 const grabUserIdRoute = import.meta.env.VITE_USERID_ROUTE
 const changePasswordRoute = import.meta.env.VITE_CHANGE_PASSWORD_ROUTE
-const logoutRoute = import.meta.env.VITE_LOGOUT_ROUTE
-const invalidTokenCode = import.meta.env.VITE_INVALID_TOKEN_CODE
 
 const emailFromCache: Ref<string> = ref('')
 const passwordInput: Ref<string> = ref('')
@@ -53,20 +52,7 @@ onMounted(async () => {
     if (!cookie || cookie !== route.params.hash) {
         errMessage.value =
             'Invalid hash provided, please log back in and try again.'
-        // TODO: Repeated code, put into utility class
-        const logOutRes = await fetch(logoutRoute, {
-            method: 'GET',
-            credentials: 'include',
-        })
-        const jsonLogOutRes = await logOutRes.json()
-        if (
-            jsonLogOutRes.statusCode !== 200 &&
-            jsonLogOutRes.code !== invalidTokenCode
-        ) {
-            console.error('ERROR while logging out :=>', jsonLogOutRes)
-        }
-        localStorage.removeItem('appname-session-token')
-        // END repeated code
+        logout()
         await delay(1000)
         router.push('/login')
     }
