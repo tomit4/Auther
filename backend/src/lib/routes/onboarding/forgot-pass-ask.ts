@@ -7,6 +7,7 @@ import type {
 } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
+import { validateEmailInput } from '../../utils/schema-validators'
 import sendEmail from '../../utils/send-email'
 import hasher from '../../utils/hasher'
 
@@ -51,19 +52,14 @@ export default (
             const { email } = request.body
             const { userService } = fastify
             const hashedEmail = hasher(email)
-            const emailSchema = z.string().email()
-            const zParsedEmail = emailSchema.safeParse(email)
             try {
+                validateEmailInput(email)
                 const userAlreadyInDb =
                     await userService.grabUserByEmail(hashedEmail)
                 const userAlreadyInCache = await userService.grabFromCache(
                     hashedEmail,
                     'forgot-pass-ask',
                 )
-                if (!zParsedEmail.success) {
-                    const { error } = zParsedEmail
-                    throw new Error(error.issues[0].message as string)
-                }
                 if (!userAlreadyInDb || userAlreadyInDb.is_deleted)
                     throw new Error(
                         'There is no record of that email address, please sign up.',

@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const zod_1 = require("zod");
-const password_1 = require("../../schemas/password");
+const schema_validators_1 = require("../../utils/schema-validators");
 const send_email_1 = __importDefault(require("../../utils/send-email"));
 const hasher_1 = __importDefault(require("../../utils/hasher"));
 exports.default = (fastify, options, done) => {
@@ -38,25 +38,11 @@ exports.default = (fastify, options, done) => {
             const { userService } = fastify;
             const hashedEmail = (0, hasher_1.default)(email);
             const hashedPassword = await userService.hashPassword(password);
-            // TODO: replicate zod checks on front end
-            const emailSchema = zod_1.z.string().email();
-            const passwordSchema = zod_1.z.string().regex(password_1.passwordSchemaRegex, {
-                message: password_1.passwordSchemaErrMsg,
-            });
             try {
-                const zParsedEmail = emailSchema.safeParse(email);
-                const zParsedPassword = passwordSchema.safeParse(password);
+                (0, schema_validators_1.validateInputs)(email, password);
                 const userAlreadyInDb = await userService.grabUserByEmail(hashedEmail);
                 const userAlreadyInCache = await userService.isUserInCacheExpired(hashedEmail);
                 const emailSent = await (0, send_email_1.default)(email, `verify/${hashedEmail}`, process.env.BREVO_SIGNUP_TEMPLATE_ID);
-                if (!zParsedEmail.success) {
-                    const { error } = zParsedEmail;
-                    throw new Error(error.issues[0].message);
-                }
-                if (!zParsedPassword.success) {
-                    const { error } = zParsedPassword;
-                    throw new Error(error.issues[0].message);
-                }
                 if (userAlreadyInDb && !userAlreadyInDb.is_deleted)
                     throw new Error('You have already signed up, please log in.');
                 if (!userAlreadyInCache)

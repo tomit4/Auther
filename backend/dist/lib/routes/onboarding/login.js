@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const zod_1 = require("zod");
-const password_1 = require("../../schemas/password");
+const schema_validators_1 = require("../../utils/schema-validators");
 const hasher_1 = __importDefault(require("../../utils/hasher"));
 exports.default = (fastify, options, done) => {
     fastify.withTypeProvider().route({
@@ -41,21 +41,8 @@ exports.default = (fastify, options, done) => {
             const { userService } = fastify;
             const { email, loginPassword } = request.body;
             const hashedEmail = (0, hasher_1.default)(email);
-            const emailSchema = zod_1.z.string().email();
-            const passwordSchema = zod_1.z.string().regex(password_1.passwordSchemaRegex, {
-                message: password_1.passwordSchemaErrMsg,
-            });
             try {
-                const zParsedEmail = emailSchema.safeParse(email);
-                const zParsedPassword = passwordSchema.safeParse(loginPassword);
-                if (!zParsedEmail.success) {
-                    const { error } = zParsedEmail;
-                    throw new Error(error.issues[0].message);
-                }
-                if (!zParsedPassword.success) {
-                    const { error } = zParsedPassword;
-                    throw new Error(error.issues[0].message);
-                }
+                (0, schema_validators_1.validateInputs)(email, loginPassword);
                 const userByEmail = await userService.grabUserByEmail(hashedEmail);
                 const { password } = userByEmail !== null && userByEmail !== void 0 ? userByEmail : {};
                 const passwordHashesMatch = password !== undefined &&

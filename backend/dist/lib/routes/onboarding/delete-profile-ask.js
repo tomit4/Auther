@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const zod_1 = require("zod");
-const password_1 = require("../../schemas/password");
+const schema_validators_1 = require("../../utils/schema-validators");
 const send_email_1 = __importDefault(require("../../utils/send-email"));
 exports.default = (fastify, options, done) => {
     fastify.withTypeProvider().route({
@@ -35,15 +35,8 @@ exports.default = (fastify, options, done) => {
             const { userService } = fastify;
             const { loginPassword } = request.body;
             const refreshToken = request.cookies['appname-refresh-token'];
-            const passwordSchema = zod_1.z.string().regex(password_1.passwordSchemaRegex, {
-                message: password_1.passwordSchemaErrMsg,
-            });
-            const zParsedPassword = passwordSchema.safeParse(loginPassword);
             try {
-                if (!zParsedPassword.success) {
-                    const { error } = zParsedPassword;
-                    throw new Error(error.issues[0].message);
-                }
+                (0, schema_validators_1.validatePasswordInput)(loginPassword);
                 const refreshTokenIsValid = userService.verifyToken(refreshToken);
                 const hashedEmail = refreshTokenIsValid.email;
                 const rawEmailFromRedis = await userService.grabUserEmailInCache(hashedEmail);

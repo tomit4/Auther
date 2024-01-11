@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const zod_1 = require("zod");
-const password_1 = require("../../schemas/password");
+const schema_validators_1 = require("../../utils/schema-validators");
 exports.default = (fastify, options, done) => {
     fastify.withTypeProvider().route({
         method: 'PATCH',
@@ -31,15 +31,8 @@ exports.default = (fastify, options, done) => {
             const { userService } = fastify;
             const { newPassword } = request.body;
             const refreshToken = request.cookies['appname-refresh-token'];
-            const passwordSchema = zod_1.z.string().regex(password_1.passwordSchemaRegex, {
-                message: password_1.passwordSchemaErrMsg,
-            });
-            const zParsedPassword = passwordSchema.safeParse(newPassword);
             try {
-                if (!zParsedPassword.success) {
-                    const { error } = zParsedPassword;
-                    throw new Error(error.issues[0].message);
-                }
+                (0, schema_validators_1.validatePasswordInput)(newPassword);
                 const refreshTokenIsValid = userService.verifyToken(refreshToken);
                 const hashedEmail = refreshTokenIsValid.email;
                 const redisCacheExpired = await userService.checkIfCacheIsExpired(hashedEmail, 'change-password-ask');

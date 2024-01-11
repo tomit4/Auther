@@ -8,10 +8,7 @@ import type {
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import type { VerifyPayloadType } from '@fastify/jwt'
 import { z } from 'zod'
-import {
-    passwordSchemaRegex,
-    passwordSchemaErrMsg,
-} from '../../schemas/password'
+import { validatePasswordInput } from '../../utils/schema-validators'
 
 type BodyReq = {
     newPassword: string
@@ -68,15 +65,8 @@ export default (
             const refreshToken = request.cookies[
                 'appname-refresh-token'
             ] as string
-            const passwordSchema = z.string().regex(passwordSchemaRegex, {
-                message: passwordSchemaErrMsg,
-            })
-            const zParsedPassword = passwordSchema.safeParse(newPassword)
             try {
-                if (!zParsedPassword.success) {
-                    const { error } = zParsedPassword
-                    throw new Error(error.issues[0].message as string)
-                }
+                validatePasswordInput(newPassword)
                 const refreshTokenIsValid = userService.verifyToken(
                     refreshToken,
                 ) as VerifyPayloadType & { email: string }

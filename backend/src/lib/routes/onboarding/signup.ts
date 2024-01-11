@@ -7,10 +7,7 @@ import type {
 } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
-import {
-    passwordSchemaRegex,
-    passwordSchemaErrMsg,
-} from '../../schemas/password'
+import { validateInputs } from '../../utils/schema-validators'
 import sendEmail from '../../utils/send-email'
 import hasher from '../../utils/hasher'
 
@@ -63,14 +60,8 @@ export default (
             const { userService } = fastify
             const hashedEmail = hasher(email)
             const hashedPassword = await userService.hashPassword(password)
-            // TODO: replicate zod checks on front end
-            const emailSchema = z.string().email()
-            const passwordSchema = z.string().regex(passwordSchemaRegex, {
-                message: passwordSchemaErrMsg,
-            })
             try {
-                const zParsedEmail = emailSchema.safeParse(email)
-                const zParsedPassword = passwordSchema.safeParse(password)
+                validateInputs(email, password)
                 const userAlreadyInDb =
                     await userService.grabUserByEmail(hashedEmail)
                 const userAlreadyInCache =
@@ -80,14 +71,6 @@ export default (
                     `verify/${hashedEmail}` as string,
                     process.env.BREVO_SIGNUP_TEMPLATE_ID as unknown as number,
                 )
-                if (!zParsedEmail.success) {
-                    const { error } = zParsedEmail
-                    throw new Error(error.issues[0].message as string)
-                }
-                if (!zParsedPassword.success) {
-                    const { error } = zParsedPassword
-                    throw new Error(error.issues[0].message as string)
-                }
                 if (userAlreadyInDb && !userAlreadyInDb.is_deleted)
                     throw new Error(
                         'You have already signed up, please log in.',

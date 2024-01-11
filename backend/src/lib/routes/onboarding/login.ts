@@ -7,10 +7,7 @@ import type {
 } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
-import {
-    passwordSchemaRegex,
-    passwordSchemaErrMsg,
-} from '../../schemas/password'
+import { validateInputs } from '../../utils/schema-validators'
 import hasher from '../../utils/hasher'
 
 type BodyReq = {
@@ -75,21 +72,8 @@ export default (
             const { userService } = fastify
             const { email, loginPassword } = request.body
             const hashedEmail = hasher(email)
-            const emailSchema = z.string().email()
-            const passwordSchema = z.string().regex(passwordSchemaRegex, {
-                message: passwordSchemaErrMsg,
-            })
             try {
-                const zParsedEmail = emailSchema.safeParse(email)
-                const zParsedPassword = passwordSchema.safeParse(loginPassword)
-                if (!zParsedEmail.success) {
-                    const { error } = zParsedEmail
-                    throw new Error(error.issues[0].message as string)
-                }
-                if (!zParsedPassword.success) {
-                    const { error } = zParsedPassword
-                    throw new Error(error.issues[0].message as string)
-                }
+                validateInputs(email, loginPassword)
                 const userByEmail: User | null =
                     await userService.grabUserByEmail(hashedEmail)
                 const { password } = userByEmail ?? {}
