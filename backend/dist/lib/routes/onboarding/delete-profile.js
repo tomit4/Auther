@@ -24,7 +24,7 @@ exports.default = (fastify, options, done) => {
                 const refreshTokenIsValid = userService.verifyToken(refreshToken);
                 const hashedEmail = refreshTokenIsValid.email;
                 const redisCacheExpired = await userService.checkIfCacheIsExpired(hashedEmail, 'delete-profile-ask');
-                const rawEmailFromRedis = await userService.grabUserEmailInCache(hashedEmail);
+                const rawEmailFromRedis = await userService.grabFromCache(hashedEmail, 'email');
                 const userByEmail = await userService.grabUserByEmail(hashedEmail);
                 if (!refreshToken ||
                     !hashedEmail ||

@@ -39,7 +39,7 @@ exports.default = (fastify, options, done) => {
                 (0, schema_validators_1.validatePasswordInput)(loginPassword);
                 const refreshTokenIsValid = userService.verifyToken(refreshToken);
                 const hashedEmail = refreshTokenIsValid.email;
-                const rawEmailFromRedis = await userService.grabUserEmailInCache(hashedEmail);
+                const rawEmailFromRedis = await userService.grabFromCache(hashedEmail, 'email');
                 if (!refreshToken || !hashedEmail || !rawEmailFromRedis) {
                     reply.code(401);
                     throw new Error('No refresh token found, redirecting to home.');

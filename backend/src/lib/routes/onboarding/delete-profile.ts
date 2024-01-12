@@ -52,8 +52,10 @@ export default (
                         hashedEmail,
                         'delete-profile-ask',
                     )
-                const rawEmailFromRedis =
-                    await userService.grabUserEmailInCache(hashedEmail)
+                const rawEmailFromRedis = await userService.grabFromCache(
+                    hashedEmail,
+                    'email',
+                )
                 const userByEmail =
                     await userService.grabUserByEmail(hashedEmail)
                 if (

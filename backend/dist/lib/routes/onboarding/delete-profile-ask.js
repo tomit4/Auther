@@ -39,7 +39,7 @@ exports.default = (fastify, options, done) => {
                 (0, schema_validators_1.validatePasswordInput)(loginPassword);
                 const refreshTokenIsValid = userService.verifyToken(refreshToken);
                 const hashedEmail = refreshTokenIsValid.email;
-                const rawEmailFromRedis = await userService.grabUserEmailInCache(hashedEmail);
+                const rawEmailFromRedis = await userService.grabFromCache(hashedEmail, 'email');
                 const userPasswordByEmail = await userService.grabUserByEmail(hashedEmail);
                 const { password } = userPasswordByEmail !== null && userPasswordByEmail !== void 0 ? userPasswordByEmail : {};
                 const passwordHashesMatch = password !== undefined &&

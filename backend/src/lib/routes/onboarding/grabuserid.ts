@@ -58,8 +58,10 @@ export default (
                 )
                     throw new Error('Refresh Token Payload in improper format')
                 const hashedEmail = refreshTokenIsValid.email as string
-                const rawEmailFromRedis =
-                    await userService.grabUserEmailInCache(hashedEmail)
+                const rawEmailFromRedis = await userService.grabFromCache(
+                    hashedEmail,
+                    'email',
+                )
                 if (!rawEmailFromRedis)
                     throw new Error(
                         `No raw email found in cache for : ${hashedEmail}`,

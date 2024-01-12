@@ -72,8 +72,10 @@ export default (
                     refreshToken,
                 ) as VerifyPayloadType & { email?: string }
                 const hashedEmail = refreshTokenIsValid.email as string
-                const rawEmailFromRedis =
-                    await userService.grabUserEmailInCache(hashedEmail)
+                const rawEmailFromRedis = await userService.grabFromCache(
+                    hashedEmail,
+                    'email',
+                )
                 if (!refreshToken || !hashedEmail || !rawEmailFromRedis) {
                     reply.code(401)
                     throw new Error(
