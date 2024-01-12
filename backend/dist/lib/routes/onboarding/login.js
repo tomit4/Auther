@@ -57,7 +57,6 @@ exports.default = (fastify, options, done) => {
                 }
                 const sessionToken = userService.signToken(hashedEmail, process.env.JWT_SESSION_EXP);
                 const refreshToken = userService.signToken(hashedEmail, process.env.JWT_REFRESH_EXP);
-                // TODO: reset expiration to a .env variable
                 await userService.setRefreshTokenInCache(hashedEmail, refreshToken);
                 await userService.setUserEmailInCache(hashedEmail, email);
                 reply

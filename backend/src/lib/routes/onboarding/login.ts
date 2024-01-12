@@ -100,7 +100,6 @@ export default (
                     hashedEmail,
                     process.env.JWT_REFRESH_EXP as string,
                 )
-                // TODO: reset expiration to a .env variable
                 await userService.setRefreshTokenInCache(
                     hashedEmail,
                     refreshToken,
