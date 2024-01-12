@@ -13,7 +13,9 @@ import sendEmail from '../../lib/utils/send-email'
 import hasher from '../../lib/utils/hasher'
 import { validateInputs } from '../../lib/utils/schema-validators'
 
-// NOTE: Uncomment the following line if you want to use the test email
+/* NOTE: Set to True if you want to actually send
+ * an email to test (ensure TEst_EMAIL variable is
+ * set to your actual email in the .env file) */
 const actuallySendEmail = false
 
 type BodyReq = {
@@ -27,6 +29,11 @@ type SignUpRes = {
     error?: string
 }
 
+const mockReq: BodyReq = {
+    email: process.env.TEST_EMAIL as string,
+    password: process.env.TEST_PASSWORD as string,
+}
+
 const mock = {
     ok: true,
     message: `Your Email Was Successfully Sent to ${process.env.TEST_EMAIL}!`,
@@ -34,7 +41,6 @@ const mock = {
 
 const fastify: FastifyInstance = Fastify()
 
-// TODO: We'll need to implement sinon in order to stub the DB and redis calls...
 const registerRoute = async (fastify: FastifyInstance) => {
     const newRoute = async (
         fastify: FastifyInstance,
@@ -48,24 +54,16 @@ const registerRoute = async (fastify: FastifyInstance) => {
                 request: FastifyRequest,
                 reply: FastifyReply,
             ): Promise<SignUpRes> => {
-                const body: BodyReq = {
-                    email: process.env.TEST_EMAIL as string,
-                    password: process.env.TEST_PASSWORD as string,
-                }
-                const { email, password } = body
+                const { email, password } = mockReq
                 const { userService } = fastify
                 const hashedEmail = hasher(email)
                 const hashedPassword = await userService.hashPassword(password)
                 try {
                     validateInputs(email, password)
                     stub(userService, 'grabUserByEmail').resolves(null)
-                    stub(userService, 'isUserInCacheExpired').resolves(true)
-                    stub(
-                        userService,
-                        'setUserEmailAndPasswordInCache',
-                    ).resolves()
                     const userAlreadyInDb =
                         await userService.grabUserByEmail(hashedEmail)
+                    stub(userService, 'isUserInCacheExpired').resolves(true)
                     const userAlreadyInCache =
                         await userService.isUserInCacheExpired(hashedEmail)
                     let emailSent
@@ -93,6 +91,10 @@ const registerRoute = async (fastify: FastifyInstance) => {
                             'An error occurred while sending email, please contact support.',
                         )
                     }
+                    stub(
+                        userService,
+                        'setUserEmailAndPasswordInCache',
+                    ).resolves()
                     await userService.setUserEmailAndPasswordInCache(
                         hashedEmail,
                         email,

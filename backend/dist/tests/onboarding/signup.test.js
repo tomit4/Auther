@@ -10,34 +10,34 @@ const auth_utils_1 = __importDefault(require("../../test-utils/auth-utils"));
 const send_email_1 = __importDefault(require("../../lib/utils/send-email"));
 const hasher_1 = __importDefault(require("../../lib/utils/hasher"));
 const schema_validators_1 = require("../../lib/utils/schema-validators");
-// NOTE: Uncomment the following line if you want to use the test email
+/* NOTE: Set to True if you want to actually send
+ * an email to test (ensure TEst_EMAIL variable is
+ * set to your actual email in the .env file) */
 const actuallySendEmail = false;
+const mockReq = {
+    email: process.env.TEST_EMAIL,
+    password: process.env.TEST_PASSWORD,
+};
 const mock = {
     ok: true,
     message: `Your Email Was Successfully Sent to ${process.env.TEST_EMAIL}!`,
 };
 const fastify = (0, fastify_1.default)();
-// TODO: We'll need to implement sinon in order to stub the DB and redis calls...
 const registerRoute = async (fastify) => {
     const newRoute = async (fastify, options, done) => {
         fastify.route({
             method: 'POST',
             url: '/signup',
             handler: async (request, reply) => {
-                const body = {
-                    email: process.env.TEST_EMAIL,
-                    password: process.env.TEST_PASSWORD,
-                };
-                const { email, password } = body;
+                const { email, password } = mockReq;
                 const { userService } = fastify;
                 const hashedEmail = (0, hasher_1.default)(email);
                 const hashedPassword = await userService.hashPassword(password);
                 try {
                     (0, schema_validators_1.validateInputs)(email, password);
                     (0, sinon_1.stub)(userService, 'grabUserByEmail').resolves(null);
-                    (0, sinon_1.stub)(userService, 'isUserInCacheExpired').resolves(true);
-                    (0, sinon_1.stub)(userService, 'setUserEmailAndPasswordInCache').resolves();
                     const userAlreadyInDb = await userService.grabUserByEmail(hashedEmail);
+                    (0, sinon_1.stub)(userService, 'isUserInCacheExpired').resolves(true);
                     const userAlreadyInCache = await userService.isUserInCacheExpired(hashedEmail);
                     let emailSent;
                     if (actuallySendEmail) {
@@ -54,6 +54,7 @@ const registerRoute = async (fastify) => {
                         fastify.log.error('Error occurred while sending email, are your Brevo credentials up to date? :=>');
                         throw new Error('An error occurred while sending email, please contact support.');
                     }
+                    (0, sinon_1.stub)(userService, 'setUserEmailAndPasswordInCache').resolves();
                     await userService.setUserEmailAndPasswordInCache(hashedEmail, email, hashedPassword);
                     reply
                         .code(200)
