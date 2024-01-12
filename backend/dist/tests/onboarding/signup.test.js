@@ -14,6 +14,7 @@ const mock = {
     message: `Your Email Was Successfully Sent to ${process.env.TEST_EMAIL}!`,
 };
 const fastify = (0, fastify_1.default)();
+// TODO: We'll need to implement sinon in order to stub the DB and redis calls...
 const registerRoute = async (fastify) => {
     const newRoute = async (fastify, options, done) => {
         fastify.route({

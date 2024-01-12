@@ -30,6 +30,7 @@ const mock = {
 
 const fastify: FastifyInstance = Fastify()
 
+// TODO: We'll need to implement sinon in order to stub the DB and redis calls...
 const registerRoute = async (fastify: FastifyInstance) => {
     const newRoute = async (
         fastify: FastifyInstance,
