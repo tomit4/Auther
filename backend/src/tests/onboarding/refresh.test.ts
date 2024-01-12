@@ -10,14 +10,15 @@ import type {
 } from 'fastify'
 import registerPlugins from '../../test-utils/auth-utils'
 
-type LogOutRes = {
+type RefreshRes = {
     ok: boolean
     message?: string
+    sessionToken?: string
 }
 
-const mockRes: LogOutRes = {
+const mockRes: RefreshRes = {
     ok: true,
-    message: 'logged out',
+    message: 'Successfully refreshed session.',
 }
 
 const fastify: FastifyInstance = Fastify()
@@ -30,11 +31,11 @@ const registerRoute = async (fastify: FastifyInstance) => {
     ) => {
         fastify.route({
             method: 'GET',
-            url: '/logout',
+            url: '/refresh',
             handler: async (
                 request: FastifyRequest,
                 reply: FastifyReply,
-            ): Promise<LogOutRes> => {
+            ): Promise<RefreshRes> => {
                 const { userService } = fastify
                 stub(request, 'cookies').value({
                     'appname-refresh-token': userService.signToken(
@@ -45,38 +46,43 @@ const registerRoute = async (fastify: FastifyInstance) => {
                 const refreshToken = request.cookies['appname-refresh-token']
                 try {
                     if (!refreshToken)
-                        throw new Error('No refresh token sent from client')
+                        throw new Error(
+                            'No refresh token sent from client, redirecting home...',
+                        )
                     const refreshTokenIsValid =
                         userService.verifyToken(refreshToken)
-                    if (!refreshTokenIsValid) {
-                        reply.code(401)
-                        throw new Error('Invalid refresh token')
-                    }
                     if (
                         typeof refreshTokenIsValid !== 'object' ||
                         !('email' in refreshTokenIsValid)
                     )
                         throw new Error('Refresh Token has incorrect payload')
                     const hashedEmail = refreshTokenIsValid.email
-                    stub(userService, 'removeFromCache').resolves(undefined)
-                    await userService.removeFromCache(
-                        hashedEmail as string,
-                        'refresh-token',
+                    stub(userService, 'grabFromCache').resolves(
+                        userService.signToken(
+                            process.env.TEST_EMAIL as string,
+                            process.env.JWT_REFRESH_EXP as string,
+                        ),
                     )
-                    await userService.removeFromCache(
+                    const refreshTokenFromRedis =
+                        await userService.grabFromCache(
+                            hashedEmail as string,
+                            'refresh-token',
+                        )
+                    if (!refreshTokenFromRedis)
+                        throw new Error('Invalid refresh token.')
+                    userService.signToken(
                         hashedEmail as string,
-                        'email',
+                        process.env.JWT_SESSION_EXP as string,
                     )
                     reply.code(200).send({
                         ok: true,
-                        message: 'logged out',
+                        message: 'Successfully refreshed session.',
                     })
                 } catch (err) {
-                    if (err instanceof Error)
-                        reply.send({
-                            ok: false,
-                            message: err.message,
-                        })
+                    reply.code(401).send({
+                        ok: false,
+                        message: 'Invalid refresh token.',
+                    })
                 }
                 return reply
             },
@@ -86,7 +92,7 @@ const registerRoute = async (fastify: FastifyInstance) => {
     fastify.register(newRoute)
 }
 
-test('logs user out from app', async t => {
+test('refreshes session token after validating refresh token', async t => {
     t.plan(3)
     await registerPlugins(fastify)
     await registerRoute(fastify)
@@ -95,7 +101,7 @@ test('logs user out from app', async t => {
 
     const response = await fastify.inject({
         method: 'GET',
-        url: '/logout',
+        url: '/refresh',
     })
 
     t.is(response.statusCode, 200)
