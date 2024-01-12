@@ -6,6 +6,10 @@ import knexPlugin from '../lib/plugins/knex'
 import userService from '../lib/services/user-service'
 
 const registerPlugins = async (fastify: FastifyInstance): Promise<void> => {
+    await fastify.register(import('@fastify/cookie'), {
+        secret: process.env.COOKIE_SECRET as string,
+        hook: 'onRequest',
+    })
     await fastify.register(import('fastify-bcrypt'))
     await fastify.register(import('@fastify/redis'), {
         host: process.env.REDIS_HOST as string,

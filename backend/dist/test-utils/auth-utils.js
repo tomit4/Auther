@@ -32,6 +32,10 @@ const knexFile = knexfile_1.default.development;
 const knex_1 = __importDefault(require("../lib/plugins/knex"));
 const user_service_1 = __importDefault(require("../lib/services/user-service"));
 const registerPlugins = async (fastify) => {
+    await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/cookie'))), {
+        secret: process.env.COOKIE_SECRET,
+        hook: 'onRequest',
+    });
     await fastify.register(Promise.resolve().then(() => __importStar(require('fastify-bcrypt'))));
     await fastify.register(Promise.resolve().then(() => __importStar(require('@fastify/redis'))), {
         host: process.env.REDIS_HOST,
