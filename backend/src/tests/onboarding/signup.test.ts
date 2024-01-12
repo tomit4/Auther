@@ -23,7 +23,12 @@ type SignUpRes = {
     error?: string
 }
 
-const mock = {
+const mockReq: BodyReq = {
+    email: process.env.TEST_EMAIL as string,
+    password: process.env.TEST_PASSWORD as string,
+}
+
+const mockRes: SignUpRes = {
     ok: true,
     message: `Your Email Was Successfully Sent to ${process.env.TEST_EMAIL}!`,
 }
@@ -43,11 +48,7 @@ const registerRoute = async (fastify: FastifyInstance) => {
                 request: FastifyRequest,
                 reply: FastifyReply,
             ): Promise<SignUpRes> => {
-                const body: BodyReq = {
-                    email: process.env.TEST_EMAIL as string,
-                    password: process.env.TEST_PASSWORD as string,
-                }
-                const { email, password } = body
+                const { email, password } = mockReq
                 const { userService } = fastify
                 const hashedEmail = hasher(email)
                 const hashedPassword = await userService.hashPassword(password)
@@ -126,6 +127,6 @@ test('signs up user for first time and sends transac email', async t => {
 
     t.is(response.statusCode, 200)
     t.is(response.headers['content-type'], 'application/json; charset=utf-8')
-    t.is(response.payload, JSON.stringify(mock))
+    t.is(response.payload, JSON.stringify(mockRes))
     await fastify.close()
 })

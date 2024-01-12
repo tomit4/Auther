@@ -9,7 +9,11 @@ const auth_utils_1 = __importDefault(require("../../test-utils/auth-utils"));
 const send_email_1 = __importDefault(require("../../lib/utils/send-email"));
 const hasher_1 = __importDefault(require("../../lib/utils/hasher"));
 const schema_validators_1 = require("../../lib/utils/schema-validators");
-const mock = {
+const mockReq = {
+    email: process.env.TEST_EMAIL,
+    password: process.env.TEST_PASSWORD,
+};
+const mockRes = {
     ok: true,
     message: `Your Email Was Successfully Sent to ${process.env.TEST_EMAIL}!`,
 };
@@ -20,11 +24,7 @@ const registerRoute = async (fastify) => {
             method: 'POST',
             url: '/signup',
             handler: async (request, reply) => {
-                const body = {
-                    email: process.env.TEST_EMAIL,
-                    password: process.env.TEST_PASSWORD,
-                };
-                const { email, password } = body;
+                const { email, password } = mockReq;
                 const { userService } = fastify;
                 const hashedEmail = (0, hasher_1.default)(email);
                 const hashedPassword = await userService.hashPassword(password);
@@ -82,6 +82,6 @@ const registerRoute = async (fastify) => {
     });
     t.is(response.statusCode, 200);
     t.is(response.headers['content-type'], 'application/json; charset=utf-8');
-    t.is(response.payload, JSON.stringify(mock));
+    t.is(response.payload, JSON.stringify(mockRes));
     await fastify.close();
 });
