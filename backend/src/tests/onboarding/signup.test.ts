@@ -1,4 +1,5 @@
 import test from 'ava'
+import { stub } from 'sinon'
 import Fastify from 'fastify'
 import type {
     FastifyInstance,
