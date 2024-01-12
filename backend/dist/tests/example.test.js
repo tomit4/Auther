@@ -5,8 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const ava_1 = __importDefault(require("ava"));
 const fastify_1 = __importDefault(require("fastify"));
+const auth_utils_1 = __importDefault(require("../test-utils/auth-utils"));
 // TODO: Set up registration of plugins and mock output
-// import registerPlugins from '../../test_utils/auth-utils'
 // import mock from '../mocks/auth/mock_get-user.json'
 const mock = {
     ok: true,
@@ -19,6 +19,14 @@ const registerRoute = async (fastify) => {
             method: 'POST',
             url: '/signup',
             handler: async (request, reply) => {
+                // NOTE:  userService is now registered and
+                // all necessary plugins to do basic testing of routes is in place
+                const body = {
+                    email: process.env.TEST_EMAIL,
+                    password: process.env.TEST_PASSWORD,
+                };
+                const { email, password } = body;
+                const { userService } = fastify;
                 return reply.send({ ok: true, message: 'Hello World!' });
             },
         });
@@ -28,7 +36,7 @@ const registerRoute = async (fastify) => {
 };
 (0, ava_1.default)('requests the / route', async (t) => {
     // t.plan(3)
-    // await registerPlugins(fastify)
+    await (0, auth_utils_1.default)(fastify);
     await registerRoute(fastify);
     await fastify.listen();
     await fastify.ready();

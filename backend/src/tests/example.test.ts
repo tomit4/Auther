@@ -7,6 +7,10 @@ import type {
     FastifyRequest,
     HookHandlerDoneFunction,
 } from 'fastify'
+import registerPlugins from '../test-utils/auth-utils'
+import sendEmail from '../lib/utils/send-email'
+import hasher from '../lib/utils/hasher'
+import { validateInputs } from '../lib/utils/schema-validators'
 
 type BodyReq = {
     email: string
@@ -20,7 +24,6 @@ type SignUpRes = {
 }
 
 // TODO: Set up registration of plugins and mock output
-// import registerPlugins from '../../test_utils/auth-utils'
 // import mock from '../mocks/auth/mock_get-user.json'
 const mock = {
     ok: true,
@@ -38,9 +41,17 @@ const registerRoute = async (fastify: FastifyInstance) => {
             method: 'POST',
             url: '/signup',
             handler: async (
-                request: FastifyRequest<{ Body: BodyReq }>,
+                request: FastifyRequest,
                 reply: FastifyReply,
             ): Promise<SignUpRes> => {
+                // NOTE:  userService is now registered and
+                // all necessary plugins to do basic testing of routes is in place
+                const body: BodyReq = {
+                    email: process.env.TEST_EMAIL as string,
+                    password: process.env.TEST_PASSWORD as string,
+                }
+                const { email, password } = body
+                const { userService } = fastify
                 return reply.send({ ok: true, message: 'Hello World!' })
             },
         })
@@ -51,7 +62,7 @@ const registerRoute = async (fastify: FastifyInstance) => {
 
 test('requests the / route', async t => {
     // t.plan(3)
-    // await registerPlugins(fastify)
+    await registerPlugins(fastify)
     await registerRoute(fastify)
     await fastify.listen()
     await fastify.ready()
