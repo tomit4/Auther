@@ -44,8 +44,6 @@ export default (
         ): Promise<GrabUserCredsRes> => {
             const { userService } = fastify
             const refreshToken = request.cookies['appname-refresh-token']
-            /* NOTE: no need to check refresh token here,
-             * request is coming from frontend protected route */
             try {
                 if (!refreshToken)
                     throw new Error(
