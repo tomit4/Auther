@@ -42,8 +42,8 @@ exports.default = (fastify, options, done) => {
                     throw new Error('You have already submitted your email, please check your inbox.');
                 const emailSent = await (0, send_email_1.default)(email, `verify-forgot-pass/${hashedEmail}`, process.env
                     .BREVO_FORGOT_PASSWORD_TEMPLATE_ID);
-                if (!emailSent.wasSuccessfull) {
-                    fastify.log.error('Error occurred while sending email, are your Brevo credentials up to date? :=>', emailSent.error);
+                if (!(emailSent === null || emailSent === void 0 ? void 0 : emailSent.wasSuccessfull)) {
+                    fastify.log.error('Error occurred while sending email, are your Brevo credentials up to date? :=>');
                     throw new Error('An error occurred while sending email, please contact support.');
                 }
                 const sessionToken = userService.signToken(hashedEmail, process.env.JWT_SESSION_EXP);

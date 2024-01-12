@@ -13,6 +13,9 @@ import sendEmail from '../../lib/utils/send-email'
 import hasher from '../../lib/utils/hasher'
 import { validateInputs } from '../../lib/utils/schema-validators'
 
+// NOTE: Uncomment the following line if you want to use the test email
+const actuallySendEmail = false
+
 type BodyReq = {
     email: string
     password: string
@@ -55,16 +58,25 @@ const registerRoute = async (fastify: FastifyInstance) => {
                 const hashedPassword = await userService.hashPassword(password)
                 try {
                     validateInputs(email, password)
+                    stub(userService, 'grabUserByEmail').resolves(null)
+                    stub(userService, 'isUserInCacheExpired').resolves(true)
+                    stub(
+                        userService,
+                        'setUserEmailAndPasswordInCache',
+                    ).resolves()
                     const userAlreadyInDb =
                         await userService.grabUserByEmail(hashedEmail)
                     const userAlreadyInCache =
                         await userService.isUserInCacheExpired(hashedEmail)
-                    const emailSent = await sendEmail(
-                        email as string,
-                        `verify/${hashedEmail}` as string,
-                        process.env
-                            .BREVO_SIGNUP_TEMPLATE_ID as unknown as number,
-                    )
+                    let emailSent
+                    if (actuallySendEmail) {
+                        emailSent = await sendEmail(
+                            email as string,
+                            `verify/${hashedEmail}` as string,
+                            process.env
+                                .BREVO_SIGNUP_TEMPLATE_ID as unknown as number,
+                        )
+                    } else emailSent = { wasSuccessfull: true }
                     if (userAlreadyInDb && !userAlreadyInDb.is_deleted)
                         throw new Error(
                             'You have already signed up, please log in.',
@@ -73,10 +85,9 @@ const registerRoute = async (fastify: FastifyInstance) => {
                         throw new Error(
                             'You have already submitted your email, please check your inbox.',
                         )
-                    if (!emailSent.wasSuccessfull) {
+                    if (!emailSent?.wasSuccessfull) {
                         fastify.log.error(
                             'Error occurred while sending email, are your Brevo credentials up to date? :=>',
-                            emailSent.error,
                         )
                         throw new Error(
                             'An error occurred while sending email, please contact support.',
@@ -125,6 +136,8 @@ test('signs up user for first time and sends transac email', async t => {
         method: 'POST',
         url: '/signup',
     })
+
+    if (!actuallySendEmail) t.log('Actual email functionality not tested')
 
     t.is(response.statusCode, 200)
     t.is(response.headers['content-type'], 'application/json; charset=utf-8')

@@ -54,8 +54,8 @@ exports.default = (fastify, options, done) => {
                 }
                 const emailSent = await (0, send_email_1.default)(rawEmailFromRedis, `verify-change-pass/${hashedEmail}`, process.env
                     .BREVO_CHANGE_PASSWORD_TEMPLATE_ID);
-                if (!emailSent.wasSuccessfull) {
-                    fastify.log.error('Error occurred while sending email, are your Brevo credentials up to date? :=>', emailSent.error);
+                if (!(emailSent === null || emailSent === void 0 ? void 0 : emailSent.wasSuccessfull)) {
+                    fastify.log.error('Error occurred while sending email, are your Brevo credentials up to date? :=>');
                     throw new Error('An error occurred while sending email, please contact support.');
                 }
                 await userService.setInCacheWithExpiry(hashedEmail, 'change-password-ask', rawEmailFromRedis, 60);

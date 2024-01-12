@@ -54,8 +54,8 @@ exports.default = (fastify, options, done) => {
                     throw Error('Incorrect password. Please try again.');
                 const emailSent = await (0, send_email_1.default)(rawEmailFromRedis, `verify-delete-profile/${hashedEmail}`, process.env
                     .BREVO_DELETE_ACCOUNT_TEMPLATE_ID);
-                if (!emailSent.wasSuccessfull) {
-                    fastify.log.error('Error occurred while sending email, are your Brevo credentials up to date? :=>', emailSent.error);
+                if (!(emailSent === null || emailSent === void 0 ? void 0 : emailSent.wasSuccessfull)) {
+                    fastify.log.error('Error occurred while sending email, are your Brevo credentials up to date? :=>');
                     throw new Error('An error occurred while sending email, please contact support.');
                 }
                 await userService.setInCacheWithExpiry(hashedEmail, 'delete-profile-ask', rawEmailFromRedis, 60);

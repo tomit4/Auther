@@ -47,8 +47,8 @@ exports.default = (fastify, options, done) => {
                     throw new Error('You have already signed up, please log in.');
                 if (!userAlreadyInCache)
                     throw new Error('You have already submitted your email, please check your inbox.');
-                if (!emailSent.wasSuccessfull) {
-                    fastify.log.error('Error occurred while sending email, are your Brevo credentials up to date? :=>', emailSent.error);
+                if (!(emailSent === null || emailSent === void 0 ? void 0 : emailSent.wasSuccessfull)) {
+                    fastify.log.error('Error occurred while sending email, are your Brevo credentials up to date? :=>');
                     throw new Error('An error occurred while sending email, please contact support.');
                 }
                 await userService.setUserEmailAndPasswordInCache(hashedEmail, email, hashedPassword);

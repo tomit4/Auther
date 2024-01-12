@@ -99,10 +99,9 @@ export default (
                     process.env
                         .BREVO_CHANGE_PASSWORD_TEMPLATE_ID as unknown as number,
                 )
-                if (!emailSent.wasSuccessfull) {
+                if (!emailSent?.wasSuccessfull) {
                     fastify.log.error(
                         'Error occurred while sending email, are your Brevo credentials up to date? :=>',
-                        emailSent.error,
                     )
                     throw new Error(
                         'An error occurred while sending email, please contact support.',

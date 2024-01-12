@@ -37,12 +37,10 @@ export default async (
         // NOTE: verify must also change based off of sign up, change password, or delete
         link: `${process.env.BREVO_LINK}/${endpoint}`,
     }
-    return await apiInstance.sendTransacEmail(sendSmtpEmail).then(
-        data => {
-            return { wasSuccessfull: true, data: data }
-        },
-        error => {
-            return { wasSuccessfull: false, error: error }
-        },
-    )
+    try {
+        const data = await apiInstance.sendTransacEmail(sendSmtpEmail)
+        return { wasSuccessfull: true, data: data }
+    } catch (err) {
+        throw new Error(`ERROR :=>, ${err}`)
+    }
 }
