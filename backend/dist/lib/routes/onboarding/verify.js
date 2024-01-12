@@ -12,7 +12,7 @@ exports.default = (fastify, options, done) => {
             response: {
                 200: zod_1.z.object({
                     ok: zod_1.z.boolean(),
-                    message: zod_1.z.string(),
+                    msg: zod_1.z.string(),
                     sessionToken: zod_1.z.string(),
                 }),
                 500: zod_1.z.object({
@@ -54,7 +54,7 @@ exports.default = (fastify, options, done) => {
                 })
                     .send({
                     ok: true,
-                    message: 'Your email has been verified, redirecting you to the app...',
+                    msg: 'Your email has been verified, redirecting you to the app...',
                     sessionToken: sessionToken,
                 });
             }

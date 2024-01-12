@@ -1,4 +1,5 @@
-import type { ExecutionContext, TestFn } from 'ava'
+import test from 'ava'
+import Fastify from 'fastify'
 import type {
     FastifyInstance,
     FastifyPluginOptions,
@@ -6,9 +7,15 @@ import type {
     FastifyRequest,
     HookHandlerDoneFunction,
 } from 'fastify'
+import registerPlugins from '../../test-utils/auth-utils'
 import sendEmail from '../../lib/utils/send-email'
 import hasher from '../../lib/utils/hasher'
 import { validateInputs } from '../../lib/utils/schema-validators'
+
+type BodyReq = {
+    email: string
+    password: string
+}
 
 type SignUpRes = {
     ok: boolean
@@ -16,20 +23,12 @@ type SignUpRes = {
     error?: string
 }
 
-type BodyReq = {
-    email: string
-    password: string
-}
-
-const mockReq: BodyReq = {
-    email: process.env.TEST_EMAIL as string,
-    password: process.env.TEST_PASSWORD as string,
-}
-
-const mockRes: SignUpRes = {
+const mock = {
     ok: true,
     message: `Your Email Was Successfully Sent to ${process.env.TEST_EMAIL}!`,
 }
+
+const fastify: FastifyInstance = Fastify()
 
 const registerRoute = async (fastify: FastifyInstance) => {
     const newRoute = async (
@@ -44,7 +43,11 @@ const registerRoute = async (fastify: FastifyInstance) => {
                 request: FastifyRequest,
                 reply: FastifyReply,
             ): Promise<SignUpRes> => {
-                const { email, password } = mockReq
+                const body: BodyReq = {
+                    email: process.env.TEST_EMAIL as string,
+                    password: process.env.TEST_PASSWORD as string,
+                }
+                const { email, password } = body
                 const { userService } = fastify
                 const hashedEmail = hasher(email)
                 const hashedPassword = await userService.hashPassword(password)
@@ -109,25 +112,20 @@ const registerRoute = async (fastify: FastifyInstance) => {
     fastify.register(newRoute)
 }
 
-const signupTest = async (test: TestFn, fastify: FastifyInstance) => {
-    test.before(async () => {
-        await registerRoute(fastify)
+test('signs up user for first time and sends transac email', async t => {
+    t.plan(3)
+    await registerPlugins(fastify)
+    await registerRoute(fastify)
+    await fastify.listen()
+    await fastify.ready()
+
+    const response = await fastify.inject({
+        method: 'POST',
+        url: '/signup',
     })
-    return test('signs up user for first time and sends transac email', async (t: ExecutionContext) => {
-        t.plan(3)
 
-        const response = await fastify.inject({
-            method: 'POST',
-            url: '/signup',
-        })
-
-        t.is(response.statusCode, 200)
-        t.is(
-            response.headers['content-type'],
-            'application/json; charset=utf-8',
-        )
-        t.is(response.payload, JSON.stringify(mockRes))
-    })
-}
-
-export default signupTest
+    t.is(response.statusCode, 200)
+    t.is(response.headers['content-type'], 'application/json; charset=utf-8')
+    t.is(response.payload, JSON.stringify(mock))
+    await fastify.close()
+})
