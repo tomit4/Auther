@@ -19,7 +19,7 @@ const registerRoute = async (fastify) => {
             url: '/logout',
             handler: async (request, reply) => {
                 const { userService } = fastify;
-                (0, sinon_1.stub)(request, 'cookies').value({
+                (0, sinon_1.stub)(request, 'cookies').resolves({
                     'appname-refresh-token': userService.signToken(process.env.TEST_EMAIL, process.env.JWT_REFRESH_EXP),
                 });
                 const refreshToken = request.cookies['appname-refresh-token'];

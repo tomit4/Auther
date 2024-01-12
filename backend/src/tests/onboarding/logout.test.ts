@@ -36,7 +36,7 @@ const registerRoute = async (fastify: FastifyInstance) => {
                 reply: FastifyReply,
             ): Promise<LogOutRes> => {
                 const { userService } = fastify
-                stub(request, 'cookies').value({
+                stub(request, 'cookies').resolves({
                     'appname-refresh-token': userService.signToken(
                         process.env.TEST_EMAIL as string,
                         process.env.JWT_REFRESH_EXP as string,
