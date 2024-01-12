@@ -3,7 +3,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const fastify_1 = __importDefault(require("fastify"));
 const send_email_1 = __importDefault(require("../../lib/utils/send-email"));
 const hasher_1 = __importDefault(require("../../lib/utils/hasher"));
 const schema_validators_1 = require("../../lib/utils/schema-validators");
@@ -15,7 +14,6 @@ const mockRes = {
     ok: true,
     message: `Your Email Was Successfully Sent to ${process.env.TEST_EMAIL}!`,
 };
-const fastify = (0, fastify_1.default)();
 const registerRoute = async (fastify) => {
     const newRoute = async (fastify, options, done) => {
         fastify.route({

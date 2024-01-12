@@ -1,5 +1,4 @@
 import type { ExecutionContext, TestFn } from 'ava'
-import Fastify from 'fastify'
 import type {
     FastifyInstance,
     FastifyPluginOptions,
@@ -31,8 +30,6 @@ const mockRes: SignUpRes = {
     ok: true,
     message: `Your Email Was Successfully Sent to ${process.env.TEST_EMAIL}!`,
 }
-
-const fastify: FastifyInstance = Fastify()
 
 const registerRoute = async (fastify: FastifyInstance) => {
     const newRoute = async (
