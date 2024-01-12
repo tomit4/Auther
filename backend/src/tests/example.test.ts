@@ -1,11 +1,68 @@
 import test from 'ava'
+import Fastify from 'fastify'
+import type {
+    FastifyInstance,
+    FastifyPluginOptions,
+    FastifyReply,
+    FastifyRequest,
+    HookHandlerDoneFunction,
+} from 'fastify'
 
-// NOTE: This is just an example test file, to be deleted later
-test('foo', t => {
-    t.pass()
-})
+type BodyReq = {
+    email: string
+    password: string
+}
 
-test('bar', async t => {
-    const bar = Promise.resolve('bar')
-    t.is(await bar, 'bar')
+type SignUpRes = {
+    ok: boolean
+    message?: string
+    error?: string
+}
+
+// TODO: Set up registration of plugins and mock output
+// import registerPlugins from '../../test_utils/auth-utils'
+// import mock from '../mocks/auth/mock_get-user.json'
+const mock = {
+    ok: true,
+    message: 'Hello World!',
+}
+const fastify: FastifyInstance = Fastify()
+
+const registerRoute = async (fastify: FastifyInstance) => {
+    const newRoute = async (
+        fastify: FastifyInstance,
+        options: FastifyPluginOptions,
+        done: HookHandlerDoneFunction,
+    ) => {
+        fastify.route({
+            method: 'POST',
+            url: '/signup',
+            handler: async (
+                request: FastifyRequest<{ Body: BodyReq }>,
+                reply: FastifyReply,
+            ): Promise<SignUpRes> => {
+                return reply.send({ ok: true, message: 'Hello World!' })
+            },
+        })
+        done()
+    }
+    fastify.register(newRoute)
+}
+
+test('requests the / route', async t => {
+    // t.plan(3)
+    // await registerPlugins(fastify)
+    await registerRoute(fastify)
+    await fastify.listen()
+    await fastify.ready()
+
+    const response = await fastify.inject({
+        method: 'POST',
+        url: '/signup',
+    })
+
+    t.is(response.statusCode, 200)
+    t.is(response.headers['content-type'], 'application/json; charset=utf-8')
+    t.is(response.payload, JSON.stringify(mock))
+    await fastify.close()
 })
