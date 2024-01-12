@@ -1,4 +1,4 @@
-import test from 'ava'
+import type { ExecutionContext, TestFn } from 'ava'
 import Fastify from 'fastify'
 import type {
     FastifyInstance,
@@ -7,20 +7,19 @@ import type {
     FastifyRequest,
     HookHandlerDoneFunction,
 } from 'fastify'
-import registerPlugins from '../../test-utils/auth-utils'
 import sendEmail from '../../lib/utils/send-email'
 import hasher from '../../lib/utils/hasher'
 import { validateInputs } from '../../lib/utils/schema-validators'
-
-type BodyReq = {
-    email: string
-    password: string
-}
 
 type SignUpRes = {
     ok: boolean
     message?: string
     error?: string
+}
+
+type BodyReq = {
+    email: string
+    password: string
 }
 
 const mockReq: BodyReq = {
@@ -113,20 +112,25 @@ const registerRoute = async (fastify: FastifyInstance) => {
     fastify.register(newRoute)
 }
 
-test('signs up user for first time and sends transac email', async t => {
-    t.plan(3)
-    await registerPlugins(fastify)
-    await registerRoute(fastify)
-    await fastify.listen()
-    await fastify.ready()
-
-    const response = await fastify.inject({
-        method: 'POST',
-        url: '/signup',
+const signupTest = async (test: TestFn, fastify: FastifyInstance) => {
+    test.before(async () => {
+        await registerRoute(fastify)
     })
+    return test('signs up user for first time and sends transac email', async (t: ExecutionContext) => {
+        t.plan(3)
 
-    t.is(response.statusCode, 200)
-    t.is(response.headers['content-type'], 'application/json; charset=utf-8')
-    t.is(response.payload, JSON.stringify(mockRes))
-    await fastify.close()
-})
+        const response = await fastify.inject({
+            method: 'POST',
+            url: '/signup',
+        })
+
+        t.is(response.statusCode, 200)
+        t.is(
+            response.headers['content-type'],
+            'application/json; charset=utf-8',
+        )
+        t.is(response.payload, JSON.stringify(mockRes))
+    })
+}
+
+export default signupTest

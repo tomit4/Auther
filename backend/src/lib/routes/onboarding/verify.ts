@@ -11,9 +11,10 @@ import { z } from 'zod'
 type BodyReq = {
     hashedEmail: string
 }
+
 type VerifyRes = {
     ok: boolean
-    msg?: string
+    message?: string
     error?: string
     sessionToken?: string
 }
@@ -33,7 +34,7 @@ export default (
             response: {
                 200: z.object({
                     ok: z.boolean(),
-                    msg: z.string(),
+                    message: z.string(),
                     sessionToken: z.string(),
                 }),
                 500: z.object({
@@ -104,7 +105,8 @@ export default (
                     })
                     .send({
                         ok: true,
-                        msg: 'Your email has been verified, redirecting you to the app...',
+                        message:
+                            'Your email has been verified, redirecting you to the app...',
                         sessionToken: sessionToken,
                     })
             } catch (err) {
