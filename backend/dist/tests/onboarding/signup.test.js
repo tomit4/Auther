@@ -71,7 +71,7 @@ const registerRoute = async (fastify) => {
     fastify.register(newRoute);
 };
 (0, ava_1.default)('signs up user for first time and sends transac email', async (t) => {
-    // t.plan(3)
+    t.plan(3);
     await (0, auth_utils_1.default)(fastify);
     await registerRoute(fastify);
     await fastify.listen();

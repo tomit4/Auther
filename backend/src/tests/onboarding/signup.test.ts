@@ -113,7 +113,7 @@ const registerRoute = async (fastify: FastifyInstance) => {
 }
 
 test('signs up user for first time and sends transac email', async t => {
-    // t.plan(3)
+    t.plan(3)
     await registerPlugins(fastify)
     await registerRoute(fastify)
     await fastify.listen()
