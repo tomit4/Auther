@@ -6,7 +6,7 @@
     "scripts": {
         "watch": "tsc -w",
         "start": "node dist/index.js",
-        "test": "ava",
+        "test": "nyc --reporter=text ava && rm -r ./.nyc_output",
         "migrate-make": "cd src && knex migrate:make -x ts",
         "migrate-latest": "cd src && npx ts-node ../node_modules/.bin/knex migrate:latest",
         "migrate-rollback": "cd src && npx ts-node ../node_modules/.bin/knex migrate:rollback",
@@ -42,6 +42,7 @@
         "@ava/typescript": "^4.1.0",
         "@types/node": "^20.10.4",
         "ava": "^6.0.1",
+        "nyc": "^15.1.0",
         "ts-node": "^10.9.2",
         "ts-node-dev": "^2.0.0",
         "typescript": "^5.3.3"
