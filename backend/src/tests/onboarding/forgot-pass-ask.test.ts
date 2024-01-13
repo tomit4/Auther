@@ -9,9 +9,9 @@ import type {
     HookHandlerDoneFunction,
 } from 'fastify'
 import registerPlugins from '../../test-utils/auth-utils'
+import { validateEmailInput } from '../../lib/utils/schema-validators'
 import sendEmail from '../../lib/utils/send-email'
 import hasher from '../../lib/utils/hasher'
-import { validateInputs } from '../../lib/utils/schema-validators'
 
 /* NOTE: Set to True if you want to actually send
  * an email to test (ensure TEST_EMAIL variable is
@@ -20,23 +20,28 @@ const actuallySendEmail = false
 
 type BodyReq = {
     email: string
-    password: string
 }
 
-type SignUpRes = {
+type ForgotPassAskRes = {
     ok: boolean
     message?: string
-    error?: string
+}
+
+type User = {
+    id: number
+    email: string
+    password: string
+    is_deleted: boolean
+    created_at: Date
 }
 
 const mockReq: BodyReq = {
     email: process.env.TEST_EMAIL as string,
-    password: process.env.TEST_PASSWORD as string,
 }
 
-const mockRes = {
+const mockRes: ForgotPassAskRes = {
     ok: true,
-    message: `Your Email Was Successfully Sent to ${process.env.TEST_EMAIL}!`,
+    message: `Your forgot password request was successfully sent to ${process.env.TEST_EMAIL}!`,
 }
 
 const fastify: FastifyInstance = Fastify()
@@ -49,40 +54,49 @@ const registerRoute = async (fastify: FastifyInstance) => {
     ) => {
         fastify.route({
             method: 'POST',
-            url: '/signup',
+            url: '/forgot-password-ask',
             handler: async (
                 request: FastifyRequest,
                 reply: FastifyReply,
-            ): Promise<SignUpRes> => {
-                const { email, password } = mockReq
+            ): Promise<ForgotPassAskRes> => {
+                const { email } = mockReq
                 const { userService } = fastify
                 const hashedEmail = hasher(email)
-                const hashedPassword = await userService.hashPassword(password)
                 try {
-                    validateInputs(email, password)
-                    stub(userService, 'grabUserByEmail').resolves(null)
+                    validateEmailInput(email)
+                    stub(userService, 'grabUserByEmail').resolves({
+                        id: 3,
+                        email: hasher(process.env.TEST_EMAIL as string),
+                        password: await userService.hashPassword(
+                            process.env.TEST_PASSWORD as string,
+                        ),
+                        is_deleted: false,
+                        created_at: new Date(),
+                    })
                     const userAlreadyInDb =
                         await userService.grabUserByEmail(hashedEmail)
-                    stub(userService, 'isUserInCacheExpired').resolves(true)
-                    const userAlreadyInCache =
-                        await userService.isUserInCacheExpired(hashedEmail)
+                    stub(userService, 'grabFromCache').resolves(null)
+                    const userAlreadyInCache = await userService.grabFromCache(
+                        hashedEmail,
+                        'forgot-pass-ask',
+                    )
+                    if (!userAlreadyInDb || userAlreadyInDb.is_deleted)
+                        throw new Error(
+                            'There is no record of that email address, please sign up.',
+                        )
+                    if (userAlreadyInCache)
+                        throw new Error(
+                            'You have already submitted your email, please check your inbox.',
+                        )
                     let emailSent: undefined | { wasSuccessfull: boolean }
                     if (actuallySendEmail) {
                         emailSent = await sendEmail(
                             email as string,
-                            `verify/${hashedEmail}` as string,
+                            `verify-forgot-pass/${hashedEmail}` as string,
                             process.env
-                                .BREVO_SIGNUP_TEMPLATE_ID as unknown as number,
+                                .BREVO_FORGOT_PASSWORD_TEMPLATE_ID as unknown as number,
                         )
                     } else emailSent = { wasSuccessfull: true }
-                    if (userAlreadyInDb && !userAlreadyInDb.is_deleted)
-                        throw new Error(
-                            'You have already signed up, please log in.',
-                        )
-                    if (!userAlreadyInCache)
-                        throw new Error(
-                            'You have already submitted your email, please check your inbox.',
-                        )
                     if (!emailSent?.wasSuccessfull) {
                         fastify.log.error(
                             'Error occurred while sending email, are your Brevo credentials up to date? :=>',
@@ -91,29 +105,26 @@ const registerRoute = async (fastify: FastifyInstance) => {
                             'An error occurred while sending email, please contact support.',
                         )
                     }
-                    stub(
-                        userService,
-                        'setUserEmailAndPasswordInCache',
-                    ).resolves()
-                    await userService.setUserEmailAndPasswordInCache(
+                    userService.signToken(
                         hashedEmail,
-                        email,
-                        hashedPassword,
+                        process.env.JWT_SESSION_EXP as string,
                     )
-                    reply
-                        .code(200)
-                        .setCookie('appname-hash', hashedEmail, {
-                            path: '/verify',
-                            maxAge: 60 * 60,
-                        })
-                        .send({
-                            ok: true,
-                            message: `Your Email Was Successfully Sent to ${email}!`,
-                        })
+                    stub(userService, 'setInCacheWithExpiry').resolves(
+                        undefined,
+                    )
+                    await userService.setInCacheWithExpiry(
+                        hashedEmail,
+                        'forgot-pass-ask',
+                        email,
+                        60,
+                    )
+                    reply.code(200).send({
+                        ok: true,
+                        message: `Your forgot password request was successfully sent to ${email}!`,
+                    })
                 } catch (err) {
                     if (err instanceof Error) {
-                        fastify.log.error('ERROR :=>', err.message)
-                        reply.code(500).send({
+                        reply.send({
                             ok: false,
                             message: err.message,
                         })
@@ -127,7 +138,7 @@ const registerRoute = async (fastify: FastifyInstance) => {
     fastify.register(newRoute)
 }
 
-test('signs up user for first time and sends transac email', async t => {
+test('sends a transac email to reset forgotten password', async t => {
     t.plan(3)
     await registerPlugins(fastify)
     await registerRoute(fastify)
@@ -136,11 +147,13 @@ test('signs up user for first time and sends transac email', async t => {
 
     const response = await fastify.inject({
         method: 'POST',
-        url: '/signup',
+        url: '/forgot-password-ask',
     })
 
     if (!actuallySendEmail)
-        t.log('Actual email functionality not tested in signup route')
+        t.log(
+            'Actual email functionality not tested in forgot-password-ask route',
+        )
 
     t.is(response.statusCode, 200)
     t.is(response.headers['content-type'], 'application/json; charset=utf-8')
