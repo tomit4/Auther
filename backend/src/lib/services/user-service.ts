@@ -174,7 +174,7 @@ class UserService {
         emailFromRedis: string,
     ): Promise<void> {
         const { redis } = this
-        await redis.set(`${hashedEmail}-email`, emailFromRedis, 'EX', 60)
+        await redis.set(`${hashedEmail}-email`, emailFromRedis, 'EX', 180)
         await redis.del(`${hashedEmail}-password`)
     }
 

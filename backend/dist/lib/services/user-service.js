@@ -97,7 +97,7 @@ class UserService {
     }
     async setUserEmailInCacheAndDeletePassword(hashedEmail, emailFromRedis) {
         const { redis } = this;
-        await redis.set(`${hashedEmail}-email`, emailFromRedis, 'EX', 60);
+        await redis.set(`${hashedEmail}-email`, emailFromRedis, 'EX', 180);
         await redis.del(`${hashedEmail}-password`);
     }
     // TODO: reset expiration to a .env variable
