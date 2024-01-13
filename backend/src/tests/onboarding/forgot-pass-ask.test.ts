@@ -27,14 +27,6 @@ type ForgotPassAskRes = {
     message?: string
 }
 
-type User = {
-    id: number
-    email: string
-    password: string
-    is_deleted: boolean
-    created_at: Date
-}
-
 const mockReq: BodyReq = {
     email: process.env.TEST_EMAIL as string,
 }
