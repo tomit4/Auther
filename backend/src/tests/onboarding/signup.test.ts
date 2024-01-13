@@ -14,7 +14,7 @@ import hasher from '../../lib/utils/hasher'
 import { validateInputs } from '../../lib/utils/schema-validators'
 
 /* NOTE: Set to True if you want to actually send
- * an email to test (ensure TEst_EMAIL variable is
+ * an email to test (ensure TEST_EMAIL variable is
  * set to your actual email in the .env file) */
 const actuallySendEmail = false
 
