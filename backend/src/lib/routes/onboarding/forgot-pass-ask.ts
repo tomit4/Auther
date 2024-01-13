@@ -20,6 +20,14 @@ type ForgotPassAskRes = {
     message?: string
 }
 
+type User = {
+    id: number
+    email: string
+    password: string
+    is_deleted: boolean
+    created_at: Date
+}
+
 export default (
     fastify: FastifyInstance,
     options: FastifyPluginOptions,
@@ -54,7 +62,7 @@ export default (
             const hashedEmail = hasher(email)
             try {
                 validateEmailInput(email)
-                const userAlreadyInDb =
+                const userAlreadyInDb: User | null =
                     await userService.grabUserByEmail(hashedEmail)
                 const userAlreadyInCache = await userService.grabFromCache(
                     hashedEmail,
