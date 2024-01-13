@@ -15,6 +15,7 @@ type BodyReq = {
 
 type ForgotPassCheckRes = {
     ok: boolean
+    email?: string
     message?: string
     error?: string
 }
