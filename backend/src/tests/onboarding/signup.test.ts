@@ -34,7 +34,7 @@ const mockReq: BodyReq = {
     password: process.env.TEST_PASSWORD as string,
 }
 
-const mock = {
+const mockRes = {
     ok: true,
     message: `Your Email Was Successfully Sent to ${process.env.TEST_EMAIL}!`,
 }
@@ -66,7 +66,7 @@ const registerRoute = async (fastify: FastifyInstance) => {
                     stub(userService, 'isUserInCacheExpired').resolves(true)
                     const userAlreadyInCache =
                         await userService.isUserInCacheExpired(hashedEmail)
-                    let emailSent
+                    let emailSent: undefined | { wasSuccessfull: boolean }
                     if (actuallySendEmail) {
                         emailSent = await sendEmail(
                             email as string,
@@ -143,6 +143,6 @@ test('signs up user for first time and sends transac email', async t => {
 
     t.is(response.statusCode, 200)
     t.is(response.headers['content-type'], 'application/json; charset=utf-8')
-    t.is(response.payload, JSON.stringify(mock))
+    t.is(response.payload, JSON.stringify(mockRes))
     await fastify.close()
 })

@@ -18,7 +18,7 @@ const mockReq = {
     email: process.env.TEST_EMAIL,
     password: process.env.TEST_PASSWORD,
 };
-const mock = {
+const mockRes = {
     ok: true,
     message: `Your Email Was Successfully Sent to ${process.env.TEST_EMAIL}!`,
 };
@@ -97,6 +97,6 @@ const registerRoute = async (fastify) => {
         t.log('Actual email functionality not tested');
     t.is(response.statusCode, 200);
     t.is(response.headers['content-type'], 'application/json; charset=utf-8');
-    t.is(response.payload, JSON.stringify(mock));
+    t.is(response.payload, JSON.stringify(mockRes));
     await fastify.close();
 });
