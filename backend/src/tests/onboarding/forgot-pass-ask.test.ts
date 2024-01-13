@@ -27,6 +27,14 @@ type ForgotPassAskRes = {
     message?: string
 }
 
+type User = {
+    id: number
+    email: string
+    password: string
+    is_deleted: boolean
+    created_at: Date
+}
+
 const mockReq: BodyReq = {
     email: process.env.TEST_EMAIL as string,
 }
@@ -65,7 +73,7 @@ const registerRoute = async (fastify: FastifyInstance) => {
                         is_deleted: false,
                         created_at: new Date(),
                     })
-                    const userAlreadyInDb =
+                    const userAlreadyInDb: User | null =
                         await userService.grabUserByEmail(hashedEmail)
                     stub(userService, 'grabFromCache').resolves(null)
                     const userAlreadyInCache = await userService.grabFromCache(
