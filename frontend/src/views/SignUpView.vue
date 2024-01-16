@@ -62,7 +62,6 @@ onBeforeRouteLeave(() => {
         <br />
         <span className="email-form">
             <label className="email-label" for="email">Email Me At:</label>
-            <!-- TODO: v-focus throws Vue Warning in vitest, resolve. -->
             <input
                 type="email"
                 id="email"

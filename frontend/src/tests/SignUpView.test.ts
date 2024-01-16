@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/vue'
 
 import SignUp from '../views/SignUpView.vue'
 
+// TODO: add test to validate error handling/message
 describe('SignUp', () => {
     it('SignUp renders and interacts as expected', async () => {
         render(SignUp)
