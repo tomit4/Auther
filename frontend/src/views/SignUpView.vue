@@ -31,6 +31,7 @@ const handleSubmit = async (
             body: JSON.stringify(data),
         })
         const jsonRes = await res.json()
+        console.log('jsonRes :=>', jsonRes)
         if (!res.ok) {
             errMessage.value = jsonRes.message
                 ? jsonRes.message
@@ -47,6 +48,8 @@ const handleSubmit = async (
     }
 }
 
+// TODO: onBeforeRouteLeave throws Vue Warning in vitest, resolve.
+// NOTE: related to vue-router
 onBeforeRouteLeave(() => {
     emailInput.value = ''
     passwordInput.value = ''
@@ -61,6 +64,7 @@ onBeforeRouteLeave(() => {
         <br />
         <span className="email-form">
             <label className="email-label" for="email">Email Me At:</label>
+            <!-- TODO: v-focus throws Vue Warning in vitest, resolve. -->
             <input
                 type="email"
                 id="email"
@@ -69,10 +73,10 @@ onBeforeRouteLeave(() => {
                 minlength="5"
                 placeholder="jondoe@example.com"
                 v-model="emailInput"
+                v-focus
                 @keyup.enter="
                     handleSubmit(emailInput as string, passwordInput as string)
                 "
-                v-focus
                 required
             />
             <br />
@@ -103,10 +107,10 @@ onBeforeRouteLeave(() => {
                 Submit
             </button>
         </span>
-        <span v-if="errMessage">
+        <span data-testid="err-message" v-if="errMessage">
             <p>{{ errMessage }}</p>
         </span>
-        <span v-else-if="resSuccessful.length">
+        <span data-testid="res-successful" v-else-if="resSuccessful.length">
             <p>{{ resSuccessful }}</p>
         </span>
         <span v-else />
