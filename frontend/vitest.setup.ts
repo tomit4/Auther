@@ -1,16 +1,13 @@
-import { beforeAll, afterEach, afterAll, vi } from 'vitest'
-import { createRouterMock, injectRouterMock } from 'vue-router-mock'
+import { beforeEach, afterEach, afterAll, vi } from 'vitest'
+import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
 import { server } from './src/mocks/node'
 
-const router = createRouterMock({
-    spy: {
-        create: fn => vi.fn(fn),
-        reset: spy => spy.mockReset(),
-    },
-})
-
-beforeAll(() => {
-    injectRouterMock(router)
+beforeEach(() => {
+    vi.mock('vue-router', () => ({
+        onBeforeRouteLeave: () => vi.fn(onBeforeRouteLeave),
+        useRoute: () => vi.fn(useRoute),
+        useRouter: () => vi.fn(useRouter),
+    }))
     server.listen({ onUnhandledRequest: 'error' })
 })
 

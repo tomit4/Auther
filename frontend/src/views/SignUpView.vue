@@ -48,8 +48,6 @@ const handleSubmit = async (
     }
 }
 
-// TODO: onBeforeRouteLeave throws Vue Warning in vitest, resolve.
-// NOTE: related to vue-router
 onBeforeRouteLeave(() => {
     emailInput.value = ''
     passwordInput.value = ''
@@ -107,7 +105,7 @@ onBeforeRouteLeave(() => {
                 Submit
             </button>
         </span>
-        <span data-testid="err-message" v-if="errMessage">
+        <span data-testid="err-message" v-if="errMessage.length">
             <p>{{ errMessage }}</p>
         </span>
         <span data-testid="res-successful" v-else-if="resSuccessful.length">

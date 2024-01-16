@@ -6,8 +6,11 @@ import Footer from './components/Footer.vue'
 <template>
     <div className="app">
         <Nav />
-        <!-- TODO: router-view throws warning in vitest, resolve.-->
-        <router-view />
+        <router-view v-slot="{ Component }">
+            <keep-alive>
+                <component :is="Component" />
+            </keep-alive>
+        </router-view>
         <Footer />
     </div>
 </template>

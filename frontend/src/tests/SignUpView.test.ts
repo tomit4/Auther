@@ -1,21 +1,11 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { getRouter } from 'vue-router-mock'
+import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 
-import { mount } from '@vue/test-utils'
 import SignUp from '../views/SignUpView.vue'
 
 describe('SignUp', () => {
-    beforeEach(() => {
-        const router = getRouter()
-        render(SignUp, {
-            global: {
-                plugins: [router],
-            },
-        })
-    })
-    mount(SignUp)
     it('SignUp renders and interacts as expected', async () => {
+        render(SignUp)
         const SubmitBtn = screen.getByText('Submit')
         const emailText = screen.getByLabelText(/email/i)
         const passwordText = screen.getByLabelText(/password/i)
