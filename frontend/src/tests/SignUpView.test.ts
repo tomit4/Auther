@@ -14,8 +14,8 @@ describe('SignUp', () => {
             },
         })
     })
+    mount(SignUp)
     it('SignUp renders and interacts as expected', async () => {
-        mount(SignUp)
         const SubmitBtn = screen.getByText('Submit')
         const emailText = screen.getByLabelText(/email/i)
         const passwordText = screen.getByLabelText(/password/i)

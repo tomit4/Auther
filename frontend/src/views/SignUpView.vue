@@ -3,6 +3,7 @@ import { ref, type Ref } from 'vue'
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { delay } from '../utils/utils.ts'
 import { validateInputs } from '../utils/schema-validators'
+import vFocus from '../directives/focus'
 
 const router = useRouter()
 const emailInput: Ref<string> = ref('')
@@ -31,7 +32,6 @@ const handleSubmit = async (
             body: JSON.stringify(data),
         })
         const jsonRes = await res.json()
-        console.log('jsonRes :=>', jsonRes)
         if (!res.ok) {
             errMessage.value = jsonRes.message
                 ? jsonRes.message
