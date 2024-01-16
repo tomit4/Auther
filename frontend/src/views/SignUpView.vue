@@ -105,6 +105,7 @@ onBeforeRouteLeave(() => {
                 Submit
             </button>
         </span>
+        <!-- TODO: add .length to all v-if checks involving errMessage and resSuccessful -->
         <span data-testid="err-message" v-if="errMessage.length">
             <p>{{ errMessage }}</p>
         </span>

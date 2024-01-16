@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
+// NOTE: Consider reimplementing without @vue/test-utils in favor of @testing-library/vue
 import { mount } from '@vue/test-utils'
 import Nav from '../components/Nav.vue'
 
