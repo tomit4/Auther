@@ -7,12 +7,13 @@ defineProps({
 <template>
     <div className="app-dash">
         <h1>App</h1>
-        <p>Welcome {{ emailFromCache }}!!</p>
+        <p data-test="greeting">Welcome {{ emailFromCache }}!!</p>
         <button
             @click="$emit('handleLogout')"
             type="submit"
             value="Submit"
             className="btn logout-btn"
+            data-test="logout-btn"
         >
             Log Out
         </button>
@@ -22,6 +23,7 @@ defineProps({
             type="submit"
             value="Submit"
             className="btn change-password-btn"
+            data-test="change-password-btn"
         >
             Change Password
         </button>
@@ -31,6 +33,7 @@ defineProps({
             type="submit"
             value="Submit"
             className="btn delete-profile-btn"
+            data-test="delete-profile-btn"
         >
             Delete My Profile
         </button>
