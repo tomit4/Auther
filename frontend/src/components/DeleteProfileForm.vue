@@ -3,6 +3,7 @@ import { ref, type Ref } from 'vue'
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { delay } from '../utils/utils.ts'
 import { validatePasswordInput } from '../utils/schema-validators'
+import vFocus from '../directives/focus.ts'
 
 const router = useRouter()
 const passwordInput: Ref<string> = ref('')
@@ -83,7 +84,13 @@ onBeforeRouteLeave(() => {
                 Submit
             </button>
         </span>
-        <button className="btn" @click="$emit('goBack')">Go Back</button>
+        <button
+            className="btn"
+            data-test="go-back-btn"
+            @click="$emit('goBack')"
+        >
+            Go Back
+        </button>
         <span v-if="errMessage">
             <p>{{ errMessage }}</p>
         </span>

@@ -48,9 +48,7 @@ onMounted(async (): Promise<void> => {
         const jsonRes = await res.json()
         emailFromCache.value = jsonRes.email
     } catch (err) {
-        if (err instanceof Error) {
-            console.error(err.message)
-        }
+        if (err instanceof Error) console.error(err.message)
         localStorage.removeItem('appname-session-token')
         router.push('/login')
     }
@@ -66,20 +64,16 @@ onMounted(async (): Promise<void> => {
             @toggle-change-password-form="toggleChangePasswordForm"
             @toggle-delete-profile-form="toggleDeleteProfileForm"
         />
-        <div>
-            <ChangePassForm
-                v-if="showChangePassForm"
-                @go-back="toggleChangePasswordForm"
-                :email-from-cache="emailFromCache"
-            />
-        </div>
-        <div>
-            <DeleteProfileForm
-                v-if="showDeleteProfileForm"
-                @go-back="toggleDeleteProfileForm"
-                :email-from-cache="emailFromCache"
-            />
-        </div>
+        <ChangePassForm
+            v-if="showChangePassForm"
+            @go-back="toggleChangePasswordForm"
+            :email-from-cache="emailFromCache"
+        />
+        <DeleteProfileForm
+            v-if="showDeleteProfileForm"
+            @go-back="toggleDeleteProfileForm"
+            :email-from-cache="emailFromCache"
+        />
     </div>
 </template>
 

@@ -1,6 +1,4 @@
 import { beforeEach, afterEach, afterAll, vi } from 'vitest'
-import { RouterLink } from 'vue-router'
-import { RouterLinkStub } from '@vue/test-utils'
 import { server } from './src/mocks/node'
 
 beforeEach(() => {
@@ -17,12 +15,12 @@ beforeEach(() => {
             useRouter: () => {
                 return { push: vi.fn() }
             },
-            RouterLink: RouterLinkStub,
         }
     })
     vi.mock('localStorage', () => {
         return {
             setItem: vi.fn(),
+            removeItem: vi.fn(),
         }
     })
     vi.mock(
