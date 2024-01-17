@@ -1,13 +1,10 @@
 import { beforeEach, afterEach, afterAll, vi } from 'vitest'
 import { server } from './src/mocks/node'
+import { delay } from './src/utils/utils'
 
 beforeEach(() => {
     vi.mock('vue-router', () => ({
-        onBeforeRouteLeave: () => {
-            return {
-                onBeforeRouteLeave: vi.fn(),
-            }
-        },
+        onBeforeRouteLeave: vi.fn(),
         useRoute: () => {
             return {
                 params: {

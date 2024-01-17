@@ -22,7 +22,6 @@ export const handlers = [
             ok: true,
             message:
                 'Your email has been verified, redirecting you to the app...',
-            // sessionToken: sessionToken
         })
     }),
 ]
