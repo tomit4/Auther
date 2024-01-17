@@ -57,13 +57,13 @@ onMounted(async () => {
 
 <template>
     <div>
-        <h1 data-testid="h1">Thanks For Answering Our Email,</h1>
-        <h2 data-testid="h2">please wait while we verify...</h2>
+        <h1 data-test="h1">Thanks For Answering Our Email,</h1>
+        <h2 data-test="h2">please wait while we verify...</h2>
         <span v-if="errMessage?.length">
-            <p data-testid="err-message">{{ errMessage }}</p>
+            <p data-test="err-message">{{ errMessage }}</p>
         </span>
         <span v-else-if="resSuccessful?.length">
-            <p data-testid="res-successful">{{ resSuccessful }}</p>
+            <p data-test="res-successful">{{ resSuccessful }}</p>
         </span>
         <span v-else />
     </div>

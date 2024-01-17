@@ -1,21 +1,20 @@
 import { describe, it, expect } from 'vitest'
-import { render } from '@testing-library/vue'
-import { flushPromises } from '@vue/test-utils'
+import { mount, flushPromises } from '@vue/test-utils'
 
 import Verified from '../views/VerifiedView.vue'
 
 describe('Verified', () => {
     it('Verified renders and verifies as expected', async () => {
-        const { queryByTestId } = render(Verified)
+        const wrapper = mount(Verified)
         await flushPromises()
-        const h1 = queryByTestId('h1') as HTMLElement
-        const h2 = queryByTestId('h2') as HTMLElement
-        const errMessage = queryByTestId('err-message') as HTMLElement
-        const resSuccessful = queryByTestId('res-successful') as HTMLElement
-        expect(h1.textContent).toContain('Thanks For Answering Our Email,')
-        expect(h2.textContent).toContain('please wait while we verify...')
-        expect(errMessage).toBeNull()
-        expect(resSuccessful.textContent).toContain(
+        const h1 = wrapper.get('[data-test="h1"]')
+        const h2 = wrapper.get('[data-test="h2"]')
+        const errMessage = wrapper.find('[data-test="err-message"]')
+        const resSuccessful = wrapper.get('[data-test="res-successful"]')
+        expect(h1.text()).toContain('Thanks For Answering Our Email,')
+        expect(h2.text()).toContain('please wait while we verify...')
+        expect(errMessage.exists()).toBe(false)
+        expect(resSuccessful.text()).toContain(
             'Your email has been verified, redirecting you to the app...',
         )
     })
