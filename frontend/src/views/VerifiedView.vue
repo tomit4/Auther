@@ -9,7 +9,6 @@ const resSuccessful: Ref<string> = ref('')
 
 const verifyRoute = import.meta.env.VITE_VERIFY_ROUTE as string
 
-// TODO: wrap in try catch like other views
 onMounted(async () => {
     try {
         const cookie = grabStoredCookie('appname-hash')

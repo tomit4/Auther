@@ -3,7 +3,6 @@ import { ref, type Ref } from 'vue'
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { delay } from '../utils/utils.ts'
 import { validatePasswordInput } from '../utils/schema-validators'
-import vFocus from '../directives/focus.ts'
 
 const router = useRouter()
 const passwordInput: Ref<string> = ref('')

@@ -2,11 +2,18 @@ import { describe, it, expect } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { nextTick } from 'vue'
 
+import Focus from '../directives/focus.ts'
 import AppView from '../views/AppView.vue'
 
 describe('AppView', () => {
     it('AppView renders and interacts as expected', async () => {
-        const wrapper = mount(AppView)
+        const wrapper = mount(AppView, {
+            global: {
+                directives: {
+                    Focus: Focus,
+                },
+            },
+        })
         await flushPromises()
         expect(wrapper.text()).toContain(
             `AppWelcome ${process.env.VITE_TEST_EMAIL}!! Log Out  Change Password  Delete My Profile`,
