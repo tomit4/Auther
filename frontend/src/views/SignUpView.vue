@@ -3,7 +3,6 @@ import { ref, type Ref } from 'vue'
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { delay } from '../utils/utils.ts'
 import { validateInputs } from '../utils/schema-validators'
-import vFocus from '../directives/focus'
 
 const router = useRouter()
 const emailInput: Ref<string> = ref('')
@@ -65,6 +64,7 @@ onBeforeRouteLeave(() => {
                 type="email"
                 id="email"
                 className="email-input"
+                data-test="email-input"
                 size="30"
                 minlength="5"
                 placeholder="jondoe@example.com"
@@ -83,6 +83,7 @@ onBeforeRouteLeave(() => {
                 type="password"
                 id="password"
                 className="password-input"
+                data-test="password-input"
                 size="30"
                 minlength="10"
                 placeholder="Password1234!"
@@ -99,15 +100,16 @@ onBeforeRouteLeave(() => {
                 type="submit"
                 value="Submit"
                 className="submit-btn"
+                data-test="submit-btn"
             >
                 Submit
             </button>
         </span>
         <!-- TODO: add .length to all v-if checks involving errMessage and resSuccessful -->
-        <span data-testid="err-message" v-if="errMessage?.length">
+        <span data-test="err-message" v-if="errMessage?.length">
             <p>{{ errMessage }}</p>
         </span>
-        <span data-testid="res-successful" v-else-if="resSuccessful?.length">
+        <span data-test="res-successful" v-else-if="resSuccessful?.length">
             <p>{{ resSuccessful }}</p>
         </span>
         <span v-else />

@@ -1,19 +1,30 @@
 import { describe, it, expect } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/vue'
+import { mount, flushPromises, RouterLinkStub } from '@vue/test-utils'
 
+import Focus from '../directives/focus.ts'
 import SignUp from '../views/SignUpView.vue'
 
 describe('SignUp', () => {
     it('SignUp renders and displays err message on bad email input', async () => {
-        render(SignUp)
-        const SubmitBtn = screen.getByText('Submit')
-        const emailText = screen.getByLabelText(/email/i)
-        const passwordText = screen.getByLabelText(/password/i)
-        await fireEvent.update(emailText, 'notanemail')
-        await fireEvent.update(passwordText, process.env.VITE_TEST_PASSWORD)
-        await fireEvent.click(SubmitBtn)
-        const errMessage = await screen.findByTestId('err-message')
-        const { textContent } = errMessage
-        expect(textContent).toContain('Invalid email')
+        const wrapper = mount(SignUp, {
+            global: {
+                directives: {
+                    Focus: Focus,
+                },
+                stubs: {
+                    RouterLink: RouterLinkStub,
+                },
+            },
+        })
+        await wrapper.get('[data-test="email-input"]').setValue('notanemail')
+        await wrapper
+            .get('[data-test="password-input"]')
+            .setValue(process.env.VITE_TEST_PASSWORD)
+        await wrapper.get('[data-test="submit-btn"]').trigger('click')
+        await flushPromises()
+        const errMessage = wrapper.get('[data-test="err-message"]')
+        const resSuccessful = wrapper.find('[data-test="res-successful"]')
+        expect(resSuccessful.exists()).toBe(false)
+        expect(errMessage.text()).toContain('Invalid email')
     })
 })

@@ -4,8 +4,6 @@ import { mount, flushPromises, RouterLinkStub } from '@vue/test-utils'
 import Focus from '../directives/focus.ts'
 import Login from '../views/LoginView.vue'
 
-// TODO: This is a better implementation using the official @vue/test-utils library.
-// Rewrite previous tests to no longer use @testing-library/vue
 describe('Login', () => {
     it('Login renders and interacts as expected', async () => {
         const wrapper = mount(Login, {
