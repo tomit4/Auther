@@ -1,5 +1,5 @@
-const vFocus = {
+const Focus = {
     mounted: (el: HTMLElement) => el.focus(),
 }
 
-export default vFocus
+export default Focus

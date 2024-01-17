@@ -1,21 +1,25 @@
 import { beforeEach, afterEach, afterAll, vi } from 'vitest'
+import { RouterLink } from 'vue-router'
+import { RouterLinkStub } from '@vue/test-utils'
 import { server } from './src/mocks/node'
-import { delay } from './src/utils/utils'
 
 beforeEach(() => {
-    vi.mock('vue-router', () => ({
-        onBeforeRouteLeave: vi.fn(),
-        useRoute: () => {
-            return {
-                params: {
-                    hash: process.env.VITE_TEST_HASH,
-                },
-            }
-        },
-        useRouter: () => {
-            return { push: vi.fn() }
-        },
-    }))
+    vi.mock('vue-router', () => {
+        return {
+            onBeforeRouteLeave: vi.fn(),
+            useRoute: () => {
+                return {
+                    params: {
+                        hash: process.env.VITE_TEST_HASH,
+                    },
+                }
+            },
+            useRouter: () => {
+                return { push: vi.fn() }
+            },
+            RouterLink: RouterLinkStub,
+        }
+    })
     vi.mock('localStorage', () => {
         return {
             setItem: vi.fn(),

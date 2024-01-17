@@ -66,6 +66,7 @@ onBeforeRouteLeave(() => {
                 type="email"
                 id="email"
                 className="email-input"
+                data-test="email-input"
                 size="30"
                 minlength="5"
                 placeholder="jondoe@example.com"
@@ -84,6 +85,7 @@ onBeforeRouteLeave(() => {
                 type="password"
                 id="password"
                 className="password-input"
+                data-test="password-input"
                 size="30"
                 minlength="10"
                 placeholder="Password1234!"
@@ -97,6 +99,7 @@ onBeforeRouteLeave(() => {
                 @click="
                     handleSubmit(emailInput as string, passwordInput as string)
                 "
+                data-test="submit-btn"
                 type="submit"
                 value="Submit"
                 className="submit-btn"
@@ -107,11 +110,11 @@ onBeforeRouteLeave(() => {
                 >Forgot My Password</router-link
             >
         </span>
-        <span v-if="errMessage.length">
-            <p>{{ errMessage }}</p>
+        <span v-if="errMessage?.length">
+            <p data-test="err-message">{{ errMessage }}</p>
         </span>
-        <span v-else-if="resSuccessful.length">
-            <p>{{ resSuccessful }}</p>
+        <span v-else-if="resSuccessful?.length">
+            <p data-test="res-successful">{{ resSuccessful }}</p>
         </span>
         <span v-else />
     </div>
