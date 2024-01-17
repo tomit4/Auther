@@ -8,6 +8,7 @@ beforeEach(() => {
         useRoute: () => vi.fn(useRoute),
         useRouter: () => vi.fn(useRouter),
     }))
+    vi.mock('router', () => ({ push: vi.fn(useRouter().push) }))
     server.listen({ onUnhandledRequest: 'error' })
 })
 

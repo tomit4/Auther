@@ -44,7 +44,6 @@ const handleSubmit = async (
         }
     } catch (err) {
         if (err instanceof Error) errMessage.value = err.message
-        console.error(err)
     }
 }
 
