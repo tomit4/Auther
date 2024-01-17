@@ -9,51 +9,61 @@ const resSuccessful: Ref<string> = ref('')
 
 const verifyRoute = import.meta.env.VITE_VERIFY_ROUTE as string
 
+// TODO: wrap in try catch like other views
 onMounted(async () => {
-    const cookie = grabStoredCookie('appname-hash')
-    if (cookie && cookie === route.params.hash) {
-        const data = {
-            hashedEmail: cookie,
-        }
-        const res = await fetch(verifyRoute, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify(data),
-        })
-        const jsonRes = await res.json()
-        if (!res.ok || jsonRes.error) {
-            const errMsg = {
-                ok: res.ok,
-                error: jsonRes.error ? jsonRes.error : 'Unknown error occurred',
+    try {
+        const cookie = grabStoredCookie('appname-hash')
+        if (!route.params.hash) throw Error('No hash provided')
+        if (!cookie) throw Error('No cookie hash found')
+        if (cookie && cookie === route.params.hash) {
+            const data = {
+                hashedEmail: cookie,
             }
-            errMessage.value = errMsg.error
-            await delay(1000)
-            router.push('/')
-        } else {
-            resSuccessful.value = jsonRes.msg
-            localStorage.setItem('appname-session-token', jsonRes.sessionToken)
-            await delay(1000)
-            router.push('/app')
-        }
-    } else {
-        errMessage.value =
-            'Invalid hash provided, please try and sign up again.'
+            const res = await fetch(verifyRoute, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(data),
+            })
+            const jsonRes = await res.json()
+            if (!res.ok || jsonRes.error) {
+                const errMsg = {
+                    ok: res.ok,
+                    message: jsonRes.message
+                        ? jsonRes.message
+                        : 'Unknown error occurred',
+                }
+                throw new Error(errMsg.message)
+            } else {
+                resSuccessful.value = jsonRes.message
+                localStorage.setItem(
+                    'appname-session-token',
+                    jsonRes.sessionToken,
+                )
+                await delay(1000)
+                router.push('/app')
+            }
+        } else
+            throw new Error(
+                'Invalid hash provided, please try and sign up again.',
+            )
+    } catch (err) {
+        if (err instanceof Error) errMessage.value = err.message
         await delay(1000)
-        router.push('/signup')
+        router.push('/')
     }
 })
 </script>
 
 <template>
     <div>
-        <h1>Thanks For Answering Our Email,</h1>
-        <h2>please wait while we verify...</h2>
-        <span v-if="errMessage">
-            <p>{{ errMessage }}</p>
+        <h1 data-testid="h1">Thanks For Answering Our Email,</h1>
+        <h2 data-testid="h2">please wait while we verify...</h2>
+        <span v-if="errMessage?.length">
+            <p data-testid="err-message">{{ errMessage }}</p>
         </span>
-        <span v-else-if="resSuccessful.length">
-            <p>{{ resSuccessful }}</p>
+        <span v-else-if="resSuccessful?.length">
+            <p data-testid="res-successful">{{ resSuccessful }}</p>
         </span>
         <span v-else />
     </div>

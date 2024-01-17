@@ -104,10 +104,10 @@ onBeforeRouteLeave(() => {
             </button>
         </span>
         <!-- TODO: add .length to all v-if checks involving errMessage and resSuccessful -->
-        <span data-testid="err-message" v-if="errMessage.length">
+        <span data-testid="err-message" v-if="errMessage?.length">
             <p>{{ errMessage }}</p>
         </span>
-        <span data-testid="res-successful" v-else-if="resSuccessful.length">
+        <span data-testid="res-successful" v-else-if="resSuccessful?.length">
             <p>{{ resSuccessful }}</p>
         </span>
         <span v-else />

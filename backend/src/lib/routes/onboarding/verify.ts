@@ -15,7 +15,6 @@ type BodyReq = {
 type VerifyRes = {
     ok: boolean
     message?: string
-    error?: string
     sessionToken?: string
 }
 
@@ -113,7 +112,7 @@ export default (
                 if (err instanceof Error) {
                     reply.code(500).send({
                         ok: false,
-                        error: err.message,
+                        message: err.message,
                     })
                 }
             }

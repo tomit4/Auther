@@ -48,9 +48,7 @@ const handleSubmit = async (passwordInput: string): Promise<void> => {
 
 onMounted(async () => {
     try {
-        if (!route.params.hash) {
-            throw Error('No hash provided')
-        }
+        if (!route.params.hash) throw Error('No hash provided')
         const data = {
             hash: route.params.hash,
         }

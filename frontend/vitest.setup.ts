@@ -1,18 +1,45 @@
 import { beforeEach, afterEach, afterAll, vi } from 'vitest'
-import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
 import { server } from './src/mocks/node'
 
 beforeEach(() => {
     vi.mock('vue-router', () => ({
-        onBeforeRouteLeave: () => vi.fn(onBeforeRouteLeave),
-        useRoute: () => vi.fn(useRoute),
-        useRouter: () => vi.fn(useRouter),
+        onBeforeRouteLeave: () => {
+            return {
+                onBeforeRouteLeave: vi.fn(),
+            }
+        },
+        useRoute: () => {
+            return {
+                params: {
+                    hash: process.env.VITE_TEST_HASH,
+                },
+            }
+        },
+        useRouter: () => {
+            return { push: vi.fn() }
+        },
     }))
-    vi.mock('router', () => ({ push: vi.fn(useRouter().push) }))
+    vi.mock('localStorage', () => {
+        return {
+            setItem: vi.fn(),
+        }
+    })
+    vi.mock(
+        './src/utils/utils',
+        vi.fn(() => {
+            return {
+                delay: vi.fn(),
+                grabStoredCookie: vi.fn(() => {
+                    return process.env.VITE_TEST_HASH
+                }),
+            }
+        }),
+    )
     server.listen({ onUnhandledRequest: 'error' })
 })
 
 afterEach(() => {
+    vi.resetModules()
     vi.restoreAllMocks()
     server.resetHandlers()
 })
