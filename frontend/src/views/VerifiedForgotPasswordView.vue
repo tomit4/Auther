@@ -84,8 +84,10 @@ onBeforeRouteLeave(() => {
 <template>
     <div>
         <h1>App</h1>
-        <p>Please enter your New Password for {{ emailFromCache }}</p>
-        <span className="email-form">
+        <p data-test="prompt">
+            Please enter your New Password for {{ emailFromCache }}
+        </p>
+        <span className="password-form">
             <label className="password-label" for="password">
                 Enter Your Password:
             </label>
@@ -93,6 +95,7 @@ onBeforeRouteLeave(() => {
                 type="password"
                 id="password"
                 className="password-input"
+                data-test="password-input"
                 size="30"
                 minlength="10"
                 placeholder="Password1234!"
@@ -106,15 +109,16 @@ onBeforeRouteLeave(() => {
                 type="submit"
                 value="Submit"
                 className="submit-btn"
+                data-test="submit-btn"
             >
                 Submit
             </button>
         </span>
         <span v-if="errMessage">
-            <p>{{ errMessage }}</p>
+            <p data-test="err-message">{{ errMessage }}</p>
         </span>
         <span v-else-if="resSuccessful.length">
-            <p>{{ resSuccessful }}</p>
+            <p data-test="res-successful">{{ resSuccessful }}</p>
         </span>
         <span v-else />
     </div>

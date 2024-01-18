@@ -14,6 +14,8 @@ const deleteProfileAskRoute = import.meta.env.VITE_DELETE_PROFILE_ASK_ROUTE
 const forgotPassAskRoute = import.meta.env.VITE_FORGOT_PASS_ASK_ROUTE
 const changePasswordRoute = import.meta.env.VITE_CHANGE_PASSWORD_ROUTE
 const deleteProfileRoute = import.meta.env.VITE_DELETE_PROFILE_ROUTE
+const forgotPasswordCheckRoute = import.meta.env.VITE_FORGOT_PASS_CHECK_ROUTE
+const forgotPasswordChangeRoute = import.meta.env.VITE_FORGOT_PASS_CHANGE_ROUTE
 
 export const handlers = [
     // SignUpView
@@ -91,6 +93,21 @@ export const handlers = [
             ok: true,
             message:
                 'You have successfully deleted your profile, redirecting you home',
+        })
+    }),
+    // VerifiedForgotPasswordView
+    http.post(forgotPasswordCheckRoute, async () => {
+        return HttpResponse.json({
+            ok: true,
+            email: process.env.VITE_TEST_EMAIL,
+            message:
+                'Hashed Email Verified and Validated, now you can change your password',
+        })
+    }),
+    http.patch(forgotPasswordChangeRoute, async () => {
+        return HttpResponse.json({
+            ok: true,
+            message: 'You have successfully changed your password!',
         })
     }),
 ]
