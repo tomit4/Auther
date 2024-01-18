@@ -14,6 +14,7 @@ const changePasswordAskRoute = import.meta.env
 const deleteProfileAskRoute = import.meta.env
     .VITE_DELETE_PROFILE_ASK_ROUTE as string
 const forgotPassAskRoute = import.meta.env.VITE_FORGOT_PASS_ASK_ROUTE as string
+const changePasswordRoute = import.meta.env.VITE_CHANGE_PASSWORD_ROUTE
 
 export const handlers = [
     // SignUpView
@@ -76,6 +77,13 @@ export const handlers = [
         return HttpResponse.json({
             ok: true,
             message: `Your forgot password request was successfully sent to ${email}!`,
+        })
+    }),
+    // VerifiedChangePasswordView
+    http.patch(changePasswordRoute, async () => {
+        return HttpResponse.json({
+            ok: true,
+            message: 'You have successfully changed your password!',
         })
     }),
 ]
