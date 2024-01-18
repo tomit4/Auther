@@ -20,7 +20,6 @@
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
         /* Custom */
-        "suppressImplicitAnyIndexErrors": true,
         "types": ["vitest/globals"]
     },
     "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
