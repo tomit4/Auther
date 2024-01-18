@@ -56,5 +56,11 @@
             },
             "compile": false
         }
+    },
+    "nyc": {
+        "exclude": [
+            "dist/lib/utils/send-email.js",
+            "dist/lib/services/user-service.js"
+        ]
     }
 }
