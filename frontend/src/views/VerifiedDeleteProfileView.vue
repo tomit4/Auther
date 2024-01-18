@@ -66,12 +66,12 @@ onMounted(async () => {
 <template>
     <div>
         <h1>App</h1>
-        <p>
+        <p data-test="message">
             You have successfully deleted profile for {{ emailFromCache }},
             currently rerouting you...
         </p>
         <span v-if="errMessage">
-            <p>{{ errMessage }}</p>
+            <p data-test="err-message">{{ errMessage }}</p>
         </span>
     </div>
 </template>

@@ -13,6 +13,7 @@ const changePasswordAskRoute = import.meta.env.VITE_CHANGE_PASSWORD_ASK_ROUTE
 const deleteProfileAskRoute = import.meta.env.VITE_DELETE_PROFILE_ASK_ROUTE
 const forgotPassAskRoute = import.meta.env.VITE_FORGOT_PASS_ASK_ROUTE
 const changePasswordRoute = import.meta.env.VITE_CHANGE_PASSWORD_ROUTE
+const deleteProfileRoute = import.meta.env.VITE_DELETE_PROFILE_ROUTE
 
 export const handlers = [
     // SignUpView
@@ -82,6 +83,14 @@ export const handlers = [
         return HttpResponse.json({
             ok: true,
             message: 'You have successfully changed your password!',
+        })
+    }),
+    // DeleteProfileView
+    http.delete(deleteProfileRoute, async () => {
+        return HttpResponse.json({
+            ok: true,
+            message:
+                'You have successfully deleted your profile, redirecting you home',
         })
     }),
 ]
