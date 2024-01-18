@@ -4,16 +4,14 @@ type CustomBodyType = DefaultBodyType & {
     email?: string
 }
 
-const emailRoute = import.meta.env.VITE_EMAIL_ROUTE as string
-const verifyRoute = import.meta.env.VITE_VERIFY_ROUTE as string
-const loginRoute = import.meta.env.VITE_LOGIN_ROUTE as string
+const emailRoute = import.meta.env.VITE_EMAIL_ROUTE
+const verifyRoute = import.meta.env.VITE_VERIFY_ROUTE
+const loginRoute = import.meta.env.VITE_LOGIN_ROUTE
 const logoutRoute = import.meta.env.VITE_LOGOUT_ROUTE
 const grabUserIdRoute = import.meta.env.VITE_USERID_ROUTE
-const changePasswordAskRoute = import.meta.env
-    .VITE_CHANGE_PASSWORD_ASK_ROUTE as string
-const deleteProfileAskRoute = import.meta.env
-    .VITE_DELETE_PROFILE_ASK_ROUTE as string
-const forgotPassAskRoute = import.meta.env.VITE_FORGOT_PASS_ASK_ROUTE as string
+const changePasswordAskRoute = import.meta.env.VITE_CHANGE_PASSWORD_ASK_ROUTE
+const deleteProfileAskRoute = import.meta.env.VITE_DELETE_PROFILE_ASK_ROUTE
+const forgotPassAskRoute = import.meta.env.VITE_FORGOT_PASS_ASK_ROUTE
 const changePasswordRoute = import.meta.env.VITE_CHANGE_PASSWORD_ROUTE
 
 export const handlers = [
