@@ -65,6 +65,7 @@ onBeforeRouteLeave(() => {
                 type="password"
                 id="password"
                 className="password-input"
+                data-test="password-input"
                 size="30"
                 minlength="10"
                 placeholder="Password1234!"
@@ -78,6 +79,7 @@ onBeforeRouteLeave(() => {
                 type="submit"
                 value="Submit"
                 className="submit-btn"
+                data-test="submit-btn"
             >
                 Submit
             </button>
@@ -90,10 +92,10 @@ onBeforeRouteLeave(() => {
             Go Back
         </button>
         <span v-if="errMessage">
-            <p>{{ errMessage }}</p>
+            <p data-test="err-message">{{ errMessage }}</p>
         </span>
         <span v-else-if="resSuccessful.length">
-            <p>{{ resSuccessful }}</p>
+            <p data-test="res-successful">{{ resSuccessful }}</p>
         </span>
         <span v-else />
     </div>

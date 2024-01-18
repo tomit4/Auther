@@ -11,6 +11,8 @@ const logoutRoute = import.meta.env.VITE_LOGOUT_ROUTE
 const grabUserIdRoute = import.meta.env.VITE_USERID_ROUTE
 const changePasswordAskRoute = import.meta.env
     .VITE_CHANGE_PASSWORD_ASK_ROUTE as string
+const deleteProfileAskRoute = import.meta.env
+    .VITE_DELETE_PROFILE_ASK_ROUTE as string
 
 export const handlers = [
     // SignUpView
@@ -51,11 +53,20 @@ export const handlers = [
             message: 'logged out',
         })
     }),
+    // ChangePassForm
     http.post(changePasswordAskRoute, async () => {
         return HttpResponse.json({
             ok: true,
             message:
                 'Your password is authenticated, please answer your email to continue change of password',
+        })
+    }),
+    // DeleteProfileForm
+    http.post(deleteProfileAskRoute, async () => {
+        return HttpResponse.json({
+            ok: true,
+            message:
+                'You have successfully requested to delete your profile, please check your email',
         })
     }),
 ]
