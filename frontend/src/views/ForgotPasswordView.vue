@@ -61,6 +61,7 @@ onBeforeRouteLeave(() => {
                 type="email"
                 id="email"
                 className="email-input"
+                data-test="email-input"
                 size="30"
                 minlength="5"
                 placeholder="jondoe@example.com"
@@ -74,15 +75,16 @@ onBeforeRouteLeave(() => {
                 type="submit"
                 value="Submit"
                 className="submit-btn"
+                data-test="submit-btn"
             >
                 Submit
             </button>
         </span>
         <span v-if="errMessage.length">
-            <p>{{ errMessage }}</p>
+            <p data-test="err-message">{{ errMessage }}</p>
         </span>
         <span v-else-if="resSuccessful.length">
-            <p>{{ resSuccessful }}</p>
+            <p data-test="res-successful">{{ resSuccessful }}</p>
         </span>
         <span v-else />
     </div>

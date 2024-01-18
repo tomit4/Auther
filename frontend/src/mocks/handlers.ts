@@ -13,6 +13,7 @@ const changePasswordAskRoute = import.meta.env
     .VITE_CHANGE_PASSWORD_ASK_ROUTE as string
 const deleteProfileAskRoute = import.meta.env
     .VITE_DELETE_PROFILE_ASK_ROUTE as string
+const forgotPassAskRoute = import.meta.env.VITE_FORGOT_PASS_ASK_ROUTE as string
 
 export const handlers = [
     // SignUpView
@@ -67,6 +68,14 @@ export const handlers = [
             ok: true,
             message:
                 'You have successfully requested to delete your profile, please check your email',
+        })
+    }),
+    // ForgotPasswordView
+    http.post(forgotPassAskRoute, async ({ request }) => {
+        const { email } = (await request.json()) as CustomBodyType
+        return HttpResponse.json({
+            ok: true,
+            message: `Your forgot password request was successfully sent to ${email}!`,
         })
     }),
 ]
