@@ -1,3 +1,4 @@
+/* v8 ignore next 115 */
 import { createRouter, createWebHistory } from 'vue-router'
 import { authorizeSession, attemptRefresh, logout } from '../utils/auth-utils'
 

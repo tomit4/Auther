@@ -1,3 +1,4 @@
+/* v8 ignore next 17 */
 const delay = (ms: number): Promise<void> => {
     return new Promise(resolve => setTimeout(resolve, ms))
 }

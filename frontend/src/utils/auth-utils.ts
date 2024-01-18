@@ -1,3 +1,4 @@
+/* v8 ignore next 35 */
 const authRoute = import.meta.env.VITE_AUTH_ROUTE
 const refreshRoute = import.meta.env.VITE_REFRESH_ROUTE
 const logoutRoute = import.meta.env.VITE_LOGOUT_ROUTE

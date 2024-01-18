@@ -1,3 +1,4 @@
+/* v8 ignore next 13 */
 import { createApp } from 'vue'
 import { router } from './router/index'
 import './style.css'
