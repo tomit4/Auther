@@ -5,7 +5,7 @@ const router = useRouter()
 
 <template>
     <div>
-        <h1>Splash</h1>
+        <h1 data-test="h1">Splash</h1>
         <br />
         <div className="onboard">
             <button
@@ -13,6 +13,7 @@ const router = useRouter()
                 type="submit"
                 value="Submit"
                 className="btn signup-btn"
+                data-test="signup-btn"
             >
                 Sign Up
             </button>
@@ -22,6 +23,7 @@ const router = useRouter()
                 type="submit"
                 value="Submit"
                 className="btn login-btn"
+                data-test="login-btn"
             >
                 Login
             </button>
