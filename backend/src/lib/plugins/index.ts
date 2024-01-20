@@ -31,8 +31,7 @@ export default async (fastify: FastifyInstance): Promise<void> => {
     await fastify.register(import('@fastify/redis'), {
         host: process.env.REDIS_HOST as string,
         port: process.env.REDIS_PORT as unknown as number,
-        // TODO: Reinstate once working within docker
-        // password: process.env.REDIS_PASSWORD as string,
+        password: process.env.REDIS_PASSWORD as string,
     })
     await fastify.register(import('./knex'), knexFile)
     await fastify.register(import('@fastify/jwt'), {
