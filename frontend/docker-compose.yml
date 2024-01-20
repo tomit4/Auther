@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+    app:
+        env_file: .env
+        build:
+            context: .
+            dockerfile: Dockerfile
+        networks:
+            - backend_app_backend
+
+networks:
+    backend_app_backend:
+        external: true

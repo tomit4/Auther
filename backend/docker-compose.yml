@@ -37,8 +37,6 @@ services:
         image: app
         restart: on-failure
         env_file: .env
-        ports:
-            - '3000:3000'
         networks:
             - app_backend
         depends_on:
