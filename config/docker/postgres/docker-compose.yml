@@ -8,10 +8,5 @@ services:
       - POSTGRES_PASSWORD=postgros
     networks:
       - app_backend
-    volumes:
-      - db:/var/lib/postgresql/data
 networks:
   app_backend: {}
-volumes:
-  db:
-    driver: local
