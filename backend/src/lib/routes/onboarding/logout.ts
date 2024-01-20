@@ -44,7 +44,7 @@ export default (
                 if (!refreshToken)
                     throw new Error('No refresh token sent from client')
                 reply.clearCookie('appname-refresh-token', {
-                    path: '/onboarding',
+                    path: '/',
                 })
                 reply.clearCookie('appname-hash', {
                     path: '/verify-change-pass',
