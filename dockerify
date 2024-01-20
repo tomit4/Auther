@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+while getopts ":ud" opt; do
+    case $opt in
+        u)
+            # Spin up both backend and frontend
+            echo "Spinning up backend..."
+            docker-compose -f ./backend/docker-compose.yml up -d
+
+            echo "Spinning up frontend..."
+            docker-compose -f ./frontend/docker-compose.yml up -d
+            ;;
+        d)
+            # Spin down and remove containers and images
+            echo "Spinning down and removing backend..."
+            docker-compose -f ./backend/docker-compose.yml down --volumes --rmi all
+
+            echo "Spinning down and removing frontend..."
+            docker-compose -f ./frontend/docker-compose.yml down --volumes --rmi all
+            ;;
+        \?)
+            echo "Invalid option: -$OPTARG" >&2
+            exit 1
+            ;;
+    esac
+done
