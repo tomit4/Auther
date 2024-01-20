@@ -1,6 +1,37 @@
 version: '3.8'
 
 services:
+    db:
+        image: postgres:16.1-alpine
+        restart: always
+        environment:
+            - POSTGRES_USER=postgros
+            - POSTGRES_PASSWORD=postgros
+        networks:
+            - app_backend
+        depends_on:
+            - cache
+        healthcheck:
+            test:
+                ['CMD', 'pg_isready', '-q', '-d', 'postgres', '-U', 'postgros']
+            interval: 5s
+            timeout: 10s
+            retries: 5
+
+    cache:
+        image: redis:7.2-alpine
+        restart: always
+        command: redis-server --save 20 1 --loglevel warning --requirepass redis
+        networks:
+            - app_backend
+        volumes:
+            - cache:/data
+        healthcheck:
+            test: ['CMD', 'redis-cli', 'ping']
+            interval: 5s
+            timeout: 10s
+            retries: 5
+
     app-server:
         container_name: app
         image: app
@@ -9,13 +40,23 @@ services:
         ports:
             - '3000:3000'
         networks:
-            - postgres_app_backend
+            - app_backend
+        depends_on:
+            - db
+            - cache
         build:
             context: .
             dockerfile: Dockerfile
             target: app
         command: bash -c "npm run reset && npm run start"
+
 networks:
-    postgres_app_backend:
-        name: postgres_app_backend
-        external: true
+    app_backend:
+        ipam:
+            driver: default
+            config:
+                - subnet: '172.20.0.0/16'
+
+volumes:
+    cache:
+        driver: local
