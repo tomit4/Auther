@@ -12,8 +12,5 @@ RUN apt update
 RUN rm -rf node_modules
 RUN npm install 
 RUN npm run build
-# RUN npm run reset
 
 COPY . ./
-
-CMD ["npm", "run", "start"]
