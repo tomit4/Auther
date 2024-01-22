@@ -189,3 +189,25 @@ these tools.
 
 - [ ] Refactor remaining utility functions into their own classes (will require
       rewriting of some unit tests)
+
+### Generating SSL Certs For Use Within Docker
+
+Because the fastify server sends secure https only cookies, when the server is
+finally virtualized inside of a docker container, both the frontend and backend
+servers must have ssl certificates to enable https, otherwise the
+authentication strategies will fail and the user will always be redirected back
+to login (email signup still works until you actually log in).
+
+I have provided a sample CA.cnf file as well as a localhost.cnf file within the
+security directory to be utilized with an gencert bash script to generate these
+certificates. Once the appropriate localhost_cert.pem and localhost_key.pem files
+have been generated, you simply have to copy this security directory directly
+within both of the backend and frontend directories prior to running the
+dockerify script. The gencert script is not of my own making, but rather is
+based off of [this stackoverflow post](https://stackoverflow.com/questions/66558788/how-to-create-a-self-signed-or-signed-by-own-ca-ssl-certificate-for-ip-address).
+
+As noted in some of the comments of this stack overflow post, this is not truly
+a self signed certificate and only works because we are using it in a local
+environment on docker. In actual production, SSL certificates are to be signed
+by an official authority like [Let's Encrypt](https://letsencrypt.org) using
+tools like [certbot](https://certbot.eff.org/).
