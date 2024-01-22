@@ -1,7 +1,7 @@
 {
-    "name": "vite_via_nginx_frontend",
-    "private": true,
-    "version": "0.0.0",
+    "name": "auther_frontend",
+    "private": false,
+    "version": "1.0.0",
     "type": "module",
     "scripts": {
         "dev": "vite",
@@ -12,6 +12,9 @@
         "test:unit": "vitest --environment jsdom",
         "test:coverage": "vitest run --coverage"
     },
+    "keywords": [],
+    "author": "Brian Hayes",
+    "license": "BSD-3-Clause-Clear license",
     "dependencies": {
         "dotenv": "^16.3.1",
         "vue": "^3.3.8",

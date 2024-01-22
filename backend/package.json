@@ -1,5 +1,5 @@
 {
-    "name": "vite_via_nginx_backend",
+    "name": "auther_backend",
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
@@ -18,8 +18,8 @@
         "dev": "tsnd --respawn --transpile-only --exit-child src/index.ts"
     },
     "keywords": [],
-    "author": "",
-    "license": "ISC",
+    "author": "Brian Hayes",
+    "license": "BSD-3-Clause-Clear license",
     "dependencies": {
         "@fastify/cookie": "^9.2.0",
         "@fastify/cors": "^8.4.2",
