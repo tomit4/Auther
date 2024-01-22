@@ -66,12 +66,7 @@ export default (
                     await userService.grabUserByEmail(hashedEmail)
                 const userAlreadyInCache =
                     await userService.isUserInCacheExpired(hashedEmail)
-                const emailSent = await sendEmail(
-                    email as string,
-                    `verify/${hashedEmail}` as string,
-                    process.env.BREVO_SIGNUP_TEMPLATE_ID as unknown as number,
-                )
-                if (userAlreadyInDb && !userAlreadyInDb.is_deleted)
+                if (userAlreadyInDb && userAlreadyInDb.is_deleted === false)
                     throw new Error(
                         'You have already signed up, please log in.',
                     )
@@ -79,6 +74,11 @@ export default (
                     throw new Error(
                         'You have already submitted your email, please check your inbox.',
                     )
+                const emailSent = await sendEmail(
+                    email as string,
+                    `verify/${hashedEmail}` as string,
+                    process.env.BREVO_SIGNUP_TEMPLATE_ID as unknown as number,
+                )
                 if (!emailSent?.wasSuccessfull) {
                     fastify.log.error(
                         'Error occurred while sending email, are your Brevo credentials up to date? :=>',

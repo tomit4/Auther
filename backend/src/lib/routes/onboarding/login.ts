@@ -84,6 +84,12 @@ export default (
                         password,
                     ))
                 if (!userByEmail || !passwordHashesMatch) reply.code(401)
+                if (userByEmail?.is_deleted) {
+                    reply.code(401)
+                    throw new Error(
+                        'No record of that email found. Please try again.',
+                    )
+                }
                 if (!userByEmail) {
                     throw new Error(
                         'No record of that email found. Please try again.',
