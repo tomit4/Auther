@@ -1,4 +1,6 @@
-### Environment Variables
+## Environment Variables
+
+### Development
 
 **Backend**
 
@@ -206,3 +208,12 @@ VITE_TEST_EMAIL="jondoe@example.com"
 VITE_TEST_PASSWORD="Password1234!"
 VITE_TEST_HASH="reallyreallylonghash"
 ```
+
+### Staging
+
+I'll simply provide a note here to say that there are also env.dist.sample files
+which reflect the slight differences between the development and production
+environment variable settings. The most stark difference are the frontend routes
+which reference the backend. You'll notice that it does not include the host or
+port number. This is because the entire Auther application is running on the
+same docker network and thusly it is referencing all routes starting with /onboarding.
