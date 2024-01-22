@@ -273,10 +273,4 @@ demonstration of the basics around JWT authentication.
 
 I am always learning, and want to learn more about this topic. If you have some
 constructive criticism or advice to give, please feel to reach out to me here on
-Github. Alternatively, you can reach me on LinkedIn or Mastodon.
-
-**V3_TODOS:**
-
-- [ ] Refactor remaining utility functions into their own classes (will require
-      rewriting of some unit tests)
-- [ ] Integrate basic CI/CD using GH actions and drone.yml
+Github. Alternatively, you can reach me on [LinkedIn](https://linkedin.com/in/brian-hayes-33496067) or [Mastodon](https://mas.to/@brianhayesdev).
