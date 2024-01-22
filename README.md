@@ -1,68 +1,100 @@
-## Vite + Vue + NGINX
+## Auther
 
 ### Introduction
 
-This simple project is simply an experimentation in how Vue-Router's Page
-Routing Logic, Brevo's Transacitonal Email API, and also NGINX interact. The
-plan is to eventually expand this out as a scaffolding for a project
-incorporating login via logic involving jwt, trasac email, redis caching, and
-db storage via mariadb.
+Auther is a scaffolding project which demonstrates the basic concepts around
+authentication using JSON Web Tokens and 2 factor authentication using transactional emails.
+Meant to be put in front of any application that needs authentication, Auther
+aims to provide the basic features of authentication (sign up, login, forgot
+password, change password, delete profile) that users have come to
+expect to be a part of any modern day application.
 
 #### The Why
 
-As a beginner web developer, putting things into actual development is sometimes
-a mystery. With services like Github Pages, Netlify, and many others, it
-sometimes can seem like we simply push our development code up to a magic place
-in the cloud, and voilà, our site is live on the internet!
+While there are many out of the box options for working with authentication such
+as [Auth0](https://auth0.com/) and [Oauth](https://oauth.net/2/), for smaller
+applications and beginner developers, often attempts at understanding the basics
+of authentication using JSON Web Tokens(JWTs) can sometimes seem elusive.
 
-I've endeavored to dive just a tiny bit deeper and host my sites on my own VPS.
-At the time of this writing (12/06/2023), I have only deployed a basic node
-backend via docker and nginx, as well as a simple blog website written in HTML,
-CSS, and JavaScript also served via docker and nginx.
+Thusly, Auther is mean to demonstrate the essentials at the basic concepts
+around JWT authentication utilizing simple tools utilized in modern applications
+today.
 
-While I have played around with VueJS and ReactJS in development, I have not
-actually released a production application in either Framework, and it occurred
-to me that routing might have some caveats since NGINX looks directly for files
-in various directories when working with a traditional HTML/CSS/JS website.
+Make no mistake, Auther is a very opinionated solution to integrating
+authorization into any existing application, as it utilizes a myriad of my
+personally preferred tools for building my personal projects.
 
-This proved not to be too difficult, as it required a single line in the NGINX
-config to resolve the issue. This might not be worth writing extensively about,
-but nevertheless I am committing this small repository as a good starting point
-for a simple project.
+Nevertheless, should your choice of tools align closely with mine, or should you
+wish to understand the basics of authentication using JWT, I invite you to take
+a closer look at Auther, its logic, and what it has to offer.
 
 #### The What
 
-This project provides a one step Onboarding Form that simply asks for an email.
-Once the email is entered, it is sent back to a simple HapiJS server which
-utilizes the Brevo Transactional Email API to send an email (template set up
-directly on Brevo's website, requires API key and writing a simple
-template with a button that sends via a parameter called {{params.link}}.
+On its surface, Auther simply provides the user with a sign up form asking for
+their email, and a password. Once the email is answered, the user is brought
+back to the application page and logged in, where they are presented with a
+minimal dashboard. This includes buttons which can log out, change password, or
+delete profile for the user.
 
-This email, if received and properly formatted via their online interface,
-should lead the user back to the the application with a simple confirmation that
-they've answered the email and "been verified" (currently no authentication,
-authorization, or verification is actually implemented).
+Once the user has signed up, they may sign in using their email and password to
+return to the same dashboard after they have either logged out or their session
+has expired.
+
+#### Under The Hood
+
+Auther is written in [TypeScript](https://www.typescriptlang.org/) for both the backend and the frontend sides of the application. It utilizes [NodeJS](https://nodejs.org/) with the [Fastify Framework](https://fastify.dev/), along with the [Knex Query Builder](https://knexjs.org/), [Postgres](https://www.postgresql.org/), and [Redis](https://redis.io/) on the backend. On the frontend it utilizes [VueJS](https://vuejs.org/), bundled by [Vite](https://vitejs.dev/). It also makes heavy use of the [Brevo Transactional Email API](https://vitejs.dev/).
+
+Additionally, Auther provides a series of scripts and configuration files to
+containerize the project into a series of [Docker]() containers, all within a
+single [docker network]() so as to be pushed into staging, and eventually,
+production.
+
+#### Required Knowledge
+
+Auther, unfortunately, requires a decent amount of configuration to get started,
+including the setting of multiple environment variables depending on
+whether you are working in development or staging. Additionally, one must
+acquire an [API key from Brevo](https://help.brevo.com/hc/en-us/articles/209467485-Create-and-manage-your-API-keys) multiple [email templates](https://help.brevo.com/hc/en-us/articles/360019787120-Create-an-email-template) must first be in place on one's Brevo' account (all are available on their free tier).
+
+This is not a beginner's project (though not particularly advanced either).
+Should you choose to install and play around with Auther, please be advised that
+it is highly recommended that you already be familiar with the basic flow of
+CRUD applications. It is also highly advised that you already have a decent
+understanding of Git, JavaScript, SQL, Redis, and Docker. This project doesn't
+utilize advanced features of any of these, but it is still advised you have more
+than a passing familiarity with them.
 
 #### Installation
+
+**Required Packages**
+I will not provide in this README the installation instructions for the
+following, but it is expected you already have them running on your host
+machine. You will need the following already installed and/or running:
+
+- nodejs/npm
+- postgresql
+- redis
+- docker (if planning to put this to staging)
 
 **Development**
 
 1. Clone this repository:
 
 ```
-git clone "https://github.com/tomit4/vite_via_nginx"
+git clone "https://github.com/tomit4/auther"
 ```
 
 2. Install all packages via npm
 
 ```
-cd vite_via_nginx/backend && npm install && cd ../frontend && npm install
+cd auther/backend && npm install && cd ../frontend && npm install
 ```
 
 3. Edit your .env files. Provided within both the frontend and backend
    directories are some sample env files which you should copy and edit
    according to which ports you wish to use for the backend as well as
-   environment variables central to interacting with the Brevo API.
+   environment variables central to interacting with the Brevo API (see below
+   for details).
 
 4. Once installed, start each server, usually done through two different
    terminal windows:
@@ -88,107 +120,15 @@ npm run dev
 You should now be returned to the application page confirming you've fulfilled
 the transactional email request.
 
-**Production**
+### Environment Variables
 
-I have provided a sample nginx.conf in the root directory of the project under
-the config directory. This is a bare minimum nginx.conf that should not actually
-be used in production, but will work as an example for what to append to your
-hopefully more extensive nginx.conf you already have.
+- See the [env_vars.md](./env_vars.md) document for details on how to set up your environment
+  variables.
 
-Of particular importance is the line:
+### Brevo Email Templates
 
-```
-try_files $uri $uri/ /index.html;
-```
-
-This is taken directly from the Vue-Router website. To get this working on
-NGINX, you of course, must have NGINX installed on your development machine. I
-personally work on an Arch Linux based distribution, so while the pathnames may be a
-bit different, the concepts around NGINX remain similar between Linux
-distributions. Consult your specific distros documentation on NGINX to find where
-your default nginx.conf files exist.
-
-On Arch Linux, those files can be found in /etc/nginx. There you will find a
-default nginx.conf file. Navigate there and make a backup of the default, we
-will be replacing it for the purposes of this demonstration:
-
-```
-cp nginx.conf nginx.conf.bak
-```
-
-Next copy the sample nginx.conf provided with this project to your /etc/nginx/
-directory.
-
-```
-cp vite_via_nginx/config/config/nginx_example.conf /etc/nginx/nginx.conf
-```
-
-Finally restart nginx so that it will load this new configuration file:
-
-```
-systemctl restart nginx
-```
-
-Navigate to the port specified within the nginx_example.conf (now your
-nginx.conf) and you should see the home screen. Navigate to the onboarding route
-and follow the steps above in the Development section to ensure everything is
-working as expected.
-
-### Conclusion
-
-While this is essentially a trivial application meant solely to demonstrate how
-to set up Vue-Router with NGINX in production, as well as with the added nicety
-of interacting with the Brevo Transactional Email API, I felt it was worthwhile
-to document this simple project as it might prove useful to myself (and possibly
-others) in the future when starting out on a basic project that utilizes
-these tools.
-
-**SIGNUP LOGIC**
-
-- Once the user has entered their email and password,
-  A unique hash token representing their temporary credentials is established in
-  redis, this stores a hash of their email as well as their password encrypted
-  using bcrypt. This has an expiration time of a few hours (up to 24 hours or so).
-
-- The transactional email using Brevo holds a variable known as params.link, which
-  should send them back to our application url with the same hash email in the
-  url.
-
-- Upon arrival back at the application at this specified url, the hash is sent to
-  the backend where it is checked against the redis store.
-
-- If the hash exists, a jwt is established, that jwt is hashed and then sent back
-  as a cookie to the client in the headers to be used as a login (this is
-  indicative of how login will be covered as well). Additionally,
-  the user's hashed email and encrypted password is then stored in the SQL
-  database (either mariadb or postgresql) for future logins.
-
-**TODOS**
-
-- [x] Convert project over to typescript as practice
-- [x] Investigate caching (i.e.redis)
-- [x] Set up knex/postgresql following [this tutorial](https://www.basedash.com/blog/how-to-configure-knex-js-with-typescript)
-- [x] Incorporate postgresql with knex query builder for very basic db integration,
-      allow for secure storage of hashed email addresses and associated usernames,
-      dates of sign up, etc.
-- [x] Expand example to include jsonwebtoken/login demonstration
-- [x] Heavily refactor both back end and front end so there isn't so much
-      repeated logic
-- [x] Integrate Ava Unit Testing with nyc output on backend
-- [x] Utilize Vitest for E2E testing. Consider starting with [this basic
-      tutorial](https://blog.logrocket.com/guide-vitest-automated-testing-vue-components/) and also read [the official docs](https://vitest.dev/guide/)
-- [x] After looking over Vitest, consider whether this is robust enough, or to
-      use a more commonly used E2E testing library like [Playwright](https://playwright.dev/)
-- [ ] Address any remaining TODO notes within the code base
-- [ ] Dockerize each service separately and investigate docker networking so
-      that each container can "talk" to each other via externalized ports
-- [ ] Consider utilizing kubernetes to orchestrate docker containers
-- [ ] Integrate basic CI/CD using GH actions and drone.yml
-
-**V3_TODOS:**
-
-- [ ] Refactor remaining utility functions into their own classes (will require
-      rewriting of some unit tests)
+- See the [brevo_templates.md](./brevo_templates.md) document for details on how
+  to set up the transactional email forms for Auther.
 
 ### Generating SSL Certs For Use Within Docker
 
@@ -211,3 +151,132 @@ a self signed certificate and only works because we are using it in a local
 environment on docker. In actual production, SSL certificates are to be signed
 by an official authority like [Let's Encrypt](https://letsencrypt.org) using
 tools like [certbot](https://certbot.eff.org/).
+
+### Docker Orchestration
+
+Once ready to start staging for production, ensure you have generated local ssl
+certs as instructed to above. Once you have a security directory both within the
+backend and frontend directories containing these generated ssl certs, simply
+invoke the provided dockerify script to spin up the various docker containers.
+This will invoke the docker-compose.yml and Dockerfile scripts in both the backend
+and frontend directories, which orchestrates the creation of a Postgres, Redis,
+NodeJS, and NGINX servers. Inspect that they are all running using the `docker
+ps` command. If all is looking well. Utilize the `docker inspect
+backend_app_backend` command to determine which ip address is running the
+frontend. This can be found under the `frontend-app-1` IPv4Address field.
+
+Once found, navigate there in your browser (make sure to use https). You should
+see the splash page ready to either sign up or login.
+
+### Production
+
+This project is not live on the internet as it is only a POC of authentication,
+and I don't want to be responsible should anyeone stumble upon it, create
+an account, find there's no app behind it, and leave their sensitive
+information on my VPS (see A Word of Warning below). However, for documentation
+purposes, I will briefly cover here the simple strategy of setting this up on
+the internet.
+
+Ensure you have a rented nanode on Linode/Akamai or a droplet on Digital Ocean
+set up (or any other VPS provider for that matter). Also ensure you have a domain
+purchased on NameCheap or other domain registrar.
+
+Ensure that nginx is set up and running as a daemon in the background.
+
+You'll also need to have the staged docker containers running as instructed
+above. Once all docker containers are running, reverse proxy the exposed
+frontend host/port to the host NGINX server.
+
+Utilize certbot to establish an ssl certificate and follow your VPS instructions
+on how to establish the CNAME records on your domain registrar.
+
+Yeah, I know I didn't go into detail, sorry but if you don't know how to do
+this, you'll have to do your own research. There are plenty of resources online
+on how to do this, so don't get discouraged...but also don't do this for this
+particular project, Auther is not secure.
+
+### Scaffolding Onto Auther
+
+Auther is not meant to be a fully fledged application, instead it is meant
+simply as a POC. It is simply one way of implementing the basic features of
+JWT authentication common to modern applications. Should you, like me, enjoy
+working with this particular tech stack for development, then you can start
+adding features behind Auther's authentication page.
+
+Firstly, you'll probably want to extend the time of the JWT_SESSION_EXP and
+JWT_REFRESH_EXP variables so that you can easily work on your application
+without the session timing out.
+
+**Scaffolding The Front End**
+
+Auther does not make any opinions on where the authentication buttons/links
+should go, and thusly it is placed just smack dab in the middle of the page. For
+my personal projects, I plan on putting these buttons in a navigation panel.
+Until I update this project with further features, you'll have to style the
+AppView.vue file (see frontend/src/views/AppView.vue) to achieve this.
+Incidentally, the AppView.vue file is the entry point to the expected
+application, and this is where I'd advise starting work on any page you
+that requires authentication.
+
+**Scaffolding The Back End**
+
+Auther's backend is organized in an opinionated fashion, and utilizes tools like
+KnexJS and Redis for DB and caching services. Additionally, Fastify's design
+around "everything is a plugin" requires some familiarity with their ecosystem
+in order to understand how best to scaffold off of. I recommend however, that
+you follow similar paradigms to the ones already in place (establishing
+db/caching logic within an abstracted service file, to be exported and
+registered as a plugin with fastify).
+
+NOTE: A word on routing, when working within docker, because this application
+runs on a single docker network, it is imperative that the names of routes do
+not overlap. Thusly, you cannot have an 'onboarding' route established in the
+frontend's router/index.ts file, as that would conflict with the onboarding
+routes found on the backend.
+
+### A Word of Warning: Auther Is Only a POC
+
+It is imperative that should you choose to utilize Auther as your
+Authentication strategy (with all the opinionated choices made), you must know
+that Auther is made more as a POC than a legitimate authorization strategy.
+Auther was made for me to learn this particular tech stack and also to solidify
+my own personal understanding of JWT authentication strategies.
+
+I believe Auther like common SQL injection attacks (as good as KnexJS strategies),
+common XSS attacks (as good as VueJS's http purification strategies). It also
+utilizes rate-limiting and input verification on both back and front end to
+ensure bad inputs are invalidated.
+
+Additionally, the use of docker networks to ensure there is only one point of
+entry to the application (i.e. no exposed ports except for the front end are
+available to curl on the world wide web).
+
+Lastly, all passwords are hashed/salted using bcrypt, and no passwords are saved
+in plain text, as they are also hashed as well before being stored in the db
+(though the redis cache does indeed temporarily hold onto the raw email).
+
+While I personally am unable to figure out how to hack this login form, I am no security
+expert, and therefore cannot advise the use of Auther on any large applications (or even
+small applications for that matter). Again, this is simply a POC to demonstrate
+the basic ideas around authentication using JWTs.
+
+In short, should you utilize Auther as your authentication strategy (and tech stack)
+of choice, please know that you do so at your own risk. Auther is written by
+some random web developer on the internet, and not to be considered as
+trustworthy a solution as other more well known authentication SDKs.
+
+### Constructive Criticism/Advice
+
+Please feel free to write an issue or create a pull request should you desire
+to. Again, Auther is solely a POC, but one that I hope to be a good
+demonstration of the basics around JWT authentication.
+
+I am always learning, and want to learn more about this topic. If you have some
+constructive criticism or advice to give, please feel to reach out to me here on
+Github. Alternatively, you can reach me on LinkedIn or Mastodon.
+
+**V3_TODOS:**
+
+- [ ] Refactor remaining utility functions into their own classes (will require
+      rewriting of some unit tests)
+- [ ] Integrate basic CI/CD using GH actions and drone.yml
