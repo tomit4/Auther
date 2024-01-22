@@ -13,7 +13,6 @@ const grabStoredCookie = (cookieKey: string): string | undefined => {
         .split('; ')
         .reduce((prev: Cookies, current) => {
             const [key, ...value] = current.split('=')
-            // TODO: consider refactoring this using a Map
             prev[key] = value.join('=')
             return prev
         }, {})
