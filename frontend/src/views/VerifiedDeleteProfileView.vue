@@ -29,6 +29,7 @@ onMounted(async () => {
         ) {
             console.error('ERROR while logging out :=>', jsonLogOutRes)
         }
+        delay(1000)
         localStorage.removeItem('appname-session-token')
         router.push('/app')
     }
@@ -41,6 +42,7 @@ onMounted(async () => {
         const jsonRes = await res.json()
         emailFromCache.value = jsonRes.email
     } else {
+        delay(1000)
         localStorage.removeItem('appname-session-token')
         router.push('/app')
     }

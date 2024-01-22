@@ -6,6 +6,7 @@
     "scripts": {
         "watch": "tsc -w",
         "build": "tsc",
+        "secure": "mv security dist",
         "start": "node dist/index.js",
         "test": "nyc --reporter=text ava && rm -r ./.nyc_output",
         "migrate-make": "cd src && knex migrate:make -x ts",

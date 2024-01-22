@@ -1,0 +1,8 @@
+node_modules
+dist
+.env*
+.prettierrc
+.vim
+*.vim
+.nyc_output
+security

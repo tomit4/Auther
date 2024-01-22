@@ -1,16 +1,11 @@
 import 'dotenv/config'
 import Fastify, { type FastifyInstance } from 'fastify'
+import fastifyConfig from './config'
 import registerRoutes from './lib/routes'
 import registerPlugins from './lib/plugins'
 import registerServices from './lib/services'
 
-const fastify: FastifyInstance = Fastify({
-    logger: {
-        transport: {
-            target: 'pino-pretty',
-        },
-    },
-})
+const fastify: FastifyInstance = Fastify(fastifyConfig)
 
 const start = async (): Promise<string> => {
     try {
