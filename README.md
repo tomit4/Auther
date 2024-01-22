@@ -4,10 +4,9 @@
 
 Auther is a scaffolding project which demonstrates the basic concepts around
 authentication using JSON Web Tokens and 2 factor authentication using transactional emails.
-Meant to be put in front of any application that needs authentication, Auther
-aims to provide the basic features of authentication (sign up, login, forgot
-password, change password, delete profile) that users have come to
-expect to be a part of any modern day application.
+Meant to be put in front of any application, Auther aims to provide the basic features of
+authentication (sign up, login, forgot password, change password, delete profile) that users
+have come to expect to be a part of any modern day application.
 
 #### The Why
 
@@ -16,9 +15,8 @@ as [Auth0](https://auth0.com/) and [Oauth](https://oauth.net/2/), for smaller
 applications and beginner developers, often attempts at understanding the basics
 of authentication using JSON Web Tokens(JWTs) can sometimes seem elusive.
 
-Thusly, Auther is mean to demonstrate the essentials at the basic concepts
-around JWT authentication utilizing simple tools utilized in modern applications
-today.
+Thusly, Auther is mean to demonstrate the essentials of JWT authentication
+utilizing simple tools utilized in modern applications today.
 
 Make no mistake, Auther is a very opinionated solution to integrating
 authorization into any existing application, as it utilizes a myriad of my
@@ -40,13 +38,16 @@ Once the user has signed up, they may sign in using their email and password to
 return to the same dashboard after they have either logged out or their session
 has expired.
 
+Auther includes authentication features common to modern applications such as
+forgot password, change password, and delete profile.
+
 #### Under The Hood
 
-Auther is written in [TypeScript](https://www.typescriptlang.org/) for both the backend and the frontend sides of the application. It utilizes [NodeJS](https://nodejs.org/) with the [Fastify Framework](https://fastify.dev/), along with the [Knex Query Builder](https://knexjs.org/), [Postgres](https://www.postgresql.org/), and [Redis](https://redis.io/) on the backend. On the frontend it utilizes [VueJS](https://vuejs.org/), bundled by [Vite](https://vitejs.dev/). It also makes heavy use of the [Brevo Transactional Email API](https://vitejs.dev/).
+Auther is written in [TypeScript](https://www.typescriptlang.org/) for both the backend and the frontend sides of the application. It utilizes [NodeJS](https://nodejs.org/) with the [Fastify Framework](https://fastify.dev/), along with the [Knex Query Builder](https://knexjs.org/), [Postgres](https://www.postgresql.org/), and [Redis](https://redis.io/) on the backend. On the frontend it utilizes [VueJS](https://vuejs.org/), bundled by [Vite](https://vitejs.dev/) and unit/integrated using testing suites [Ava](https://github.com/avajs/ava) and [Vitest](https://vitest.dev/). It also makes heavy use of the [Brevo Transactional Email API](https://vitejs.dev/).
 
 Additionally, Auther provides a series of scripts and configuration files to
-containerize the project into a series of [Docker]() containers, all within a
-single [docker network]() so as to be pushed into staging, and eventually,
+containerize the project into a series of [Docker](https://www.docker.com/) containers, all within a
+single [docker network](https://docs.docker.com/network/) so as to be pushed into staging, and eventually,
 production.
 
 #### Required Knowledge
@@ -71,10 +72,12 @@ I will not provide in this README the installation instructions for the
 following, but it is expected you already have them running on your host
 machine. You will need the following already installed and/or running:
 
+- git
 - nodejs/npm
 - postgresql
 - redis
 - docker (if planning to put this to staging)
+- openssl (if planning to put this to staging)
 
 **Development**
 
@@ -109,12 +112,12 @@ npm run start
 npm run dev
 ```
 
-4.  Navigate To The Onboarding Site in your browser(default vite port): localhost:5173/onboarding
+4.  Navigate To The Splash Page in your browser (default vite port): localhost:5173
 
-5.  Fill out the Email form.
+5.  Navigate to the Sign Up Page and fill out the email/password form.
 
 6.  Check your Email Inbox, if you filled out your Brevo API keys, as well as
-    created the template on their website correctly, you should receive an email
+    created the template on their website correctly (see [brevo_templates.md](./brevo_templates.md)), you should receive an email
     with a button with a simple call to action. Click the link/button.
 
 You should now be returned to the application page confirming you've fulfilled
@@ -133,13 +136,13 @@ the transactional email request.
 ### Generating SSL Certs For Use Within Docker
 
 Because the fastify server sends secure https only cookies, when the server is
-finally virtualized inside of a docker container, both the frontend and backend
+finally virtualized inside of docker containers, both the frontend and backend
 servers must have ssl certificates to enable https, otherwise the
 authentication strategies will fail and the user will always be redirected back
 to login (email signup still works until you actually log in).
 
 I have provided a sample CA.cnf file as well as a localhost.cnf file within the
-security directory to be utilized with an gencert bash script to generate these
+security directory to be utilized with the provided [gencert bash script](./ssl/gencert) to generate these
 certificates. Once the appropriate localhost_cert.pem and localhost_key.pem files
 have been generated, you simply have to copy this security directory directly
 within both of the backend and frontend directories prior to running the
@@ -149,8 +152,8 @@ based off of [this stackoverflow post](https://stackoverflow.com/questions/66558
 As noted in some of the comments of this stack overflow post, this is not truly
 a self signed certificate and only works because we are using it in a local
 environment on docker. In actual production, SSL certificates are to be signed
-by an official authority like [Let's Encrypt](https://letsencrypt.org) using
-tools like [certbot](https://certbot.eff.org/).
+by an official authority like [Let's Encrypt](https://letsencrypt.org) and
+generated using automation tools like [certbot](https://certbot.eff.org/).
 
 ### Docker Orchestration
 
@@ -198,12 +201,12 @@ particular project, Auther is not secure.
 ### Scaffolding Onto Auther
 
 Auther is not meant to be a fully fledged application, instead it is meant
-simply as a POC. It is simply one way of implementing the basic features of
+soley to be a POC (Proof of Concept). It is one way of implementing the basic features of
 JWT authentication common to modern applications. Should you, like me, enjoy
 working with this particular tech stack for development, then you can start
 adding features behind Auther's authentication page.
 
-Firstly, you'll probably want to extend the time of the JWT_SESSION_EXP and
+I'll only note that you'll probably want to extend the time of the JWT_SESSION_EXP and
 JWT_REFRESH_EXP variables so that you can easily work on your application
 without the session timing out.
 
@@ -212,65 +215,65 @@ without the session timing out.
 Auther does not make any opinions on where the authentication buttons/links
 should go, and thusly it is placed just smack dab in the middle of the page. For
 my personal projects, I plan on putting these buttons in a navigation panel.
-Until I update this project with further features, you'll have to style the
+Unless I decide to update this project with further features, you'll have to style the
 AppView.vue file (see frontend/src/views/AppView.vue) to achieve this.
 Incidentally, the AppView.vue file is the entry point to the expected
-application, and this is where I'd advise starting work on any page you
+application, and this is where I'd advise starting work on any page
 that requires authentication.
 
 **Scaffolding The Back End**
 
 Auther's backend is organized in an opinionated fashion, and utilizes tools like
 KnexJS and Redis for DB and caching services. Additionally, Fastify's design
-around "everything is a plugin" requires some familiarity with their ecosystem
-in order to understand how best to scaffold off of. I recommend however, that
-you follow similar paradigms to the ones already in place (establishing
-db/caching logic within an abstracted service file, to be exported and
-registered as a plugin with fastify).
+around "everything is a plugin" requires some familiarity with [their
+ecosystem](https://fastify.dev/ecosystem/) in order to understand how best to scaffold
+off of the project as it currently stands. I recommend however, that you follow similar
+paradigms to the ones already in place (establishing db/caching logic within an abstracted
+service file, to be exported and registered as a plugin with fastify).
 
-NOTE: A word on routing, when working within docker, because this application
-runs on a single docker network, it is imperative that the names of routes do
+NOTE: A word on routing: When working within docker, because this application
+runs on a single docker network, it is necessary that the names of routes do
 not overlap. Thusly, you cannot have an 'onboarding' route established in the
 frontend's router/index.ts file, as that would conflict with the onboarding
 routes found on the backend.
 
 ### A Word of Warning: Auther Is Only a POC
 
-It is imperative that should you choose to utilize Auther as your
+I feel that it is imperative that I should warn you: should you choose to utilize Auther as your
 Authentication strategy (with all the opinionated choices made), you must know
 that Auther is made more as a POC than a legitimate authorization strategy.
 Auther was made for me to learn this particular tech stack and also to solidify
 my own personal understanding of JWT authentication strategies.
 
-I believe Auther like common SQL injection attacks (as good as KnexJS strategies),
-common XSS attacks (as good as VueJS's http purification strategies). It also
-utilizes rate-limiting and input verification on both back and front end to
-ensure bad inputs are invalidated.
+I believe Auther may be robust against common SQL injection attacks (as good as KnexJS strategies),
+as well as against common XSS attacks (as good as VueJS's http purification strategies). It also
+utilizes [rate-limiting](https://github.com/fastify/fastify-rate-limit) and [input verification](https://zod.dev/)
+on both back and front end to ensure bad inputs are invalidated.
 
-Additionally, the use of docker networks to ensure there is only one point of
-entry to the application (i.e. no exposed ports except for the front end are
-available to curl on the world wide web).
+Additionally, the use of docker networks ensure there is only one point of
+entry to the application (i.e. no exposed ports except for the front end would
+be made public to the world wide web were it to be put into production).
 
-Lastly, all passwords are hashed/salted using bcrypt, and no passwords are saved
+Lastly, all passwords are hashed/salted using bcrypt, and no emails are saved
 in plain text, as they are also hashed as well before being stored in the db
-(though the redis cache does indeed temporarily hold onto the raw email).
+(though the redis cache does indeed temporarily hold onto the plain text email).
 
 While I personally am unable to figure out how to hack this login form, I am no security
-expert, and therefore cannot advise the use of Auther on any large applications (or even
+expert, and therefore cannot advise anyone use of Auther on any large applications (or even
 small applications for that matter). Again, this is simply a POC to demonstrate
 the basic ideas around authentication using JWTs.
 
 In short, should you utilize Auther as your authentication strategy (and tech stack)
-of choice, please know that you do so at your own risk. Auther is written by
-some random web developer on the internet, and not to be considered as
+of choice, please know that you do so at your own risk. Auther is written by me,
+some random web developer on the internet, and not to be considered as a
 trustworthy a solution as other more well known authentication SDKs.
 
 ### Constructive Criticism/Advice
 
-Please feel free to write an issue or create a pull request should you desire
-to. Again, Auther is solely a POC, but one that I hope to be a good
+Please feel free to write an issue or create a pull request if you think this
+project can be improved. Again, Auther is solely a POC, but one that I hope to be a good
 demonstration of the basics around JWT authentication.
 
-I am always learning, and want to learn more about this topic. If you have some
+I am always learning, and would love to gain more knowledge on the topic of authentication. If you have some
 constructive criticism or advice to give, please feel to reach out to me here on
 Github. Alternatively, you can reach me on [LinkedIn](https://linkedin.com/in/brian-hayes-33496067) or [Mastodon](https://mas.to/@brianhayesdev).
