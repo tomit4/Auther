@@ -116,10 +116,10 @@ onBeforeRouteLeave(() => {
         >
             Go Back
         </button>
-        <span v-if="errMessage">
+        <span v-if="errMessage?.length">
             <p data-test="err-message">{{ errMessage }}</p>
         </span>
-        <span v-else-if="resSuccessful.length">
+        <span v-else-if="resSuccessful?.length">
             <p data-test="res-successful">{{ resSuccessful }}</p>
         </span>
         <span v-else />

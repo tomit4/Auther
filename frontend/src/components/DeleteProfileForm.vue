@@ -57,45 +57,47 @@ onBeforeRouteLeave(() => {
 
 <template>
     <div>
-        <p>You're about to delete the profile for {{ emailFromCache }}</p>
-        <span className="password-form">
-            <label className="password-label" for="password">
-                Enter Your Password:
-            </label>
-            <input
-                type="password"
-                id="password"
-                className="password-input"
-                data-test="password-input"
-                size="30"
-                minlength="10"
-                placeholder="Password1234!"
-                v-model="passwordInput"
-                v-focus
-                @keyup.enter="handleSubmit(passwordInput as string)"
-                required
-            />
+        <div v-if="!resSuccessful.length">
+            <p>You're about to delete the profile for {{ emailFromCache }}</p>
+            <span className="password-form">
+                <label className="password-label" for="password">
+                    Enter Your Password:
+                </label>
+                <input
+                    type="password"
+                    id="password"
+                    className="password-input"
+                    data-test="password-input"
+                    size="30"
+                    minlength="10"
+                    placeholder="Password1234!"
+                    v-model="passwordInput"
+                    v-focus
+                    @keyup.enter="handleSubmit(passwordInput as string)"
+                    required
+                />
+                <button
+                    @click="handleSubmit(passwordInput as string)"
+                    type="submit"
+                    value="Submit"
+                    className="submit-btn"
+                    data-test="submit-btn"
+                >
+                    Submit
+                </button>
+            </span>
             <button
-                @click="handleSubmit(passwordInput as string)"
-                type="submit"
-                value="Submit"
-                className="submit-btn"
-                data-test="submit-btn"
+                className="btn"
+                data-test="go-back-btn"
+                @click="$emit('goBack')"
             >
-                Submit
+                Go Back
             </button>
-        </span>
-        <button
-            className="btn"
-            data-test="go-back-btn"
-            @click="$emit('goBack')"
-        >
-            Go Back
-        </button>
-        <span v-if="errMessage">
+        </div>
+        <span v-if="errMessage?.length">
             <p data-test="err-message">{{ errMessage }}</p>
         </span>
-        <span v-else-if="resSuccessful.length">
+        <span v-else-if="resSuccessful?.length">
             <p data-test="res-successful">{{ resSuccessful }}</p>
         </span>
         <span v-else />
