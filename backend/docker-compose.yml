@@ -5,8 +5,8 @@ services:
         image: postgres:16.1-alpine
         restart: always
         environment:
-            - POSTGRES_USER=postgros
-            - POSTGRES_PASSWORD=postgros
+            - POSTGRES_USER=${PG_USER}
+            - POSTGRES_PASSWORD=${PG_PASS}
         networks:
             - app_backend
         depends_on:
@@ -53,7 +53,7 @@ networks:
         ipam:
             driver: default
             config:
-                - subnet: '172.20.0.0/16'
+                - subnet: '${DOCKER_SUBNET}'
 
 volumes:
     cache:

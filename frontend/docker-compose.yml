@@ -8,6 +8,8 @@ services:
             dockerfile: Dockerfile
         networks:
             - backend_app_backend
+        expose:
+            - '${DOCKER_PORT}'
 
 networks:
     backend_app_backend:
