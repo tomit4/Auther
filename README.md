@@ -133,6 +133,35 @@ the transactional email request.
 - See the [brevo_templates.md](./brevo_templates.md) document for details on how
   to set up the transactional email forms for Auther.
 
+### Frontend NGINX configuration
+
+- After all Environment Variables have been set, you can use the provided
+  dockerify script to bring up the backend:
+
+```bash
+./dockerify -b
+```
+
+This will spin up only the backend application, allowing you to inspect the ip
+address of the backend application running on the docker network:
+
+```bash
+docker inspect backend_app_backend
+```
+
+Under the "Containers" section of the output, you should find a subsection where
+the "Name" field is "frontend-app-1". Under the "IPv4Address" field, you will
+find the ip address, paste this into the nginx.sample.conf, replacing the
+$app_ip. Additionally, you'll have to provide the backend port number, which is
+equivalent to the $PORT environment variable set in the backend .env file.
+Thusly $app_ip becomes akin to `127.00.0.1:3000`. Save this and copy it as
+nginx.conf before spinning up the frontend using the dockerify script with
+either the -f or -u flag:
+
+```bash
+./dockerify -u
+```
+
 ### Generating SSL Certs For Use Within Docker
 
 Because the fastify server sends secure https only cookies, when the server is

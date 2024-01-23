@@ -165,6 +165,13 @@ TEST_EMAIL="jondoe@example.com"
 TEST_PASSWORD='Password1234!'
 ```
 
+- The DOCKER_SUBNET env variable sets the main ip address on which the backend
+  app will run within the docker network
+
+```bash
+DOCKER_SUBNET="127.00.0.0/11"
+```
+
 **Frontend**
 
 - There are a multitude of variouis VITE\_..\_ROUTE env variables used to
@@ -207,6 +214,15 @@ VITE_INVALID_TOKEN_CODE="FASTIFY_JWT_EXPIRED"
 VITE_TEST_EMAIL="jondoe@example.com"
 VITE_TEST_PASSWORD="Password1234!"
 VITE_TEST_HASH="reallyreallylonghash"
+```
+
+- The DOCKER_PORT env variable sets the port on which the frontend will be
+  served from. Thusly in your browser, when all docker containers are up and
+  running, you can go to the ip address of the frontend-app (preceded by https),
+  and then this port number, and you should be presented with the application.
+
+```bash
+DOCKER_PORT=6969
 ```
 
 ### Staging
