@@ -121,7 +121,6 @@ export default (
                     .code(200)
                     .setCookie('appname-hash', hashedEmail, {
                         path: '/verify-delete-profile',
-                        maxAge: 60 * 60,
                     })
                     .send({
                         ok: true,

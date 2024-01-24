@@ -119,7 +119,6 @@ export default (
                     .code(200)
                     .setCookie('appname-hash', hashedEmail, {
                         path: '/verify-change-pass',
-                        maxAge: 60 * 60,
                     })
                     .send({
                         ok: true,
