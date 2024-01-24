@@ -45,7 +45,6 @@ class UserService {
         this.bcrypt = fastify.bcrypt as FastifyBcryptPluginType
     }
 
-    // TODO: Organize based off of which plugin used
     async hashPassword(password: string): Promise<string> {
         const { bcrypt } = this
         return await bcrypt.hash(password)
@@ -155,18 +154,32 @@ class UserService {
         email: string,
     ): Promise<void> {
         const { redis } = this
-        await redis.set(`${hashedEmail}-email`, email, 'EX', 180)
+        await redis.set(
+            `${hashedEmail}-email`,
+            email,
+            'EX',
+            Number(process.env.REDIS_REFRESH_EXP),
+        )
     }
 
-    // TODO: reset expiration to a .env variable
     async setUserEmailAndPasswordInCache(
         hashedEmail: string,
         email: string,
         hashedPassword: string,
     ): Promise<void> {
         const { redis } = this
-        await redis.set(`${hashedEmail}-email`, email, 'EX', 60)
-        await redis.set(`${hashedEmail}-password`, hashedPassword, 'EX', 60)
+        await redis.set(
+            `${hashedEmail}-email`,
+            email,
+            'EX',
+            Number(process.env.REDIS_SESSION_EXP),
+        )
+        await redis.set(
+            `${hashedEmail}-password`,
+            hashedPassword,
+            'EX',
+            Number(process.env.REDIS_SESSION_EXP),
+        )
     }
 
     async setUserEmailInCacheAndDeletePassword(
@@ -174,11 +187,15 @@ class UserService {
         emailFromRedis: string,
     ): Promise<void> {
         const { redis } = this
-        await redis.set(`${hashedEmail}-email`, emailFromRedis, 'EX', 180)
+        await redis.set(
+            `${hashedEmail}-email`,
+            emailFromRedis,
+            'EX',
+            Number(process.env.REDIS_REFRESH_EXP),
+        )
         await redis.del(`${hashedEmail}-password`)
     }
 
-    // TODO: reset expiration to a .env variable
     async setRefreshTokenInCache(
         hashedEmail: string,
         refreshToken: string,
@@ -188,7 +205,7 @@ class UserService {
             `${hashedEmail}-refresh-token`,
             refreshToken as string,
             'EX',
-            180,
+            Number(process.env.REDIS_REFRESH_EXP),
         )
     }
 
