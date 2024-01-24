@@ -61,6 +61,22 @@ REDIS_PORT=6379
 REDIS_PASSWORD="redis"
 ```
 
+- The REDIS_SESSION_EXP env is used to set the expiration of session information
+  in cache, it is a number which should reflect the value in the JWT_SESSION_EXP
+  expressed in seconds:
+
+```bash
+REDIS_SESSION_EXP=60
+```
+
+- The REDIS_REFRESH_EXP, similarly, reflects the expiration time for longer
+  lasting cached information, which should reflect the value in the
+  JWT_REFRESH_EXP time in seconds:
+
+```bash
+REDIS_REFRESH_EXP=180
+```
+
 - The HASH_SALT env can be any hashed string you like, generated however you'd
   like. Auther does not store raw email strings, instead opting to hash the string
   using NodeJS's native crypto library (see backend/src/lib/utils/hasher.ts).
