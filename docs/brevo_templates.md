@@ -17,11 +17,11 @@ Once logged into Brevo, on the left hand dashboard, you'll notice a field called
 table which listed out your templates. Navigate to and click on The New Template Button in the top right
 hand corner.
 
-<img src="https://github.com/tomit4/auther/blob/main/docs/assets/brevo_docs_01.png">
-
 This will present you with a short template form to fill out. Most
 can be left blank, but Template Name (Signup), Subject Line (My Test Email), as
 well as the From Email (your individual/company email), and From Name(generic name) fields should be filled out.
+
+<img src="https://github.com/tomit4/auther/blob/main/docs/assets/brevo_docs_01.png">
 
 Once done, hit the "Next Step" button in the upper right hand corner.
 
@@ -29,23 +29,37 @@ From here, you'll then be presented with a series of template designs. For
 simplicity's sake, choose the "Start from scratch" option. Once done, hit the
 "Save & Activate" button in the upper right hand corner to proceed.
 
+<img src="https://github.com/tomit4/auther/blob/main/docs/assets/brevo_docs_02.png">
+
 On the next page, on the left hand side of the screen, you'll then be presented
 with a series of elements you can choose to drag and drop into place on a blank template page.
 Choose the "Text" option, drag it to the right side of the browser window and write a simple message like "Thanks for Signing Up. Please Click The Link Below to Navigate Back to App!"
+
+<img src="https://github.com/tomit4/auther/blob/main/docs/assets/brevo_docs_03.png">
 
 Once completed, click and drag the "Button" element on the left hand of the
 screen to the right template and hover it just below the text you wrote, you
 should see a small highlighted blue bar where you are indicated to "drop"(stop
 dragging) the element onto the page. A blue "Call to action" button will appear
-below your text. Click on the button now to receive a series of small icons, one
+below your text.
+
+<img src="https://github.com/tomit4/auther/blob/main/docs/assets/brevo_docs_04.png">
+
+Click on the button now to receive a series of small icons, one
 of which, on the top, looks like a series of interlocking links in a chain,
-click on this option. You will then be presented with a form titled "Insert/edit" link.
+click on this option.
+
+<img src="https://github.com/tomit4/auther/blob/main/docs/assets/brevo_docs_05.png">
+
+You will then be presented with a form titled "Insert/edit" link.
 Fill out this form. Most importantly, the Link target field should contain
 specifically:
 
 ```
 {{params.link}}
 ```
+
+<img src="https://github.com/tomit4/auther/blob/main/docs/assets/brevo_docs_06.png">
 
 This is so that the confirmation link we send in this email is recognized by
 Auther's frontend page router to send the user to the appropriate page upon
@@ -60,6 +74,8 @@ template you create is the signup template (#1), the second template you create
 is the change password template (#2), the third template you create is the
 delete your profile template (#3), and lastly the fourth template you create is
 the forgot your password template (#4).
+
+<img src="https://github.com/tomit4/auther/blob/main/docs/assets/brevo_docs_07.png">
 
 This ensures they correspond with what the frontend of Auther expects when
 redirecting back to the application occurs.
