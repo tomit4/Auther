@@ -17,6 +17,8 @@ Once logged into Brevo, on the left hand dashboard, you'll notice a field called
 table which listed out your templates. Navigate to and click on The New Template Button in the top right
 hand corner.
 
+<img src="https://github.com/tomit4/auther/blob/main/docs/assets/brevo_docs_01.png">
+
 This will present you with a short template form to fill out. Most
 can be left blank, but Template Name (Signup), Subject Line (My Test Email), as
 well as the From Email (your individual/company email), and From Name(generic name) fields should be filled out.
