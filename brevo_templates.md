@@ -1,3 +1,0 @@
-### Brevo Email Templates
-
-Testing

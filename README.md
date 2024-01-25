@@ -125,12 +125,12 @@ the transactional email request.
 
 ### Environment Variables
 
-- See the [env_vars.md](./env_vars.md) document for details on how to set up your environment
+- See the [env_vars.md](./docs/env_vars.md) document for details on how to set up your environment
   variables.
 
 ### Brevo Email Templates
 
-- See the [brevo_templates.md](./brevo_templates.md) document for details on how
+- See the [brevo_templates.md](./docs/brevo_templates.md) document for details on how
   to set up the transactional email forms for Auther.
 
 ### Frontend NGINX configuration
@@ -202,30 +202,21 @@ see the splash page ready to either sign up or login.
 
 ### Production
 
-This project is not live on the internet as it is only a POC of authentication,
-and I don't want to be responsible should anyeone stumble upon it, create
-an account, find there's no app behind it, and leave their sensitive
-information on my VPS (see A Word of Warning below). However, for documentation
-purposes, I will briefly cover here the simple strategy of setting this up on
-the internet.
+This project is live on the internet, but it is only a POC of authentication.
+You can find the live site at [https://auther.online](https://auther.online).
+Please note that due to the nature of this application solely being meant to be
+a demonstration, it is advised you use a throw away email and a unique password
+that you don't use anywhere else for security purposes.
+I have done my best to ensure that no sensitive information is kept on my server
+(both email and passwords are one way hashed and only the email is kept in clear
+text on the caching layer for a few minutes before your session times out).
 
-Ensure you have a rented nanode on Linode/Akamai or a droplet on Digital Ocean
-set up (or any other VPS provider for that matter). Also ensure you have a domain
-purchased on NameCheap or other domain registrar.
+Additionally, as I continue to test and further out this project, your
+credentials will occassionally be removed from the database/cache as I continue
+to work on this. This actually is to your benefit should you play around with
+this, as this will additionally prevent possible leaking of any inputed data.
 
-Ensure that nginx is set up and running as a daemon in the background.
-
-You'll also need to have the staged docker containers running as instructed
-above. Once all docker containers are running, reverse proxy the exposed
-frontend host/port to the host NGINX server.
-
-Utilize certbot to establish an ssl certificate and follow your VPS instructions
-on how to establish the CNAME records on your domain registrar.
-
-Yeah, I know I didn't go into detail, sorry but if you don't know how to do
-this, you'll have to do your own research. There are plenty of resources online
-on how to do this, so don't get discouraged...but also don't do this for this
-particular project, Auther is not secure.
+**YOU HAVE BEEN WARNED!! SIGNUP/LOGIN AT YOUR OWN RISK**
 
 ### Scaffolding Onto Auther
 
