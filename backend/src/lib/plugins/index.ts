@@ -42,7 +42,7 @@ export default async (fastify: FastifyInstance): Promise<void> => {
         global: false,
         errorResponseBuilder: (request, context) => ({
             statusCode: 429,
-            message: `You have failed too login/signup attempts, please try again in ${context.after}`,
+            message: `You have failed too many login/signup attempts, please try again in ${context.after}`,
         }),
     })
     await fastify.register(import('@fastify/swagger'), {
