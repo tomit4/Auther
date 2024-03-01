@@ -2,6 +2,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { authorizeSession, attemptRefresh, logout } from '../utils/auth-utils'
 
+// TODO: replace all imports with dynamic imports
+// https://router.vuejs.org/guide/advanced/lazy-loading.html
+// const AppView = () => import('../views/AppView.vue')
 import AppView from '../views/AppView.vue'
 import LoginView from '../views/LoginView.vue'
 import ForgotPasswordView from '../views/ForgotPasswordView.vue'
