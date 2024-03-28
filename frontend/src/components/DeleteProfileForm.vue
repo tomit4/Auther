@@ -12,9 +12,9 @@ const resSuccessful: Ref<string> = ref('')
 const deleteProfileAskRoute = import.meta.env
     .VITE_DELETE_PROFILE_ASK_ROUTE as string
 
-defineProps({
-    emailFromCache: String,
-})
+defineProps(<{
+    emailFromCache: string,
+}>)
 
 const handleSubmit = async (passwordInput: string): Promise<void> => {
     try {

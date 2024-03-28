@@ -12,9 +12,9 @@ const resSuccessful: Ref<string> = ref('')
 const changePasswordAskRoute = import.meta.env
     .VITE_CHANGE_PASSWORD_ASK_ROUTE as string
 
-defineProps({
-    emailFromCache: String,
-})
+defineProps(<{
+    emailFromCache: string,
+}>)
 
 const handleSubmit = async (passwordInput: string): Promise<void> => {
     try {
